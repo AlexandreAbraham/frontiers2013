@@ -1,0 +1,260 @@
+%% Driver file to produce frontiersinScience.bst from merlin.mbs
+%% Generated with makebst, version 4.1 (2003/09/08)
+%% Produced on 2013/05/01 at 14:33
+%% 
+\input docstrip
+
+\preamble
+----------------------------------------
+*** To be used in journals submited to Frontiers ***
+
+\endpreamble
+
+\postamble
+End of customized bst file
+\endpostamble
+
+\keepsilent
+
+\askforoverwritefalse
+\def\MBopts{\from{merlin.mbs}{%
+%EXTERNAL FILES:
+%Name of language file: \cfile=.
+%Name of included files: \jfile=physjour,.mbs.
+  head,\MBopta}
+\from{physjour.mbs}{\MBopta}
+\from{merlin.mbs}{tail,\MBopta}}
+\def\MBopta{%
+%<<INTERNAL LANGUAGE SUPPORT (if no external language file)
+    %: (def) English words used explicitly
+% babel,%: Babel (words replaced by commands defined in babelbst.tex)
+%------\ans=*(==)-------
+%>>INTERNAL LANGUAGE SUPPORT (if no external language file)
+%<<STYLE OF CITATIONS:
+%   %: (def) Numerical as in standard LaTeX
+  ay,%: Author-year with some non-standard interface
+% alph,%: Alpha style, Jon90 or JWB90 for single or multiple authors
+% alph,alf-1,%: Alpha style, Jon90 even for multiple authors
+% alph,alf-f,%: Alpha style, Jones90 (full name of first author)
+% cite,%: Cite key (special for listing contents of bib file)
+%------\ans=a(==ay)-------
+%>>STYLE OF CITATIONS:
+%<<HTML OUTPUT (if non author-year citations)
+%   %: (def) Normal LaTeX output
+% html,%: Hypertext output, in HTML code, in paragraphs
+% html,htlist,%: Hypertext list with sequence numbers
+% html,htdes,%: Hypertext with keys for viewing databases
+%------\ans=*(==)-------
+%>>HTML OUTPUT (if non author-year citations)
+%<<AUTHOR--YEAR SUPPORT SYSTEM (if author-year citations)
+  nat,%: Natbib for use with natbib v5.3 or later
+%   %: (def) Older Natbib without full authors citations
+% alk,%: Apalike for use with apalike.sty
+% har,%: Harvard system with harvard.sty
+% ast,%: Astronomy system with astron.sty
+% cay,%: Chicago system with chicago.sty
+% nmd,%: Named system with named.sty
+% cn,%: Author-date system with authordate1-4.sty
+%------\ans=*(==nat)-------
+%<<HARVARD EXTENSIONS INCLUDED (if Harvard support selected)
+% harnm,%: With Harvard extensions for LaTeX2e version of harvard.sty
+%   %: (def) Older Harvard style, for LaTeX 2.09
+%------\ans=*(==harnm)-------
+%>>HARVARD EXTENSIONS INCLUDED (if Harvard support selected)
+%>>AUTHOR--YEAR SUPPORT SYSTEM (if author-year citations)
+%<<LANGUAGE FIELD
+%   %: (def) No language field 
+  lang,%: Add language field to switch hyphenation patterns temporarily
+%------\ans=l(==lang)-------
+%>>LANGUAGE FIELD
+%<<ANNOTATIONS:
+%   %: (def) No annotations will be recognized
+  annote,%: Annotations in annote field or in .tex file of citekey name
+%------\ans=a(==annote)-------
+%>>ANNOTATIONS:
+%<<PRESENTATIONS:
+    %: (def) Do not add presentation type for conference talks
+% pres,%: Add presentation, speaker not highlighted 
+% pres,pres-bf,%: Presentation, speaker bold face 
+% pres,pres-it,%: Presentaion, speaker italic 
+% pres,pres-sc,%: Presentaion, speaker in small caps 
+%------\ans=*(==)-------
+%>>PRESENTATIONS:
+%<<ORDERING OF REFERENCES (if non-author/year and non-alph)
+%   %: (def) Alphabetical by all authors
+% seq-no,%: Citation order (unsorted, like unsrt.bst)
+% seq-yr,%: Year ordered and then by authors
+% seq-yrr,%: Reverse year ordered and then by authors
+%------\ans=*(==)-------
+%>>ORDERING OF REFERENCES (if non-author/year and non-alph)
+%<<ORDERING OF REFERENCES (if author-year citations)
+%   %: (def) Alphabetical by all authors
+% seq-lab,%: By label (Jones before Jones and James before Jones et al)
+% seq-labc,%: By label and cite order (like above but all Jones et al ordered as cited)
+% seq-key,%: By label and cite key instead of label and title, as above
+% seq-yr,%: Year ordered and then by authors (for publication lists)
+% seq-yrr,%: Reverse year ordered and then by authors (most recent first)
+  seq-no,%: Citation order (unsorted, only meaningful for numericals)
+%------\ans=c(==seq-no)-------
+%>>ORDERING OF REFERENCES (if author-year citations)
+%<<ORDER ON VON PART (if not citation order)
+%   %: (def) Sort on von part (de la Maire before Defoe)
+% vonx,%: Sort without von part (de la Maire after Mahone)
+%------\ans=*(==)-------
+%>>ORDER ON VON PART (if not citation order)
+%<<IGNORE FIRST NAMES (if author-year citations)
+    %: (def) Respect first names or initials, treat as different authors
+% xintls,%: Sort on surname only and treat all Smiths as one
+%------\ans=*(==)-------
+%>>IGNORE FIRST NAMES (if author-year citations)
+%<<AUTHOR NAMES:
+% ed-au,%: Full, surname last (John Frederick Smith)
+% nm-revf,%: Full, surname first (Smith, John Frederick)
+% nm-init,ed-au,%: Initials + surname (J. F. Smith)
+  nm-rev,%: Surname + initials (Smith, J. F.)
+% nm-rv,%: Surname + dotless initials (Smith J F)
+% nm-rvvc,%: Surname + comma + spaceless initials (Smith, J.F.)
+% nm-rvx,%: Surname + pure initials (Smith JF)
+% nm-rvcx,%: Surname + comma + pure initials (Smith, JF)
+% nm-rvv,%: Surname + spaceless initials (Smith J.F.)
+% nm-rev1,%: Only first name reversed, initials (AGU style: Smith, J. F., H. K. Jones)
+% nm-revv1,%: First name reversed, with full names (Smith, John Fred, Harry Kab Jones)
+%------\ans=r(==nm-rev)-------
+%>>AUTHOR NAMES:
+%<<EDITOR NAMES IN COLLECTIONS (if author names reversed)
+%   %: (def) Editor names NOT reversed as edited by J. J. Smith
+  ed-rev,%: Editor names reversed just like authors'
+%------\ans=r(==ed-rev)-------
+%<<POSITION OF JUNIOR (if author names reversed)
+  jnrlst,%: Junior comes last as Smith, John, Jr.
+%   %: (def) Junior between as Smith, Jr., John
+%------\ans=*(==jnrlst)-------
+%>>POSITION OF JUNIOR (if author names reversed)
+%>>EDITOR NAMES IN COLLECTIONS (if author names reversed)
+%<<JUNIOR PART IN THE CITATION (if author-year citations)
+    %: (def) No `junior' part in the citations but in the ref listing
+% jnrlab,%: `Junior' in citations as well as in ref listing
+%------\ans=*(==)-------
+%>>JUNIOR PART IN THE CITATION (if author-year citations)
+%<<PUNCTUATION BETWEEN AUTHOR NAMES:
+    %: (def) Author names separated by commas 
+% aunm-semi,%: Names separated by semi-colon 
+% aunm-sl,%: Names separated by slash /
+%------\ans=*(==)-------
+%>>PUNCTUATION BETWEEN AUTHOR NAMES:
+%<<ADJACENT REFERENCES WITH REPEATED NAMES:
+    %: (def) Author/editor names always present 
+% nmdash,%: Repeated author/editor names replaced by dash 
+% nmdash,nmd-2,%: Repeated author/editor names replaced by 2 dashes 
+% nmdash,nmd-3,%: Repeated author/editor names replaced by 3 dashes 
+%------\ans=*(==)-------
+%>>ADJACENT REFERENCES WITH REPEATED NAMES:
+%<<NUMBER OF AUTHORS IN BIBLIOGRAPHY:
+%   %: (def) All authors included in listing
+  nmlm,%: Limited authors (et al replaces missing names)
+%------\ans=l(==nmlm)-------
+%>>NUMBER OF AUTHORS IN BIBLIOGRAPHY:
+    x6,%: Maximum of 6 authors
+    m6,%: Minimum of 6 authors
+%<<AUTHORS IN CITATIONS:
+    %: (def) One author et al for three or more authors
+% mcite,%: Some other truncation scheme 
+%------\ans=*(==)-------
+%>>AUTHORS IN CITATIONS:
+%<<MAX AUTHORS BEFORE ET AL: (if regular cite not selected)
+% mct-1,%: One et al 
+% mct-2,%: One, Two et al 
+% mct-3,%: One, Two, Three et al 
+% mct-4,%: One, Two, Three, Four et al 
+% mct-5,%: One, Two, Three, Four, Five et al 
+% mct-6,%: One, Two, Three, Four, Five, Six et al 
+%------\ans=*(==mct-1)-------
+%>>MAX AUTHORS BEFORE ET AL: (if regular cite not selected)
+%<<MAX AUTHORS WITHOUT ET AL: (if regular cite not selected)
+% mct-x2,%: Two authors without truncating 
+% mct-x3,%: Three authors without truncating
+% mct-x4,%: Four authors without truncating
+% mct-x5,%: Five authors without truncating
+% mct-x6,%: Six authors without truncating
+%------\ans=*(==mct-x2)-------
+%>>MAX AUTHORS WITHOUT ET AL: (if regular cite not selected)
+%<<TYPEFACE FOR AUTHORS IN LIST OF REFERENCES:
+    %: (def) Normal font for author names 
+% nmft,nmft-sc,%: Small caps authors (\sc)
+% nmft,nmft-it,%: Italic authors (\it or \em)
+% nmft,nmft-bf,%: Bold authors (\bf)
+% nmft,nmft-def,%: User defined author font (\bibnamefont)
+%------\ans=*(==)-------
+%>>TYPEFACE FOR AUTHORS IN LIST OF REFERENCES:
+%<<FONT FOR FIRST NAMES (if non-default font for authors)
+%   %: (def) First names same font as surnames 
+% fnm-rm,%: First names in normal font 
+% fnm-def,%: First names in user defined font (\bibfnamefont)
+%------\ans=*(==)-------
+%<<EDITOR NAMES IN INCOLLECTION ETC:
+%   %: (def) Editors incollection normal font 
+% nmfted,%: Editors incollection like authors font
+%------\ans=*(==)-------
+%>>EDITOR NAMES IN INCOLLECTION ETC:
+%<<FONT FOR `AND' IN LIST:
+%   %: (def) `And' in author font (JONES AND JAMES)
+% nmand-rm,%: `And' in normal font (JONES and JAMES)
+%------\ans=*(==)-------
+%>>FONT FOR `AND' IN LIST:
+%>>FONT FOR FIRST NAMES (if non-default font for authors)
+%<<FONT OF CITATION LABELS IN TEXT (if author-year citations)
+    %: (def) Cited authors plain as result of \cite command
+% lab,lab-it,%: Cited authors italic 
+% lab,lab-sc,%: Cited authors small caps 
+% lab,lab-bf,%: Cited authors bold 
+% lab,lab-def,%: User defined citation font (\citenamefont)
+%------\ans=*(==)-------
+%<<FONT FOR `AND' IN CITATIONS (if non-default font for citation lables)
+%   %: (def) Cited `and' in author font 
+% and-rm,%: Cited `and' in normal font 
+%------\ans=*(==)-------
+%>>FONT FOR `AND' IN CITATIONS (if non-default font for citation lables)
+%<<FONT OF EXTRA LABEL (The extra letter on the year)
+    %: (def) Extra label plain 
+% xlab-it,%: Extra label italic 
+%------\ans=*(==)-------
+%>>FONT OF EXTRA LABEL (The extra letter on the year)
+%>>FONT OF CITATION LABELS IN TEXT (if author-year citations)
+%<<LABEL WHEN AUTHORS MISSING (if author-year citations)
+  keyxyr,%: Year blank when KEY replaces missing author (for natbib 7.0)
+%   %: (def) Year included when KEY replaces missing author 
+%------\ans=*(==keyxyr)-------
+%>>LABEL WHEN AUTHORS MISSING (if author-year citations)
+%<<MISSING DATE (if author-year citations)
+    %: (def) Missing date set to ???? in label and text
+% blkyear,%: Missing date left blank 
+%------\ans=*(==)-------
+%>>MISSING DATE (if author-year citations)
+%<<DATE POSITION:
+    %: (def) Date at end 
+% dt-beg,%: Date after authors 
+% dt-jnl,%: Date part of journal spec. (as 1994;45:34-40) else at end
+% dt-end,%: Date at very end after any notes
+%------\ans=*(==)-------
+%>>DATE POSITION:
+%<<DATE FORMAT (if non author-year citations)
+%   %: (def) Plain month and year without any brackets
+% yr-par,%: Date in parentheses as (May 1993)
+% yr-brk,%: Date in brackets as [May 1993]
+% yr-col,%: Date preceded by colon as `: May 1993'
+% yr-per,%: Date preceded by period as `. May 1993'
+% yr-com,%: Date preceded by comma as `, May 1993'
+% yr-blk,%: Date preceded by space only, as ` May 1993'
+%------\ans=*(==)-------
+%<<SUPPRESS MONTH:
+%   %: (def) Date is month and year 
+% xmth,%: Date is year only 
+%------\ans=*(==)-------
+%>>SUPPRESS MONTH:
+%<<REVERSED DATE (if including month)
+%   %: (def) Date as month year 
+% dtrev,%: Date as year month 
+%------\ans=*(==)-------
+%>>REVERSED DATE (if including month)
+%>>DATE FORMAT (if non author-year citations)
+%<<DATE FORMAT (if author-year citations)

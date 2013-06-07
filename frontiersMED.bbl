@@ -1,0 +1,37 @@
+\begin{thebibliography}{4}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \expandafter\ifx\csname doi\endcsname\relax
+  \def\doi#1{doi:\discretionary{}{}{}#1}\fi \else
+  \expandafter\ifx\csname doi\endcsname\relax
+  \def\doi{doi:\discretionary{}{}{}\begingroup \urlstyle{rm}\Url}\fi \fi
+\expandafter\ifx\csname selectlanguage\endcsname\relax
+  \def\selectlanguage#1{}\fi
+
+\bibitem[{Peelen et~al.(2010)Peelen, Atkinson, and Vuilleumier}]{Peelen2010}
+Peelen MV, Atkinson AP, Vuilleumier P.
+\newblock Supramodal representations of perceived emotions in the human brain.
+\newblock {\em The Journal of Neuroscience\/} {\bf 30} (2010) 10127--10134.
+\newblock \doi{10.1523/JNEUROSCI.2161-10.2010}.
+
+\bibitem[{Kanske and Hasting(2010)}]{Kanske2010}
+Kanske P, Hasting AS.
+\newblock Decoding modality-independent emotion perception in medial prefrontal
+  and superior temporal cortex.
+\newblock {\em The Journal of Neuroscience\/} {\bf 30} (2010) 16417--16418.
+\newblock \doi{10.1523/JNEUROSCI.5078-10.2010}.
+
+\bibitem[{Louis and ten Bosch(2003)}]{Louis2003}
+Louis, ten Bosch.
+\newblock Emotions, speech and the asr framework.
+\newblock {\em Speech Communication\/} {\bf 40} (2003) 213--225.
+\newblock \doi{10.1016/S0167-6393(02)00083-3}.
+
+\bibitem[{Klasen et~al.(2011)Klasen, Kenworthy, Mathiak, Kircher, and
+  Mathiak}]{Klasen2011}
+Klasen M, Kenworthy CA, Mathiak KA, Kircher TTJ, Mathiak K.
+\newblock Supramodal representation of emotions.
+\newblock {\em The Journal of Neuroscience\/} {\bf 31} (2011) 13635--13643.
+\newblock \doi{10.1523/JNEUROSCI.2833-11.2011}.
+
+\end{thebibliography}
