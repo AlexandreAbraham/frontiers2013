@@ -7,7 +7,6 @@
 
 \usepackage{url}
 \usepackage{lineno}
-
 \usepackage{todonotes}
 
 \newcommand{\alex}[1]{\todo[inline, color=green!40]{#1}}
@@ -26,8 +25,13 @@
 \def\articleType{}
 \def\citing{\color{darkgray}\cite}
 \def\keyFont{\fontsize{6}{11}\helveticabold }
-\def\firstAuthorLast{Sample {et~al}} %use et al only if is more than 1 author
-\def\Authors{Alexandre Abraham\,$^{1,2,*}$, Fabian Pedregosa\,$^{1,2}$, Andreas Muller, Jean Kossaifi, Philippe Gervais\,$^{1,2}$, Alexandre Gramfort, Bertrand Thirion\,$^{1,2}$ and Gaël Varoquaux\,$^{1,2}$}
+\def\firstAuthorLast{Alexandre Abraham {et~al}} %use et al only if is more than 1 author
+
+% XXX Review the order of authors
+
+\def\Authors{Alexandre Abraham\,$^{1,2,*}$, Philippe Gervais\,$^{1,2}$, Fabian
+Pedregosa\,$^{1,2}$, Andreas Muller, Jean Kossaifi, Michael Eickenberg, Alexandre Gramfort, Bertrand
+Thirion\,$^{1,2}$ and Ga\"el Varoquaux\,$^{1,2}$}
 % Affiliations should be keyed to the author's name with superscript numbers and be listed as follows: Laboratory, Institute, Department, Organization, City, State abbreviation (USA, Canada, Australia), and Country (without detailed address information such as city zip codes or street names).
 % If one of the authors has a change of address, list the new address below the correspondence details using a superscript symbol and use the same symbol to indicate the author in the author list.
 \def\Address{
@@ -68,7 +72,7 @@
 \onecolumn
 \firstpage{1}
 
-\title[Running Title]{This is Title}
+\title[Machine Learning for Neuroimaging with Scikit-Learn]{Machine Learning for Neuroimaging with Scikit-Learn}
 \author[\firstAuthorLast ]{\Authors}
 \address{}
 \correspondance{}
@@ -79,37 +83,42 @@
 \begin{abstract}
 
 \section{}
-Statistical  learning  methods  are   increasingly  used  to  perform
-neuroimaging  analysis.  Their  main  virtue  for this  type  of  application
-is  their  ability  to   model  high-dimensional  datasets,  e.g.\ multivariate
-analysis  of activation  images,  or  capturing  inter­subject  variability.
-Supervised  learning  is  typically  used  in  “decoding” setting  to  relate
-brain   images  to  behavioral  or  clinical  observations,  while
-unsupervised  learning  is  typically used  to  uncover  hidden  structure  in
-sets  of  images   (e.g.\ resting  state  functional  MRI)  or  to  find
-sub­populations  in  large  cohorts  of  subjects.   By  considering
-functional  neuroimaging  use  cases,  we illustrate  how  the  Scikit­learn,
-a  Python machine  learning  library,  can  be used to perform  some  key
-analysis steps.  Scikit­learn  contains  a  large   set  of  statistical
-learning  algorithms,  both  supervised  and unsupervised, that can be  applied
-to neuroimaging data after a  proper preprocessing.  Combined  with  other
-Python  libraries, neuroimaging data can be loaded, processed and the results
+Statistical learning methods are increasingly used to perform
+neuroimaging analysis. Their main virtue for this type of application
+is their ability to model high-dimensional datasets, e.g.\ multivariate
+analysis of activation images, or capturing inter-subject variability.
+Supervised learning is typically used in “decoding” setting to relate
+brain images to behavioral or clinical observations, while
+unsupervised learning is typically used to uncover hidden structure in
+sets of images (e.g.\ resting state functional MRI) or to find
+sub-populations in large cohorts of subjects. By considering
+functional neuroimaging use cases, we illustrate how the Scikit-learn,
+a Python machine learning library, can be used to perform some key
+analysis steps. Scikit-learn contains a large set of statistical
+learning algorithms, both supervised and unsupervised, that can be applied
+to neuroimaging data after a proper preprocessing. Combined with other
+Python libraries, neuroimaging data can be loaded, processed and the results
 can be visualised easily.
 
 
 
 \tiny
-  \section{Keywords:} Text Text Text Text Text Text Text Text  %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
+% XXX Fix keywords
+%All article types: you may provide up to 8 keywords; at least 5 are mandatory.
+\section{Keywords:} Machine learning, Statistical Learning, Neuroimaging, Scikit-learn, Python
 \end{abstract}
 
 
 \section{Introduction}
 
 
-\subsection{Python scientific and neuroimaging ecosystem}
+\subsection{Scientific Python and neuroimaging ecosystem}
 
 \subsubsection{Scipy and Numpy}
 \subsubsection{nibabel}
+
+
+
 \subsubsection{nipy}
 \subsubsection{scikit-learn}
 
@@ -131,46 +140,65 @@ Explain that the scikit process 2D data. This is an introduction to masking.
 
 \subsection{Transformer}
 
-\subsection{Pipeline}
-
-Make a reference to SVM example
-
 \subsection{Cross validation}
 
 \alex{It seems more right to me to put it in this part}
 
 
-\section{Datasets}
+\section{From MR volumes to a data matrix}
 
-\alex{I think this should be good to talk about datasets from the beginning to
-    introduce what we will want (introducing examples) and to be able to cite
-    them from the beginning (we may want to precise what kind of preprocessing
-is requirend on which dataset and why).}
+As any domain specific data, MR volumes holds particular properties.
+Understanding them is crucial to be sure to make proper use of the data.
 
-\subsection{Haxby}
-
-\subsection{Kamitani}
-
-BOLD response is usually 4/6 seconds after the stimulus. For Kamitani, we shift
-the stimuli by 2 TR.
-
-\subsection{NYU Test-Retest}
-
-
-
-\section{Preparing the data}
+\[
+    \begin{bmatrix}
+        r_x & 0   & 0   & o_x \\
+        0   & r_y & 0   & o_y \\
+        0   & 0   & r_z & o_z \\
+        0   & 0   & 0   & 1   \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        x \\
+        y \\
+        z \\
+        1 \\
+    \end{bmatrix}
+\]
 
 \subsection{Data Preparation}
     % or Signal Processing ?
 
-% Neuroimaging  data  requires  special  preparation  due  to  its  particular
-% nature  and acquisition  protocol (normalization, detrending...).
+At this point, we suppose that standard preprocessings have been applied to the
+data. They should be registrated on a common template (MNI for example).
+However, data is not yet ready to be processed by the scikit-learn. In
+fact, preprocessed data may have different shapes. Moreover, it is essential to
+get rid of some remaining scanner artefacts and individual trends.
+
+\subsubsection{Detrending}
+
+Detrending is an essential step when dealing with fMRI data. It removes a
+best-fit linear trend (in the least square sense) over the time series of each
+voxel. It is obviously needed when you want to study the correlation between
+features.
+
+This step is essential because voxel intensity may differ from one subject to
+another because of the scanner. It may even differ in a single subject scans
+because of a birdcage coil artefact (some brain regions appears brighter than
+others, see Fig.).
+
+% XXX Put a figure from SDSU site in ABIDE dataset. There is a lot of birdcage
+% coil problems in this one.
+
+
 
 \subsection{Resampling}
 
+Resampling is necessary when your dataset is composed of several scan sessions
+taht may not have the same shape. It may also be used to downsample the data :
+this is the easiest way to reduce data-size and speed up computation.
+
+
 \begin{itemize}
-    \item Necessary for multi subjects (do we speak of this problem before ?)
-    \item This is one way of decreasing data size
     \item Removing confounds is necessary for some treatments
 \end{itemize}
 
@@ -266,11 +294,21 @@ to run.
 
 \section{Decoding}
 
+The process of predicting behavioral or comportamental data from fMRI scan is
+called decoding.
+
+
+
 \subsection{SVM}
 
 \begin{itemize}
-    \item Precise that we use ANOVA and give an example of pipeline
+    \item Precise that we use ANOVA
+    \item Introduce the pipeline
+    \item Introduce Haxby dataset ?
 \end{itemize}
+
+
+
 
 \begin{figure}
     \includegraphics[width=.5\linewidth]{img/plot_sgd_separating_hyperplane_1.png}
@@ -290,6 +328,9 @@ to run.
 
 \subsection{Orthogonal Matching Pursuit}
 
+
+
+
 \includegraphics[width=.5\linewidth]{img/logistic_l1_scores.png}
 
 \section{Encoding}
@@ -298,19 +339,27 @@ to run.
     example for encoding, which I think is a plus for the paper. The example will
     be integrated in Nisl.}
 
+
+
+
 \section{Functional Connectivity}
 
 \alex{Should we speak of correlation matrices to represent interaction between
 regions?}
 
-\subsection{ICA}
+\subsection{Independent Component Analysis (ICA)}
 
-\begin{itemize}
-    \item Explain principle
-    \item Put several refs
-    \item Put maps
-    \item Should we talk about CANICA ?
-\end{itemize}
+\subsubsection{Intuition}
+
+ICA is a blind source separation method. Its principle is to separate a
+multivariate signal into several components by maximizing their non-gaussianity.
+A typical example is the \emph{cocktail party problem} where ICA separates the
+voices of people using signal from several mikes.
+
+It is historically the reference method to extract networks from resting state
+fMRI \cite{biswal1999}.
+
+\subsubsection{Application}
 
 \includegraphics[width=.5\linewidth]{img/plot_canica_resting_state_17.png}
 
@@ -323,16 +372,6 @@ KMeans and Spectral clustering and only give results.
 \includegraphics[width=.3\linewidth]{img/plot_rest_clustering_1.png}
 \includegraphics[width=.3\linewidth]{img/plot_rest_clustering_2.png}
 \includegraphics[width=.3\linewidth]{img/plot_rest_clustering_3.png}
-
-\section{Data Sharing}
-
-Frontiers supports the policy of data sharing, and authors are advised to make
-freely available any materials and information described in their article, and
-any data relevant to the article (while not compromising confidentiality in the
-context of human-subject research) that may be reasonably requested by others
-for the purpose of academic and non-commercial research. In regards to
-deposition of data and data sharing through databases, Frontiers urges authors
-to comply with the current best practices within their discipline.
 
 \section*{Disclosure/Conflict-of-Interest Statement}
 %All relationships financial, commercial or otherwise that might be perceived
@@ -356,7 +395,6 @@ Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text
 Text Text.
 
 \bibliographystyle{frontiersinSCNS} % for Science articles
-%\bibliographystyle{frontiersinMED} % for Medicine articles
-\bibliography{test}
+\bibliography{biblio}
 
 \end{document}
