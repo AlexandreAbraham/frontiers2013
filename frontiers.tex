@@ -181,21 +181,21 @@ best-fit linear trend (in the least square sense) over the time series of each
 voxel. It is obviously needed when you want to study the correlation between
 features.
 
-This step is essential because voxel intensity may differ from one subject to
-another because of the scanner. It may even differ in a single subject scans
-because of a birdcage coil artefact (some brain regions appears brighter than
-others, see Fig.).
-
-% XXX Put a figure from SDSU site in ABIDE dataset. There is a lot of birdcage
-% coil problems in this one.
-
 
 
 \subsection{Resampling}
 
-Resampling is necessary when your dataset is composed of several scan sessions
-taht may not have the same shape. It may also be used to downsample the data :
-this is the easiest way to reduce data-size and speed up computation.
+Resampling consists in changing the shape of the data. This is typically needed
+when dealing when data coming from an heterogenous dataset, as the shape depends
+on acquisition parameters.
+
+Practically, resampling is an interpolation and thus may alterate the integrity
+of the data. That is why it should be used carefully. Oversampling (increasing
+data resolution) leads to higher memory consumption and computation resources.
+Downsampling is commonly used to reduce the size of the data we want to process.
+
+Typical sizes are 2mm or 3mm resolutions, but the spread of high field MR
+scanner tends to lower these values.
 
 
 \begin{itemize}
@@ -210,36 +210,6 @@ this is the easiest way to reduce data-size and speed up computation.
 
 % I think that we should present the challenges about NI data here. Poor SNR,
 % multi subject / session...
-
-\subsection{Dimension reduction}
-
-\begin{itemize}
-    \item Data is often too big for computation, we need to reduce its
-        dimensionality
-\end{itemize}
-
-\subsubsection{Resampling}
-
-Resampling is a way to reduce dimensionality.
-
-\subsubsection{Feature selection}
-
-Speak of Anova here. This is one of the simplest way to reduce efficiently
-dimensionality.
-
-\includegraphics[width=.5\linewidth]{img/plot_haxby_searchlight_2.png}
-
-\subsubsection{Clustering / ROI}
-
-We can select regions to reduce dimensionality. For example, V1 for a visual
-task. We can also segment automatically the brain thanks to a Ward, or use a
-reference atlas.
-
-\subsubsection{PCA}
-
-The PCA is good to reduce dimensionality in the time series dimension (other
-methods are for spatial reduction).
-
 
 \subsection{Masking}
 
@@ -302,18 +272,11 @@ called decoding.
 \subsection{SVM}
 
 \begin{itemize}
-    \item Precise that we use ANOVA
+    \item Precise that we use ANOVA to reduce dimensionality
     \item Introduce the pipeline
-    \item Introduce Haxby dataset ?
+    \item Introduce Haxby dataset
 \end{itemize}
 
-
-
-
-\begin{figure}
-    \includegraphics[width=.5\linewidth]{img/plot_sgd_separating_hyperplane_1.png}
-    \caption{Example of SVC on toy problem}
-\end{figure}
 
 \subsection{Searchlight}
 
@@ -368,6 +331,11 @@ fMRI \cite{biswal1999}.
 Make  an  example  with   Ward   Clustering.  Indicate  then   that  other
 algorithms  can  be  used  such  as
 KMeans and Spectral clustering and only give results.
+
+We use a PCA here to reduce dimensionality.
+
+Bonus: may be used as dimensionality reduction
+
 
 \includegraphics[width=.3\linewidth]{img/plot_rest_clustering_1.png}
 \includegraphics[width=.3\linewidth]{img/plot_rest_clustering_2.png}
