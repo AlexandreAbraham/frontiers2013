@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{2}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \expandafter\ifx\csname doi\endcsname\relax
@@ -7,6 +7,13 @@
   \def\doi{doi:\discretionary{}{}{}\begingroup \urlstyle{rm}\Url}\fi \fi
 \expandafter\ifx\csname selectlanguage\endcsname\relax
   \def\selectlanguage#1{}\fi
+
+\bibitem[{Haxby et~al.(2001)Haxby, Gobbini, Furey, Ishai, Schouten, and
+  Pietrini}]{haxby2001}
+Haxby, J.~V., Gobbini, I.~M., Furey, M.~L., Ishai, A., Schouten, J.~L., and
+  Pietrini, P. (2001) Distributed and overlapping representations of faces and
+  objects in ventral temporal cortex.
+\newblock {\em Science\/} 293 2425.
 
 \bibitem[{Biswal and Ulmer(1999)}]{biswal1999}
 Biswal, B. and Ulmer, J. (1999) {Blind source separation of multiple signal

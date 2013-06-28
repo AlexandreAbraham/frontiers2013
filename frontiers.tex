@@ -6,8 +6,11 @@
 %\documentclass{frontiersMED} % for Medicine articles
 
 \usepackage{url}
+
 \usepackage{lineno}
 \usepackage{todonotes}
+\usepackage{listings}
+\lstset{language=Python}
 
 \newcommand{\alex}[1]{\todo[inline, color=green!40]{#1}}
 
@@ -115,11 +118,30 @@ can be visualised easily.
 \subsection{Scientific Python and neuroimaging ecosystem}
 
 \subsubsection{Scipy and Numpy}
+
+Scipy and Numpy python packages are the basis of scientific computing in Python.
+They provide efficient and easy to use data representation, linear algebra, statistics, algortihms... They are the elementary bricks we use in
+all our algorithms.
+
+\subsubsection{matplotlib}
+
+Matplotlib is a plotting library that is part of the scientific python stack. It
+offers a Matlab-like experience and allows to display plots, images or even 3D
+plots in a graphical user interface. We have used it to generate all the figures
+of this paper.
+
+Note that a more convenient interface for matplotlib called pylab allows a
+procedural use of matplotlib.
+
 \subsubsection{nibabel}
 
-
+Nibabel is a neuroimaging data loading package. Nibabel can load or save data in
+the most popular neuroimaging data format. This is indeed an entry point of all
+our scripts.
 
 \subsubsection{nipy}
+
+
 \subsubsection{scikit-learn}
 
 
@@ -136,9 +158,16 @@ can be visualised easily.
 
 \subsection{Data representation}
 
-Explain that the scikit process 2D data. This is an introduction to masking.
+In the scikit learn, and in the world of statistical machine learning, data are
+usually represented in a 2-dimensional matrix of shape $n\_samples \times
+n\_features$. 
+
 
 \subsection{Transformer}
+
+A tranformer is an object that exposes a \verb!transform! method. If the transformation
+can be inverted, a method called \verb!inverse_transform! also exists.
+
 
 \subsection{Cross validation}
 
@@ -180,6 +209,10 @@ Detrending is an essential step when dealing with fMRI data. It removes a
 best-fit linear trend (in the least square sense) over the time series of each
 voxel. It is obviously needed when you want to study the correlation between
 features.
+
+\alex{Gaël told me not to go deep into the maths, I wonder if talking about
+      least squares is a good idea. Maybe I should say that a constant trend is a
+      mean and a linear trend is simply a linear function}
 
 \subsection{Resampling}
 
@@ -260,21 +293,126 @@ to run.
     \item Speak about connectivity graphs / adjacency matrices 
 \end{itemize}
 
+\subsection{Label shifting}
+
+Functional MRI measures brain activity by using the Blood-Oxygen-Level-Dependent
+contrast (BOLD). In fact, like muscles, brain regions consumes more oxygen and
+nutriments when stimulated. So when a part of the brain starts working,
+physiological mechanisms induce an oxygen-rich blood flood toward this
+particular region: this is called haemodynamic response.
+
+However, this reaction takes time, usually around 6 seconds. This is the
+duration between the event and the reaction observed in the brain. To be able to
+match these two events, we will sometimes have to shift our data. This can be
+done by removing the two first scans of the data and the two last values of the
+labels (to keep an homogeneous length).
+
+\begin{lstlisting}
+func = func[2:]
+labels = labels[:-2]
+\end{lstlisting}
+
 \section{Decoding}
 
 The process of predicting behavioral or comportamental data from fMRI scan is
 called decoding.
 
 
-
 \subsection{SVM}
 
-\begin{itemize}
-    \item Precise that we use ANOVA to reduce dimensionality
-    \item Introduce the pipeline
-    \item Introduce Haxby dataset
-\end{itemize}
 
+
+\subsubsection{Haxby dataset}
+
+For this example and the following, we will use a subset of the Haxby dataset
+(\cite{haxby2001}).
+Haxby dataset is from a study about face and object representation into the
+brain (in particular in high level visual cortex). It is composed of 12 runs for
+each of the 6 subjects. Greyscale images representing faces, houses, cats,
+bottles, scissors, shoes, chairs and random textured were presented in 24
+seconds blocks separated by rest periods. The repetition time (TR) between each
+scan is 2.5s.
+
+To make this example easier, we will work on a subset of this dataset. We will
+consider only one subject and will try to classify faces versus houses.
+
+\subsubsection{Feature selection: ANOVA F-Test}
+
+Even if the resolution of brain-imaging data seems low (3mm cubes, around 100000
+neurones), from a computational point of view, this is a huge. For example,
+Haxby dataset has a resolution of $64\times64\times40 = 163840\text{ voxels}$.
+After applying the mask, only 39912 voxels are left, which is still high.
+
+In order to reduce the number of features, we can aggregate them (in regions of
+interest for example) or we can select only the most relevant ones (those who
+correlates most with the task). As we expect a lot of feature to be irrelevant
+for our task, we opt for a feature selection method.
+
+In supervised learning, the most popular feature selection method is the
+ANalysis Of VAriance (ANOVA) F-Test. This is a generalization of the t-test to
+more than 2 features. Basically, ANOVA compares several
+groups to determine if they are similar (ie randomly drawn form the same
+population, this is the null hypothesis). We use it to compare the distributions
+of the features values across the classes.
+
+\verb!sklearn.feature_selection! contains a panel of feature selection
+strategies. One can choose to take a percentile of the features
+(\verb!SelectPercentile!), or a fixed number of features (\verb!SelectKBest!)
+for example. All these objects are implemented as transformers.
+Here we use a fixed number of features and we use the \verb!f_calssif! function
+(ANOVA F-Test) for scoring.
+
+\begin{lstlisting}
+from sklearn.feature_selection import SelectKBest, f_classif
+
+### Define the dimension reduction to be used.
+# Here we use a classical univariate feature selection based on F-test,
+# namely Anova. We set the number of features to be selected to 500
+feature_selection = SelectKBest(f_classif, k=500)
+\end{lstlisting}
+
+\subsubsection{Support Vector Classifier}
+
+A Support Vector Classifier (SVC) is a simple classifier that finds a linear
+hyperplane that separates the samples. Classifying a new example boils down to
+seeing on which side of the hyperplane the example is. SVC has the advantage to
+give reliable results even when the number of dimensions is greater than the
+number of samples.
+
+The decision is taken based upon a subset of training data called support
+vectors. We can say that these support vectors holds the information allowing to
+discriminate the two classes, this is why we will display them and try to see if
+they match some neuroscientific knowledge.
+
+\begin{lstlisting}
+from sklearn.svm import SVC
+clf = SVC(kernel='linear', C=1.)
+
+### Look at the discriminating weights
+svc = clf.support_vectors_
+# reverse feature selection
+svc = feature_selection.inverse_transform(svc)
+\end{lstlisting}
+
+\subsubsection{Pipeline}
+
+The workflow described above (feature selection + estimator) is a standard one.
+In fact, in most cases, the workflow will consist in atomic steps
+\textit{linked} together (the output of a step is the input of the next one).
+For this purpose, scikit-learn offers a pipeline object that allows such
+linking. A pipeline is simply a list of scikit-learn objects through which the
+input data will be conveyed. The function to call for each object (transform,
+fit...) depends on its type.
+This allow the developpers to write a complete processing as a one-liner.
+
+\begin{lstlisting}
+from sklearn.pipeline import Pipeline
+anova_svc = Pipeline([('anova', feature_selection), ('svc', clf)])
+\end{lstlisting}
+
+\subsubsection{Displaying the results}
+~\\
+\alex{Should we define a visualization function once and for all?}
 
 \subsection{Searchlight}
 
@@ -288,6 +426,31 @@ called decoding.
 
 
 \subsection{Orthogonal Matching Pursuit}
+
+\subsubsection{Kamitani dataset}
+
+Kamitani dataset is based on a visual task like Haxby. In this experiment,
+several series of $10\times10$ binary images are presented to two subjects.
+Our goal will be to use the scikit-learn to learn a correlation between brain
+activation and voxel color.
+
+Kamitani training set is composed of random images (where black and white pixels
+are balanced). The testing set is composed of structured images containing
+geometric shape (square, cross...) and letters (spelling the word \emph{neuro}).
+
+There are two ways to establish a link between brain voxels and image pixels: we
+can either try to reconstruct image from brain voxel activation, this is called
+decoding, or we can try to predict brain activation from an image, this is called
+encoding.
+
+In the present example, we will do both encoding and decoding and see if the
+results match.
+
+\subsubsection{Preprocessing}
+
+Classical preprocessing (detrend...) have been applied to the data.
+
+\subsubsection{Decoding: reconstructing image from brain activity}
 
 
 
