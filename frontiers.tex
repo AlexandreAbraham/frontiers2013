@@ -7,7 +7,7 @@
 
 \usepackage{url}
 
-\usepackage{lineno}
+%\usepackage{lineno}
 \usepackage{todonotes}
 \usepackage{listings}
 \lstset{language=Python}
@@ -16,7 +16,7 @@
 
 
 
-\linenumbers
+%\linenumbers
 
 
 \copyrightyear{}
@@ -115,13 +115,20 @@ can be visualised easily.
 \section{Introduction}
 
 
+
+
 \subsection{Scientific Python and neuroimaging ecosystem}
 
 \subsubsection{Scipy and Numpy}
 
-Scipy and Numpy python packages are the basis of scientific computing in Python.
-They provide efficient and easy to use data representation, linear algebra, statistics, algortihms... They are the elementary bricks we use in
-all our algorithms.
+Scipy and Numpy packages are the basis of scientific computing in Python.
+First, they provide the \verb!ndarray! data type, an efficient $n$-dimensional
+data representation. These vectors holds all common operations (transpose...)
+and can be easily manipulated thanks to a simple, yet powerful, indexing.
+
+These packages also provides common mathematicals applications applied to
+vectors: linear algebra, statistics, algortihms... They are the elementary bricks
+we use in all our algorithms.
 
 \subsubsection{matplotlib}
 
@@ -131,7 +138,7 @@ plots in a graphical user interface. We have used it to generate all the figures
 of this paper.
 
 Note that a more convenient interface for matplotlib called pylab allows a
-procedural use of matplotlib.
+procedural (ie more pythonish) use of matplotlib.
 
 \subsubsection{nibabel}
 
@@ -153,6 +160,11 @@ our scripts.
 
 % Present the underlying concepts of scikit­learn: estimator,­ data
 % representation, transformer...
+
+Scikit-learn not only provides a variety of statistical learning algorithms,
+but everything needed to preprocess data and validate the results. For the sake
+of usability, all the scikit-learn functionalities have been divided in several
+simple concepts.
 
 \subsection{Estimator}
 
@@ -210,6 +222,10 @@ best-fit linear trend (in the least square sense) over the time series of each
 voxel. It is obviously needed when you want to study the correlation between
 features.
 
+\begin{lstlisting}
+scipy.signal.detrend(data)
+\end{lstlisting}
+
 \alex{Gaël told me not to go deep into the maths, I wonder if talking about
       least squares is a good idea. Maybe I should say that a constant trend is a
       mean and a linear trend is simply a linear function}
@@ -228,16 +244,13 @@ Downsampling is commonly used to reduce the size of the data we want to process.
 Typical sizes are 2mm or 3mm resolutions, but the spread of high field MR
 scanner tends to lower these values.
 
-
-\begin{itemize}
-    \item Removing confounds is necessary for some treatments
-\end{itemize}
-
 \subsection{Signal cleaning}
 
 \begin{itemize}
     \item Remove high frequency (scanner artefacts)
+    \item Removing confounds is necessary for some treatments
 \end{itemize}
+
 
 % I think that we should present the challenges about NI data here. Poor SNR,
 % multi subject / session...
@@ -286,11 +299,14 @@ relatively to a chose threshold.
 \subsubsection{Conserving geometrical structure}
 
 Applying a mask on the data obviously remove the 3-dimensional structure of the
-data. However, some algorithms, like the Ward, need this structural information
-to run.
-
+data. However, some algorithms, like the Ward, need this structural information.
+\verb!sklearn.feature_extraction.image! provides two methods that builds an
+adjacency matrix based upon your data while taking the mask into account:
 \begin{itemize}
-    \item Speak about connectivity graphs / adjacency matrices 
+    \item \verb!grid_to_graph! creates a binary adjacency graph based upon the
+        data shape. This is useful for Ward's clustering.
+    \item \verb!grid_to_graph! creates a distance matrix using the gradient of
+        the image. This graph can be used in Spectral clustering.
 \end{itemize}
 
 \subsection{Label shifting}
@@ -303,12 +319,13 @@ particular region: this is called haemodynamic response.
 
 However, this reaction takes time, usually around 6 seconds. This is the
 duration between the event and the reaction observed in the brain. To be able to
-match these two events, we will sometimes have to shift our data. This can be
-done by removing the two first scans of the data and the two last values of the
+match these two events, we will sometimes have to shift our data. The number of
+scans taht must be shifted depends on the TR (repetition time) of the data.
+Usually, we remove the two first scans of the data and the two last values of the
 labels (to keep an homogeneous length).
 
 \begin{lstlisting}
-func = func[2:]
+data = data[2:]
 labels = labels[:-2]
 \end{lstlisting}
 
@@ -324,14 +341,14 @@ called decoding.
 
 \subsubsection{Haxby dataset}
 
-For this example and the following, we will use a subset of the Haxby dataset
+For this example and the following, we will use Haxby dataset
 (\cite{haxby2001}).
 Haxby dataset is from a study about face and object representation into the
 brain (in particular in high level visual cortex). It is composed of 12 runs for
 each of the 6 subjects. Greyscale images representing faces, houses, cats,
 bottles, scissors, shoes, chairs and random textured were presented in 24
 seconds blocks separated by rest periods. The repetition time (TR) between each
-scan is 2.5s.
+scan is 2.5s. Full acquisition information are available in the reference paper.
 
 To make this example easier, we will work on a subset of this dataset. We will
 consider only one subject and will try to classify faces versus houses.
@@ -432,7 +449,8 @@ anova_svc = Pipeline([('anova', feature_selection), ('svc', clf)])
 Kamitani dataset is based on a visual task like Haxby. In this experiment,
 several series of $10\times10$ binary images are presented to two subjects.
 Our goal will be to use the scikit-learn to learn a correlation between brain
-activation and voxel color.
+activation and voxel color. Full details are available in the reference paper
+(\cite{miyawaki2008}).
 
 Kamitani training set is composed of random images (where black and white pixels
 are balanced). The testing set is composed of structured images containing
@@ -448,10 +466,13 @@ results match.
 
 \subsubsection{Preprocessing}
 
-Classical preprocessing (detrend...) have been applied to the data.
+Common pre-treatment have been applied to the data (detrending and
+standardization).
 
 \subsubsection{Decoding: reconstructing image from brain activity}
 
+In the original paper, Miyawaki uses a sparse multinomial logistic regression to
+reconstruct the image.
 
 
 
@@ -468,8 +489,18 @@ Classical preprocessing (detrend...) have been applied to the data.
 
 \section{Functional Connectivity}
 
-\alex{Should we speak of correlation matrices to represent interaction between
-regions?}
+In \cite{biswal1995}, Biswal was the first to exhibit coherent patterns in the
+brain activation during resting state. These correlated voxel activations seemed
+to form functional networks concording with neuroscientific knowledge.
+
+Resting-state fMRI is useful when dealing with subjects that cannot execute a
+specific task. For example, stroke patients suffer various brain disease that
+are very difficult to diagnose; resting state fMRI may help by showing a
+difference in the correlation between function brain networks.
+
+As our data is unlabeled, we have to rely on unsupervised learning. The most
+famous unsupervised method is the ICA and has been widely used to study resting
+state data. We will also see how clustering algorithms behave on such data.
 
 \subsection{Independent Component Analysis (ICA)}
 
@@ -481,7 +512,11 @@ A typical example is the \emph{cocktail party problem} where ICA separates the
 voices of people using signal from several mikes.
 
 It is historically the reference method to extract networks from resting state
-fMRI \cite{biswal1999}.
+fMRI \cite{biswal1999}. Several strategies have been used to syndicate ICA
+results across several subjects. \cite{calhoun2001a} proposes a dimension
+reduction (using PCA) followed by a concatenation of the time series.
+\cite{varoquaux2010} uses dimension reduction and canonical correlation analysis
+to aggregate subject data.
 
 \subsubsection{Application}
 
