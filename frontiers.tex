@@ -9,8 +9,8 @@
 
 %\usepackage{lineno}
 \usepackage{todonotes}
-\usepackage{listings}
-\lstset{language=Python}
+\usepackage{verbments}
+\plset{language=python}
 
 \newcommand{\alex}[1]{\todo[inline, color=green!40]{#1}}
 \newcommand{\fabian}[1]{\todo[inline, color=blue!40]{#1}}
@@ -262,7 +262,7 @@ them into the original space:
 
 % I use that in the Searchlight example
 
-\begin{lstlisting}
+\begin{pyglist}
 def get_real_coordinates(mask, affine):
     # get coordinates of non zero voxels
     mask_coords = np.where(mask != 0)
@@ -271,7 +271,7 @@ def get_real_coordinates(mask, affine):
     # apply the transformation
     mask_coords = np.dot(affine, np.asarray(mask_coords))[:3].T
     return mask_coords
-\end{lstlisting}
+\end{pyglist}
 
 
 \subsection{Data Preparation}
@@ -291,9 +291,9 @@ linear trend over the time series of each
 voxel. It is needed when you want to study the correlation between
 features.
 
-\begin{lstlisting}
+\begin{pyglist}
 scipy.signal.detrend(data)
-\end{lstlisting}
+\end{pyglist}
 
 \subsection{Resampling}
 
@@ -391,10 +391,10 @@ scans that must be shifted depends on the TR (repetition time) of the data.
 Usually, we remove the two first scans of the data and the two last values of the
 labels (to keep an homogeneous length).
 
-\begin{lstlisting}
+\begin{pyglist}
 data = data[2:]
 labels = labels[:-2]
-\end{lstlisting}
+\end{pyglist}
 
 \section{Decoding}
 
@@ -446,14 +446,14 @@ for example. All these objects are implemented as transformers.
 Here we use a fixed number of features and we use the \verb!f_classif! function
 (ANOVA F-Test) for scoring.
 
-\begin{lstlisting}
+\begin{pyglist}
 from sklearn.feature_selection import SelectKBest, f_classif
 
 ### Define the dimension reduction to be used.
 # Here we use a classical univariate feature selection based on F-test,
 # namely Anova. We set the number of features to be selected to 500
 feature_selection = SelectKBest(f_classif, k=500)
-\end{lstlisting}
+\end{pyglist}
 
 \subsubsection{Classification}
 
@@ -468,7 +468,7 @@ vectors. We can say that these support vectors hold the information allowing to
 discriminate the two classes, this is why we will display them and try to see if
 they match some neuroscientific knowledge.
 
-\begin{lstlisting}
+\begin{pyglist}
 from sklearn.svm import SVC
 clf = SVC(kernel='linear', C=1.)
 clf.fit(?)
@@ -477,7 +477,7 @@ clf.fit(?)
 svc = clf.support_vectors_
 # reverse feature selection
 svc = feature_selection.inverse_transform(svc)
-\end{lstlisting}
+\end{pyglist}
 
 \subsubsection{Pipeline}
 
@@ -490,10 +490,10 @@ input data will be conveyed. The function to call for each object (transform,
 fit...) depends on its type.
 This allow the developpers to write a complete processing as a one-liner.
 
-\begin{lstlisting}
+\begin{pyglist}
 from sklearn.pipeline import Pipeline
 anova_svc = Pipeline([('anova', feature_selection), ('svc', clf)])
-\end{lstlisting}
+\end{pyglist}
 
 \subsubsection{Displaying the results}
 ~\\
@@ -535,7 +535,7 @@ connectivity informations contained in the \verb!mask!. This can be done by
 fitting a \verb!NearestNeighbours! on the \verb!mask! and applying it on
 \verb!process_mask!. \alex{TODO: reformulate}
 
-\begin{lstlisting}
+\begin{pyglist}
     # Compute world coordinates of all in-mask voxels.
     mask_coords = get_real_coordinates(mask, mask_affine)
 
@@ -550,13 +550,13 @@ fitting a \verb!NearestNeighbours! on the \verb!mask! and applying it on
 
     # Mask 3D data
     X = nifti_file.get_data()[mask].T
-\end{lstlisting}
+\end{pyglist}
 
 Then, for each row of our adjacency matrix, we do a cross validation using a
 given estimator. This is the core of the algorithm and we see that it can be
 written with a simple for-loop.
 
-\begin{lstlisting}
+\begin{pyglist}
     scores = np.zeros(len(A.rows))
     for i, row in enumerate(A.rows):
         print '%d/%d' % (i, len(A.rows))
@@ -566,7 +566,7 @@ written with a simple for-loop.
     scores_3D = np.zeros(process_mask.shape)
     scores_3D[process_mask] = scores
     return scores_3D
-\end{lstlisting}
+\end{pyglist}
 
 
 \subsection{Classification of M/EEG sensor space data}
