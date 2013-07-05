@@ -136,17 +136,12 @@ algorithms.
 
 \subsubsection{matplotlib}
 
-Matplotlib is a plotting library that is part of the scientific python stack.
-It offers a Matlab-like experience and allows to display plots, images or even
-3D plots in a graphical user interface. All figures in this paper have been
-generated using this library.
+Matplotlib is a Python plotting library that is tightly integrated into the
+rest of the scientific python stack. It offers publication quality figures in
+a variety of formats and allows to display plots, images or 3D plots in a
+graphical user interface. All figures in this paper have been generated using
+this library.
 
-Note that a more convenient interface for matplotlib called pylab allows a
-procedural (ie more pythonish) use of matplotlib.
-
-\fabian{while I agree in practice with you, pylab was built as a  is a matlab-like API, while matplotlib
-was designed to be object oriented and (in theory) more Pythonic. I think its
-better to not go into the discussion of which is more pythonic}
 
 \subsubsection{nibabel}
 
@@ -159,7 +154,7 @@ our scripts.
 
 \subsubsection{scikit-learn}
 
-The {\em scikit-learn} project \cite{pedregosa2011} is an open source machine
+The {\em scikit-learn} project, \cite{pedregosa2011}, is an open source machine
 learning library for the Python programming language. The ambition of the
 project is to provide efficient and well-established machine learning tools within
 a programming environment that is accessible to non-machine learning experts
@@ -175,21 +170,34 @@ and reusable in various scientific areas.
 % Present the underlying concepts of scikit­learn: estimator,­ data
 % representation, transformer...
 
-All objects within {\em scikit-learn} are organized around three key concepts: 
+All objects within \sklearn share a uniform common basic API consisting of three
+complementary interfaces: an \textit{estimator} interface for building and
+fitting models, a \textit{predictor} interface for making predictions and a
+\textit{transformer} interface for converting data into a different representation.
 
-
-API consisting of
-three complementary interfaces: an {\em estimator} interface 
-
-Interoperation with third-party code is OK as long as the code implements the
-needed methods, which 
-
-Scikit-learn not only provides a variety of statistical learning algorithms,
-but everything needed to preprocess data and validate the results. For the sake
-of usability, all the scikit-learn functionalities have been divided in several
-simple concepts.
+Interoperation with third-party code is made not on base on inheriting from a
+particular class but on the base of implementing the appropriate methods for a
+given interface.
 
 \subsection{Estimator}
+
+The \textit{estimator} interface is at the core of the library. It exposes a
+\texttt{fit} method for learning a model from training data.  All supervised
+and unsupervised learning algorithms (e.g., for classification, regression or
+clustering) are offered as objects implementing this interface. Machine
+learning tasks like feature extraction, feature selection or dimensionality
+reduction are also provided as estimators.
+
+\subsection{Predictor}
+
+The \textit{predictor} interface extends the notion of an estimator
+by adding a \texttt{predict}
+method that takes an array \texttt{X\_test} and produces
+predictions for \texttt{X\_test}, based on the learned parameters of the
+estimator (we call the input to \texttt{predict} ``\texttt{X\_test}'' in order
+to emphasize that \texttt{predict} generalizes to new data). In the case of
+supervised learning estimators, this method typically returns the predicted
+labels or values computed by the model.
 
 \subsection{Transformer}
 
