@@ -1,4 +1,4 @@
-\begin{thebibliography}{6}
+\begin{thebibliography}{8}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \expandafter\ifx\csname doi\endcsname\relax
@@ -7,6 +7,18 @@
   \def\doi{doi:\discretionary{}{}{}\begingroup \urlstyle{rm}\Url}\fi \fi
 \expandafter\ifx\csname selectlanguage\endcsname\relax
   \def\selectlanguage#1{}\fi
+
+\bibitem[{Millman and Brett(2007)}]{millman2007analysis}
+Millman, K.~J. and Brett, M. (2007) Analysis of functional magnetic resonance
+  imaging in python.
+\newblock {\em Computing in Science \& Engineering\/} 9 52--55.
+
+\bibitem[{Hanke et~al.(2009)Hanke, Halchenko, Sederberg, Hanson, Haxby, and
+  Pollmann}]{hanke2009pymvpa}
+Hanke, M., Halchenko, Y.~O., Sederberg, P.~B., Hanson, S.~J., Haxby, J.~V., and
+  Pollmann, S. (2009) Pymvpa: A python toolbox for multivariate pattern
+  analysis of fmri data.
+\newblock {\em Neuroinformatics\/} 7 37--53.
 
 \bibitem[{Haxby et~al.(2001)Haxby, Gobbini, Furey, Ishai, Schouten, and
   Pietrini}]{haxby2001}

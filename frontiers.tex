@@ -13,6 +13,7 @@
 \lstset{language=Python}
 
 \newcommand{\alex}[1]{\todo[inline, color=green!40]{#1}}
+\newcommand{\fabian}[1]{\todo[inline, color=blue!40]{#1}}
 
 
 
@@ -95,7 +96,7 @@ brain images to behavioral or clinical observations, while
 unsupervised learning is typically used to uncover hidden structure in
 sets of images (e.g.\ resting state functional MRI) or to find
 sub-populations in large cohorts of subjects. By considering
-functional neuroimaging use cases, we illustrate how the Scikit-learn,
+functional neuroimaging use cases, we illustrate how scikit-learn,
 a Python machine learning library, can be used to perform some key
 analysis steps. Scikit-learn contains a large set of statistical
 learning algorithms, both supervised and unsupervised, that can be applied
@@ -108,37 +109,45 @@ can be visualised easily.
 \tiny
 % XXX Fix keywords
 %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
-\section{Keywords:} Machine learning, Statistical Learning, Neuroimaging, Scikit-learn, Python
+\section{Keywords:} machine learning, statistical learning, neuroimaging, scikit-learn, python
 \end{abstract}
 
 
 \section{Introduction}
 
-
+Python is being increasingly used in neuroimaging studies
+(\cite{millman2007analysis, hanke2009pymvpa}), which can be explained its
+versatility, its ability to act as a glue between different components and the
+maturity of its scientific stack.
 
 
 \subsection{Scientific Python and neuroimaging ecosystem}
 
 \subsubsection{Scipy and Numpy}
 
-Scipy and Numpy packages are the basis of scientific computing in Python.
-First, they provide the \verb!ndarray! data type, an efficient $n$-dimensional
-data representation. These vectors holds all common operations (transpose...)
-and can be easily manipulated thanks to a simple, yet powerful, indexing.
-
-These packages also provides common mathematicals applications applied to
-vectors: linear algebra, statistics, algortihms... They are the elementary bricks
-we use in all our algorithms.
+SciPy and NumPy packages are the basis of scientific computing in Python.
+NumPy provides the \verb!ndarray! data type, an efficient $n$-dimensional data
+representation. These vectors holds all common operations (transpose...) and
+can be easily manipulated thanks to a simple, yet powerful, indexing. SciPy
+provides higher level mathematical functions that operate on ndarrays for a
+variety of domains including linear algebra, optimization and signal
+processing. Together, NumPy and SciPy provide a robust scientific environment
+for numerical computing and they are the elementary bricks we use in all our
+algorithms.
 
 \subsubsection{matplotlib}
 
-Matplotlib is a plotting library that is part of the scientific python stack. It
-offers a Matlab-like experience and allows to display plots, images or even 3D
-plots in a graphical user interface. We have used it to generate all the figures
-of this paper.
+Matplotlib is a plotting library that is part of the scientific python stack.
+It offers a Matlab-like experience and allows to display plots, images or even
+3D plots in a graphical user interface. All figures in this paper have been
+generated using this library.
 
 Note that a more convenient interface for matplotlib called pylab allows a
 procedural (ie more pythonish) use of matplotlib.
+
+\fabian{while I agree in practice with you, pylab was built as a  is a matlab-like API, while matplotlib
+was designed to be object oriented and (in theory) more Pythonic. I think its
+better to not go into the discussion of which is more pythonic}
 
 \subsubsection{nibabel}
 
