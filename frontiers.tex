@@ -115,8 +115,7 @@ can be visualised easily.
 
 \section{Introduction}
 
-Python is being increasingly used in neuroimaging studies
-(\cite{millman2007analysis, hanke2009pymvpa}), which can be explained its
+Python is being increasingly used in neuroimaging studies, \cite{millman2007analysis, hanke2009pymvpa}, which can be explained its
 versatility, its ability to act as a glue between different components and the
 maturity of its scientific stack.
 
@@ -160,7 +159,7 @@ our scripts.
 
 \subsubsection{scikit-learn}
 
-The scikit-learn project \cite{pedregosa2011} is an open source machine
+The {\em scikit-learn} project \cite{pedregosa2011} is an open source machine
 learning library for the Python programming language. The ambition of the
 project is to provide efficient and well-established machine learning tools within
 a programming environment that is accessible to non-machine learning experts
@@ -176,6 +175,15 @@ and reusable in various scientific areas.
 % Present the underlying concepts of scikit­learn: estimator,­ data
 % representation, transformer...
 
+All objects within {\em scikit-learn} are organized around three key concepts: 
+
+
+API consisting of
+three complementary interfaces: an {\em estimator} interface 
+
+Interoperation with third-party code is OK as long as the code implements the
+needed methods, which 
+
 Scikit-learn not only provides a variety of statistical learning algorithms,
 but everything needed to preprocess data and validate the results. For the sake
 of usability, all the scikit-learn functionalities have been divided in several
@@ -183,14 +191,15 @@ simple concepts.
 
 \subsection{Estimator}
 
+\subsection{Transformer}
+
+
 \subsection{Data representation}
 
 In the scikit learn, and in the world of statistical machine learning, data are
 usually represented in a 2-dimensional matrix of shape $n\_samples \times
 n\_features$. 
 
-
-\subsection{Transformer}
 
 A tranformer is an object that exposes a \verb!transform! method. If the transformation
 can be inverted, a method called \verb!inverse_transform! also exists.
