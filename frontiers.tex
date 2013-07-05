@@ -215,6 +215,18 @@ The problem of model selection is to find, within some space, the best
 combination of hyper-parameters with respect to some user-specifed criterion,
 usually the prediction score on unseen data.
 
+In {\em scikit-learn}, model selection is supported in two distinct
+estimators, \texttt{GridSearchCV} and \texttt{RandomizedSearchCV}.  They take
+as input an estimator (basic or composite), whose hyper-parameters must be
+optimized, and a set of hyperparameter settings to search through. This set is
+represented as a mapping of parameter names to a set of discrete choices in
+the case of grid search, which exhaustively enumerates the ``grid'' (cartesian
+product) of complete parameter combinations. Randomized search is a smarter
+algorithm that avoids the combinatorial explosion in grid search by sampling a
+fixed number of times from its parameter distributions.
+
+\fabian{should we put an example here ?}
+
 \section{From MR volumes to a data matrix}
 
 In the scikit learn and often in statistical machine learning, data is
