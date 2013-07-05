@@ -5,7 +5,8 @@
 \documentclass{frontiersSCNS} % for Science articles
 %\documentclass{frontiersMED} % for Medicine articles
 
-\usepackage{url}
+\usepackage[utf8]{inputenc}
+% \usepackage{url}
 
 %\usepackage{lineno}
 \usepackage{todonotes}
@@ -179,46 +180,45 @@ Interoperation with third-party code is made not on base on inheriting from a
 particular class but on the base of implementing the appropriate methods for a
 given interface.
 
-\subsection{Estimator}
+\begin{description}
+\item[Estimator.]
+    The \textit{estimator} interface is at the core of the library. It exposes a
+    \texttt{fit} method for learning a model from training data.  All supervised
+    and unsupervised learning algorithms (e.g., for classification, regression or
+    clustering) are offered as objects implementing this interface. Machine
+    learning tasks like feature extraction, feature selection or dimensionality
+    reduction are also provided as estimators.
 
-The \textit{estimator} interface is at the core of the library. It exposes a
-\texttt{fit} method for learning a model from training data.  All supervised
-and unsupervised learning algorithms (e.g., for classification, regression or
-clustering) are offered as objects implementing this interface. Machine
-learning tasks like feature extraction, feature selection or dimensionality
-reduction are also provided as estimators.
+\item[Predictor.]
+    The \textit{predictor} interface extends the notion of an estimator
+    by adding a \texttt{predict}
+    method that takes an array \texttt{X\_test} and produces
+    predictions for \texttt{X\_test}, based on the learned parameters of the
+    estimator (we call the input to \texttt{predict} ``\texttt{X\_test}'' in order
+    to emphasize that \texttt{predict} generalizes to new data). In the case of
+    supervised learning estimators, this method typically returns the predicted
+    labels or values computed by the model.
 
-\subsection{Predictor}
+\item[Transformer.]
+    Since it is common to modify or filter data before feeding it to a learning
+    algorithm, some estimators in the library implement a \textit{transformer}
+    interface which defines a \texttt{transform} method. It takes as input some new
+    data \texttt{X\_test} and yields as output a transformed version of
+    \texttt{X\_test}. Preprocessing, feature selection and dimensionality reduction
+    algorithms are all provided as transformers within the library. If the transformation
+    can be inverted, a method called \verb!inverse_transform! also exists.
 
-The \textit{predictor} interface extends the notion of an estimator
-by adding a \texttt{predict}
-method that takes an array \texttt{X\_test} and produces
-predictions for \texttt{X\_test}, based on the learned parameters of the
-estimator (we call the input to \texttt{predict} ``\texttt{X\_test}'' in order
-to emphasize that \texttt{predict} generalizes to new data). In the case of
-supervised learning estimators, this method typically returns the predicted
-labels or values computed by the model.
+\end{description}
 
-\subsection{Transformer}
+{\em scikit-learn} offers more than bla bla bla
 
-
-\subsection{Data representation}
-
-In the scikit learn, and in the world of statistical machine learning, data are
-usually represented in a 2-dimensional matrix of shape $n\_samples \times
-n\_features$. 
-
-
-\subsection{Transformer}
-
-A tranformer is an object that exposes a \verb!transform! method. If the transformation
-can be inverted, a method called \verb!inverse_transform! also exists.
-
-
-\subsection{Cross validation}
+\subsection{Model selection and cross validation}
 
 \alex{It seems more right to me to put it in this part}
 
+In the scikit learn and often in statistical machine learning, data is
+represented in a 2-dimensional matrix of shape $n\_samples \times
+n\_features$. 
 
 \section{From MR volumes to a data matrix}
 
