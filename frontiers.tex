@@ -79,11 +79,16 @@ Thirion\,$^{1,2}$ and Ga\"el Varoquaux\,$^{1,2}$}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% func_filename: name of a dataset file
-% func_img: name of a (loaded) nifti file
-% func_data, func_affine: data and affine of functional data
-% X: unmasked func_data (scikit-learn world)
-% y: labels
+% Nifti world
+% -----------
+% - func_filename: name of a dataset file
+% - func_img: name of a (loaded) nifti file
+% - func_data, func_affine: data and affine of functional data
+
+% Scikit-learn world
+% ------------------
+% - X: unmasked func_data (scikit-learn world)
+% - y: labels
 
 \begin{document}
 \onecolumn
@@ -173,10 +178,6 @@ project is to provide efficient and well-established machine learning tools with
 a programming environment that is accessible to non-machine learning experts
 and reusable in various scientific areas.
 
-
-
-% Here we present the Python neuroimaging ecosystem : scikit­learn, nibabel,
-% nipy.
 
 \section{Scikit-learn}
 
@@ -431,7 +432,7 @@ However, this reaction takes time, usually around 3-4 seconds. This is the
 duration between the event and the reaction observed in the brain. To be able to
 match these two events, we will sometimes have to shift our data. The number of
 scans that must be shifted depends on the TR (repetition time) of the data.
-Usually, we remove the two first scans of the data and the two last values of the
+Usually, we remove the first two scans of the data and the two last values of the
 labels (to keep an homogeneous length).
 
 \begin{pyglist}
@@ -622,7 +623,7 @@ activation and pixel color. Full details are available in the reference paper
 
 Kamitani training set is composed of random images (where black and white pixels
 are balanced). The testing set is composed of structured images containing
-geometric shape (square, cross...) and letters (spelling the word \emph{neuro}).
+geometric shapes (square, cross...) and letters.
 
 There are two ways to establish a link between brain voxels and image pixels: we
 can either try to reconstruct image from brain voxel activation, this is called
@@ -663,25 +664,25 @@ brain activation during resting state. These correlated voxel activations seemed
 to form functional networks concording with neuroscientific knowledge.
 
 Resting-state fMRI is useful when dealing with subjects that cannot execute a
-specific task. In fact, no task related protocol is capable of diagnosing precisely
+specific task. In fact, no task-driven protocol is capable of diagnosing precisely
 damaged brain areas in stroke patients, as no task can highlight these problems.
 \cite{varoquaux2010b} exhibits differences in correlation between functional
 networks between control and post-stroke patients.
 
 As resting state fMRI are unlabeled data, we have to use unsupervised methods to
-mine them. The most popular method to extract functional networksis the ICA and
+mine them. The most popular method to extract functional networks is ICA and
 is the subject of our first use case. We will then show results obtained with
 clustering methods as several efficient implementations are available in
 scikit-learn.
 
 The main problem with functional connectivity (and unsupervised methods in
 general) is the lack of labels or ground truth. It is therefore very difficult
-to score the computed models and find cross validate it. A first way would be
+to score the computed models and cross validate it. At first, you can
 compare your results with some reference atlas or neuroscientific knowledge. In
 fact, it is believed that functional network should match anatomical division
 \alex{Well, I believe that. Any reference ?}. It is also possible to relate to
 networks discovered in task or other resting state experiments (eg default mode
-network, visual and ausitory networks...). Some researchers even released
+network, visual and auditory networks...). Some researchers even released
 functional atlases built upon one of their experiment (cite yeo, smith,
 craddock).
 
@@ -689,22 +690,23 @@ craddock).
 
 \subsubsection{Principle}
 
-ICA is a blind source separation method. Its principle is to separate a
-multivariate signal into several components by maximizing their non-gaussianity.
 A typical example is the \emph{cocktail party problem} where ICA separates the
 voices of people using signal from several mikes.
 
-It is historically the reference method to extract networks from resting state
-fMRI \cite{biswal1999}. Several strategies have been used to syndicate ICA
+ICA is historically the reference method to extract networks from resting state
+fMRI \cite{biswal1999}. It is a blind source separation method. Its principle is
+to separate a
+multivariate signal into several components by maximizing their non-gaussianity.
+Several strategies have been used to syndicate ICA
 results across several subjects. \cite{calhoun2001a} proposes a dimension
-reduction (using PCA) followed by a concatenation of the time series.
-\cite{varoquaux2010} uses dimension reduction and canonical correlation analysis
+reduction (using PCA) followed by a concatenation of timeseries.
+\cite{varoquaux2010} use dimension reduction and canonical correlation analysis
 to aggregate subject data.
 
 \subsubsection{Preprocessing}
 
-Scikit-learn FastICA takes care of whitening of the data, so there is no need to
-standardize it in our preprocessing. However, we still detrend it because
+ICA requires whitened timeseries to run properly. Scikit-learn FastICA takes care
+of this step. However, we still detrend them because
 FastICA does not look for linear trends, only constant one.
 
 \subsubsection{Application}
@@ -723,13 +725,32 @@ others evoked methods (CanICA, MELODIC).
 
 \subsection{Clustering}
 
-Make  an  example  with   Ward   Clustering.  Indicate  then   that  other
-algorithms  can  be  used  such  as
-KMeans and Spectral clustering and only give results.
+\subsubsection{Principle}
 
-We use a PCA here to reduce dimensionality.
+A clustering method aggregates similar features into groups. Scikit-learn
+provides different clustering algorithms, each one holding its own properties:
 
-Bonus: may be used as dimensionality reduction
+\begin{itemize}
+    \item{\bf Ward's clustering} uses a bottom-up hierarchical approach. Features are
+        progressively aggregated into clusters until a whole tree is built. This
+        tree is then cut to get the requested number of clusters.
+    \item{\bf k-means} is a centroid based approach.
+    \item{\bf spectral clustering} is a graph based approach. It separates
+        features into cliques by maximizing intra-group connectivity and
+        minimizing inter-group connectivity.
+\end{itemize}
+
+For eadch algorithm, one must specify the number of clusters. This parameter is
+not easy to set as we have few information about the data.
+
+In this use case, we will use Ward's clustering and will compare its results to
+k-means and spectral clustering. Ward's clustering is fast and builds a complete
+tree of features, such that varying the number of clusters is costless.
+
+\subsubsection{Preprocessing}
+
+We use a PCA to reduce the dimensionality of the problem. Some clustering
+algorithms (like k-means) give better results if data is smoothed.
 
 
 \includegraphics[width=.3\linewidth]{img/plot_rest_clustering_1.png}
