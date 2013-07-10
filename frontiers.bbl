@@ -1,4 +1,4 @@
-\begin{thebibliography}{11}
+\begin{thebibliography}{12}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \expandafter\ifx\csname doi\endcsname\relax
@@ -32,6 +32,13 @@ Haxby, J.~V., Gobbini, I.~M., Furey, M.~L., Ishai, A., Schouten, J.~L., and
   Pietrini, P. (2001) Distributed and overlapping representations of faces and
   objects in ventral temporal cortex.
 \newblock {\em Science\/} 293 2425.
+
+\bibitem[{Kriegeskorte et~al.(2006)Kriegeskorte, Goebel, and
+  Bandettini}]{kriegeskorte2006}
+Kriegeskorte, N., Goebel, R., and Bandettini, P. (2006) Information-based
+  functional brain mapping.
+\newblock {\em Proceedings of the National Academy of Sciences of the United
+  States of America\/} 103 3863--3868.
 
 \bibitem[{Miyawaki et~al.(2008)Miyawaki, Uchida, Yamashita, Sato, Morito,
   Tanabe et~al.}]{miyawaki2008}

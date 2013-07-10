@@ -9,8 +9,17 @@
 
 %\usepackage{lineno}
 \usepackage{todonotes}
-\usepackage{verbments}
-\plset{language=python}
+\usepackage{subfigure}
+\usepackage{listings}
+\lstset{language=python,
+        basicstyle=\ttfamily,
+        frame=single,xleftmargin=\fboxsep,xrightmargin=-\fboxsep}
+
+% Absolute numerotation for figures
+\usepackage{caption}
+\captionsetup{figurewithin=none}  
+\captionsetup{tablewithin=none}
+
 
 \newcommand{\alex}[1]{\todo[inline, color=green!40]{#1}}
 \newcommand{\fabian}[1]{\todo[inline, color=blue!40]{#1}}
@@ -168,9 +177,6 @@ Nibabel is a neuroimaging data loading package. Nibabel can load or save data in
 popular neuroimaging data format. This is indeed an entry point of all
 our scripts.
 
-\subsubsection{nipy}
-
-
 \subsubsection{scikit-learn}
 
 The {\em scikit-learn} project, \cite{pedregosa2011}, is an open source machine
@@ -244,17 +250,20 @@ fixed number of times from its parameter distributions.
 
 \section{From MR volumes to a data matrix}
 
+At this point, we suppose that standard preprocessings have been applied to the
+data (motion correction, slice timing, coregistration on a common template like
+MNI if necessary).
+
 \subsection{Transformation matrix}
 
 Neuroimaging data are represented by 3D scans composed of voxels and their
 associated timeseries along with a transformation matrix (called affine)
 used to transpose the data in its original space.
-
 Such matrix is needed because data may be anisotropic: the distance between
 two voxels is not the same depending on the direction.
 It is crucial to take that into account when dealing with
 algorithms that uses the geometric structure of the data (see Searchlight
-\ref{Searchlight}).
+\ref{searchlight}).
 
 One way to take it into account is to transform the coordinates. Going from
 numpy indexing \verb!array[i, j, k]! to real coordinates $(x, y, z) \in
@@ -282,12 +291,12 @@ numpy indexing \verb!array[i, j, k]! to real coordinates $(x, y, z) \in
     \end{bmatrix}
 \]
 
-Here is a simple function that gather voxel coordinates in a mask and transpose
-them into the original space:
+We can write a Pyhton helper function to transpose coordinates of a mask into
+its original space:
 
 % I use that in the Searchlight example
 
-\begin{pyglist}
+\begin{lstlisting}
 def get_real_coordinates(mask, affine):
     # get coordinates of non zero voxels
     mask_coords = np.where(mask != 0)
@@ -296,31 +305,14 @@ def get_real_coordinates(mask, affine):
     # apply the transformation
     mask_coords = np.dot(affine, np.asarray(mask_coords))[:3].T
     return mask_coords
-\end{pyglist}
+\end{lstlisting}
 
 This affine matrix can be different across files, e.g. when dealing when
 multi-subject dataset or when using an external mask. In this case, it is very
-important to resample all files on the same affine.
-
-\subsection{Data Preparation}
-    % or Signal Processing ?
-
-At this point, we suppose that standard preprocessings have been applied to the
-data (motion correction, slice timing, coregistration on a common template like
-MNI if necessary).
-
-\subsubsection{Detrending}
-
-Detrending is an essential step when dealing with fMRI data. It removes a
-linear trend over the time series of each
-voxel. It is needed when you want to study the correlation between
-features.
-
-\begin{pyglist}
-scipy.signal.detrend(data)
-\end{pyglist}
+important to resample all files on the same affine (see \ref{resampling}).
 
 \subsection{Resampling}
+\label{resampling}
 
 Resampling consists in changing the spatial resolution of the data. This is
 typically needed
@@ -332,26 +324,28 @@ why it should be used carefully. Oversampling (increasing
 data resolution) leads to higher memory consumption and computation resources
 with no gain in information.
 Downsampling is commonly used to reduce the size of the data to process.
-
 Typical sizes are 2mm or 3mm resolutions, but the spread of high field MR
 scanner tends to lower these values.
 
+For implementation, one should refer to \texttt{scipy.ndimage.affine\_transform}.
+
 \subsection{Signal cleaning}
 
-\begin{itemize}
-    \item Remove high frequency (scanner artifacts)
-    \item Removing confounds is necessary for some processings
-\end{itemize}
+Now that 3D scans have been resampled, we have to take care of the time series
+who stills have trends and scanner artifacts.
 
-
-% I think that we should present the challenges about NI data here. Poor SNR,
-% multi subject / session...
+\subsubsection{Detrending} is an essential step when dealing with fMRI data. It removes a
+linear trend over the time series of each
+voxel. It is needed when you want to study the correlation between
+features. You have to use \texttt{scipy.signal.detrend}.
+\subsubsection{Normalization} is necessary for most processings.
+\subsubsection{Confound removal} consists in regressing out confounds like
+estimated movements. Some datasets provide csv files that can be used to remove
+these artifacts.
+\subsubsection{Signal filtering}. Low-pass filtering improves specificity.
+High-pass filtering should be kept small, to keep some sensitivity.
 
 \subsection{Masking}
-
-% This   step  turns  the  data  into  the  scikit­learn   compliant  formant
-% n_features  x  n_samples.  We  may speak of connectivity graph that allow to
-% integrate the 3D structure of the data in some algorithms.
 
 \subsubsection{From 4-dimensional image to 2-dimensional array}
 
@@ -381,8 +375,10 @@ already provided is most of public datasets).
 The implementation of masking procedure is fairly simple thanks to NumPy fancy
 indexing. Special attention must be paid to the type of the mask array: it must
 be boolean otherwise it will be considered as broadcasting and fill your memory.
+2-dimensional masked data will be refered as \texttt{X} to follow scikit-learn
+convetions.
 
-\begin{pyglist}
+\begin{lstlisting}
 def apply_mask(mask_data, mask_affine, func_data, func_affine):
     assert(np.all(mask_affine == func_affine))
     mask_data = mask_data.astype(np.bool)
@@ -393,7 +389,10 @@ def unmask(X, mask_data, mask_affine):
     func_data = np.zeros(mask_data.shape, dtype=X.dtype)
     func_data[mask_data] = X
     return func_data, mask_affine
-\end{pyglist}
+
+% For single subject data
+X = apply_mask(mask_data, mask_affine, func_data, func_affine)
+\end{lstlisting}
 
 
 % This part has been removed because automatic masking is overly complicated and
@@ -440,10 +439,10 @@ scans that must be shifted depends on the TR (repetition time) of the data.
 Usually, we remove the first two scans of the data and the two last values of the
 labels (to keep an homogeneous length).
 
-\begin{pyglist}
+\begin{lstlisting}
 X = X[2:]
 y = y[:-2]
-\end{pyglist}
+\end{lstlisting}
 
 \section{Decoding}
 
@@ -492,14 +491,14 @@ for example. All these objects are implemented as transformers.
 Here we use a fixed number of features and we use the \verb!f_classif! function
 (ANOVA F-Test) for scoring.
 
-\begin{pyglist}
+\begin{lstlisting}
 from sklearn.feature_selection import SelectKBest, f_classif
 
 ### Define the dimension reduction to be used.
 # Here we use a classical univariate feature selection based on F-test,
 # namely Anova. We set the number of features to be selected to 500
 feature_selection = SelectKBest(f_classif, k=500)
-\end{pyglist}
+\end{lstlisting}
 
 \subsubsection{Classification}
 
@@ -514,7 +513,7 @@ vectors. We can say that these support vectors hold the information allowing to
 discriminate the two classes, this is why we will display them and try to see if
 they match some neuroscientific knowledge.
 
-\begin{pyglist}
+\begin{lstlisting}
 from sklearn.svm import SVC
 clf = SVC(kernel='linear', C=1.)
 clf.fit(?)
@@ -523,7 +522,7 @@ clf.fit(?)
 svc = clf.support_vectors_
 # reverse feature selection
 svc = feature_selection.inverse_transform(svc)
-\end{pyglist}
+\end{lstlisting}
 
 \subsubsection{Pipeline}
 
@@ -536,10 +535,10 @@ input data will be conveyed. The function to call for each object (transform,
 fit...) depends on its type.
 This allow the developpers to write a complete processing as a one-liner.
 
-\begin{pyglist}
+\begin{lstlisting}
 from sklearn.pipeline import Pipeline
 anova_svc = Pipeline([('anova', feature_selection), ('svc', clf)])
-\end{pyglist}
+\end{lstlisting}
 
 \subsubsection{Results}
 
@@ -549,8 +548,8 @@ lines surround features exhibited in the reference paper. We can see that our
 classifier uses mostly voxels presents in the regions used to discriminate
 houses.
 
-\includegraphics[width=.3\linewidth]{img/svm.pdf}
-
+\textbf{Figure \ref{fig:haxby}.}{Voxel importance in prediction decision for Haxby experiment
+using \textit{a.} SVC, \textit{b.} Searchlight and \textit{c.} f\_score}{fig:01}
 
 \subsection{Searchlight}
 \label{searchlight}
@@ -582,50 +581,54 @@ code: it should be able to run on part of the mask. Thus we will have the
 traditionnal \verb!mask! and a \verb!process_mask! that restraint computation
 only to some voxels (in our case, a half axial slice).
 
-First, we compute an adjacency graph between voxels. We will take the
-neighbourhood of the voxels in the \verb!process_mask!, based on the
-connectivity informations contained in the \verb!mask!. This can be done by
+First, we compute an adjacency graph between voxels. 
+We build (fit) a connectivity graph on the mask using \texttt{NearestNeighbours}
+but take the connectivity graph restrained to the
+process mask so that the graph contains only our voxels of interest.
+
 fitting a \verb!NearestNeighbours! on the \verb!mask! and applying it on
-\verb!process_mask!. \alex{TODO: reformulate}
+\verb!process_mask!.
 
-\begin{pyglist}
-    # Compute world coordinates of all in-mask voxels.
-    mask_coords = get_real_coordinates(mask_data, mask_affine)
+\begin{lstlisting}
+# Compute world coordinates of all in-mask voxels.
+mask_coords = get_real_coordinates(mask_data, mask_affine)
 
-    # Compute world coordinates of all in-process mask voxels
-    process_mask_coords = get_real_coordinates(process_mask_data,
-                                               process_mask_affine)
+# Compute world coordinates of all in-process mask voxels
+process_mask_coords = get_real_coordinates(process_mask_data,
+                                           process_mask_affine)
 
-    clf = neighbors.NearestNeighbors(radius=radius)
-    A = clf.fit(mask_coords).radius_neighbors_graph(process_mask_coords)
-\end{pyglist}
+clf = neighbors.NearestNeighbors(radius=radius)
+A = clf.fit(mask_coords).radius_neighbors_graph(process_mask_coords)
+\end{lstlisting}
 
 Then, for each row of our adjacency matrix, we do a cross validation using a
 given estimator. This is the core of the algorithm and we see that it can be
 written with a simple for-loop.
 
-\begin{pyglist}
-    scores = np.zeros(len(A.rows))
-    for i, row in enumerate(A.rows):
-        print '%d/%d' % (i, len(A.rows))
-        scores[i] = np.mean(
-                cross_val_score(estimator, X[:, row], y, score_func=score_func,
-                                cv=cv, n_jobs=1))
-    return scores
-\end{pyglist}
+\begin{lstlisting}
+scores = np.zeros(len(A.rows))
+for i, row in enumerate(A.rows):
+    scores[i] = np.mean(
+            cross_val_score(estimator, X[:, row], y,
+                            score_func=score_func,
+                            cv=cv, n_jobs=1))
+return scores
+\end{lstlisting}
 
 \subsubsection{Results}
 
+Results are presented in figure \ref{fig:haxby}. Searchlight result is centered
+and f\_score is on the right.
 In order to evaluate the performance of Searchlight, we compare it to the
 f\_score measure which is the simplest statistical test we can make on the data.
 We can see that Searchlight localizes information mainly in the region of
 interest corresponding to house. The smoothing effect is inherent to Searchlight
 and is caused by the fact that a ball is used to iterate on the voxels.
-\includegraphics[width=.3\linewidth]{img/searchlight.pdf}
-\includegraphics[width=.3\linewidth]{img/f_score.pdf}
 
 \subsection{Classification of M/EEG sensor space data}
 
+\alex{For the moment we don't have enough space and A. Gramfort told that this
+may not fit as the whole paper is very fMRI oriented}
 
 \subsection{Decoding: reconstructing image from brain activity}
 
@@ -666,20 +669,31 @@ To measure the performance of each approach, we will use a log of the
 reconstruction error, which is closed to a log likelihood. Thanks to
 scikit-learn, applying a cross validation to get score is a oneliner.
 
-\subsubsection{}
+\begin{lstlisting}
+from sklearn.linear_model import OrthogonalMatchingPursuit as OMP
+from sklearn.cross_validation import cross_val_score
 
+pipeline_OMP = Pipeline([('selection', SelectKBest(f_classif, 500)),
+                         ('clf', OMP(n_nonzero_coefs=20)])
+scores_omp = [cross_val_score(pipeline_OMP, X_train, y,
+                              score_func=log_score, cv=5)
+              for y in y_train]
+\end{lstlisting}
 
+\subsubsection{Results}
 
-\includegraphics[width=.5\linewidth]{img/logistic_l1_scores.png}
+As Miyawaki, in figure \ref{fig:omp} we observe that reconstruction is more accurate in the fovea. This
+may be caused by the fact that there are more neurons dedicated to foveal
+representation in the primary visual area than for the borders.
+
+\textbf{Figure \ref{fig:omp}.}{Reconstruction accuracy depending on pixel
+position in the stimulus.}\label{fig:02}
 
 \section{Encoding}
 
 \alex{After talking with Michael, he told me that he could make a fairly simple
     example for encoding, which I think is a plus for the paper. The example will
     be integrated in Nisl.}
-
-
-
 
 \section{Functional Connectivity}
 
@@ -739,12 +753,12 @@ FastICA does not look for linear trends, only constant one.
 The code to apply ICA is very straitforward. Note the trnasposition of data
 matrix to apply it on the right dimension.
 
-\begin{pyglist}
+\begin{lstlisting}
 from sklearn.decomposition import FastICA
 X = np.vstack(Xs)
 ica = FastICA(n_components=n_components)
 components_masked = ica.fit_transform(data_masked.T).T
-\end{pyglist}
+\end{lstlisting}
 
 After computation, normalization and thresholding of the map is necessary to
 obtain brain networks.
@@ -752,12 +766,13 @@ obtain brain networks.
 \subsubsection{Results}
 
 In addition of classical ICA shown above, we have computed results using the
-others evoked methods (CanICA, MELODIC).
+others evoked methods (CanICA, MELODIC). We can see that with each method we can
+extract the default mode network, more or less precisely.
 
-The default network is visible in all methods.
-\includegraphics[width=.5\linewidth]{img/plot_canica_resting_state_17.png}
+\textbf{Figure \ref{fig:ica}.}{Extraction of default mode network using \textit{a} Group ICA
+  \textit{b} CanICA}\label{fig:03}
 
-\alex{Put other networks in evidence}
+\alex{MELODIC is missing}
 
 \subsection{Clustering}
 
@@ -785,26 +800,20 @@ In this use case, we will use Ward's clustering and will compare its results to
 k-means and spectral clustering. Ward's clustering is fast and builds a complete
 tree of features, such that varying the number of clusters is costless.
 
-\subsubsection{Preprocessing}
-
 We use a PCA to reduce the dimensionality of the problem. We also apply
 smoothing to k-means.
 
-\subsubsection{Application}
-
-\begin{pyglist}
+\begin{lstlisting}
 connectivity = grid_to_graph(n_x=mask.shape[0], n_y=mask.shape[1],
                              n_z=mask.shape[2], mask=mask)
 ward = WardAgglomeration(n_clusters=1000, connectivity=connectivity)
 ward.fit(X)
-\end{pyglist}
+\end{lstlisting}
 
+\subsubsection{Results}
 
+\textbf{Figure \ref{fig:clustering}.}{Brain decomposition using different clustering techniques.}\label{fig:04}
 
-
-\includegraphics[width=.3\linewidth]{img/plot_rest_clustering_1.png}
-\includegraphics[width=.3\linewidth]{img/plot_rest_clustering_2.png}
-\includegraphics[width=.3\linewidth]{img/plot_rest_clustering_3.png}
 
 \section*{Disclosure/Conflict-of-Interest Statement}
 %All relationships financial, commercial or otherwise that might be perceived
@@ -817,17 +826,48 @@ The authors declare that the research was conducted in the absence of any
 commercial or financial relationships that could be construed as a potential
 conflict of interest.
 
-\section*{Acknowledgement} Text Text Text Text Text Text  Text Text Text Text
-Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text
-Text.
-
 \paragraph{Funding\textcolon} Text Text Text Text Text Text  Text Text.
-
-\section*{Supplemental Data} Text Text Text Text Text Text  Text Text Text Text
-Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text
-Text Text.
 
 \bibliographystyle{frontiersinSCNS} % for Science articles
 \bibliography{biblio}
 
+\newpage
+
+\begin{figure}[h]
+  \begin{center}
+  \subfigure[SVC]{\includegraphics[width=.3\linewidth]{img/svm.pdf}}
+  \subfigure[Searchlight]{\includegraphics[width=.3\linewidth]{img/searchlight.pdf}}
+  \subfigure[F\_score]{\includegraphics[width=.3\linewidth]{img/f_score.pdf}}
+  \end{center}
+\caption{Voxel importance in prediction decision for Haxby experiment
+using \textit{a.} SVC, \textit{b.} Searchlight and \textit{c.}
+f\_score}
+\label{fig:haxby}
+\end{figure}
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=.3\linewidth]{img/logistic_l1_scores.png}
+  \end{center}
+  \caption{Reconstruction accuracy depending on pixel
+           position in the stimulus.}
+\label{fig:omp}
+\end{figure}
+
+\begin{figure}[h]
+  \begin{center}
+      \subfigure[ICA]{\includegraphics[width=.3\linewidth]{img/ica.pdf}}
+      \subfigure[CanICA]{\includegraphics[width=.3\linewidth]{img/plot_canica_resting_state_17.png}}
+  \end{center}
+  \caption{Extraction of default mode network using \textit{a} Group ICA
+  \textit{b} CanICA}
+  \label{fig:ica}
+\end{figure}
+
+\begin{figure}[h]
+  \begin{center}
+  \subfigure[Ward's clustering]{\includegraphics[width=.3\linewidth]{img/plot_rest_clustering_1.png}}
+  \end{center}
+  \caption{Brain decomposition using different clustering techniques.}
+  \label{fig:clustering}
+\end{figure}
 \end{document}
