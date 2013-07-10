@@ -87,7 +87,8 @@ Thirion\,$^{1,2}$ and Ga\"el Varoquaux\,$^{1,2}$}
 
 % Scikit-learn world
 % ------------------
-% - X: unmasked func_data (scikit-learn world)
+% - Xs: list of unmasked func_data (scikit-learn world)
+% - X: unmasked func_data reduced to 2 dimensions (scikit-learn world)
 % - y: labels
 
 \begin{document}
@@ -243,22 +244,21 @@ fixed number of times from its parameter distributions.
 
 \section{From MR volumes to a data matrix}
 
-In the scikit learn and often in statistical machine learning, data is
-represented in a 2-dimensional matrix of shape $n\_samples \times
-n\_features$.
-
-As any domain specific data, MR volumes holds particular properties.
-Understanding them is crucial to be sure to make proper use of the data.
-
 \subsection{Transformation matrix}
 
-Neuroimaging data are represented in a 4D numpy array (3 dimensions + time) and
-a transformation matrixi (called affine). This affine is used to transpose the
-data in its original space.
+Neuroimaging data are represented by 3D scans composed of voxels and their
+associated timeseries along with a transformation matrix (called affine)
+used to transpose the data in its original space.
 
-A simple way to apply it is to work with coordinates. One can simply go from
+Such matrix is needed because data may be anisotropic: the distance between
+two voxels is not the same depending on the direction.
+It is crucial to take that into account when dealing with
+algorithms that uses the geometric structure of the data (see Searchlight
+\ref{Searchlight}).
+
+One way to take it into account is to transform the coordinates. Going from
 numpy indexing \verb!array[i, j, k]! to real coordinates $(x, y, z) \in
-\mathbb{R}^3$.
+\mathbb{R}^3$ is a simple matrix product:
 
 \[
     \begin{bmatrix}
@@ -308,9 +308,6 @@ important to resample all files on the same affine.
 At this point, we suppose that standard preprocessings have been applied to the
 data (motion correction, slice timing, coregistration on a common template like
 MNI if necessary).
-However, data is not yet ready to be processed by the scikit-learn. In
-fact, preprocessed data may have different shapes. Moreover, it is essential to
-get rid of some remaining scanner artefacts and individual trends.
 
 \subsubsection{Detrending}
 
@@ -330,7 +327,7 @@ typically needed
 when dealing when data coming from an heterogenous dataset, as shape depends
 on acquisition parameters.
 
-Resampling is an interpolation and thus may alter the data integrity. That is
+Resampling is an interpolation and may alter the data integrity. That is
 why it should be used carefully. Oversampling (increasing
 data resolution) leads to higher memory consumption and computation resources
 with no gain in information.
@@ -361,18 +358,23 @@ scanner tends to lower these values.
 Neuroimaging data are represented in 4 dimensions: 3 dimensions for the scans,
 which are positioned in a coordinate space, and one dimension for the time.
 Scikit-learn algorithms, on the other hand, only accept 2-dimensional data: one
-dimension for the features and one for the samples.\\
+dimension for the features and one for the samples. This format brings \textit{i)}
+consistency across all scikit-learn objects \textit{ii)} fast array iteration
+\textit{iii)} compressed sparse representation thanks to NumPy.
+In most
+cases, voxels will be considered as features and timeseries as samples (these
+roles are inversed in spectral clustering for example).\\
 
-Consequently, in order to use neuroimaging data in the scikit-learn, a
+
+In order to use neuroimaging data in the scikit-learn, a
 conversion is needed. The most simple way to achieve that would be to
 \emph{flatten} the 3D scans into a 1D array. However, we know that not every
 voxels in a neuroimaging scan is useful. In particular, outter-brain voxels are
 of no use and, worse, they can bring spurious noise and scanner artefacts (such
 as ghosts).\\
 
-To sort out voxels of interest, we will have to apply a mask on the data. Most
-of public datasets provide a mask, come of them even provide several, isolating
-different functional or anatomical brain regions. \alex{ref to Haxby}
+To sort out voxels of interest, we will apply a mask on the data (which is
+already provided is most of public datasets).
 
 \includegraphics[width=.5\linewidth]{img/niimgs.jpg}
 
@@ -394,18 +396,21 @@ def unmask(X, mask_data, mask_affine):
 \end{pyglist}
 
 
+% This part has been removed because automatic masking is overly complicated and
+% does not brinautomatic masking is overly complicated and does not bring much
+% to the paper.
 
-\subsubsection{Automatically computing a mask}
+% \subsubsection{Automatically computing a mask}
 
-The simplest strategy to compute a mask is a binarization by a selected threshold.
-Due to the nature of the neuroimaging data, there exists some strategy to choose
-this threshold in order to obtain a decent segmentation.
+% The simplest strategy to compute a mask is a binarization by a selected threshold.
+% Due to the nature of the neuroimaging data, there exists some strategy to choose
+% this threshold in order to obtain a decent segmentation.
 
-\alex{There is a reference for the method used in Nisl. We should put it there
-and in the code. Add a figure with an histogram to illustrate.}
+% \alex{There is a reference for the method used in Nisl. We should put it there
+% and in the code. Add a figure with an histogram to illustrate.}
 
-Multi subject computation is simply done by intersecting subjects maps
-relatively to a chosen threshold.
+% Multi subject computation is simply done by intersecting subjects maps
+% relatively to a chosen threshold.
 
 \subsubsection{Preserving geometrical structure}
 
@@ -445,10 +450,7 @@ y = y[:-2]
 The process of predicting behavioral or phenotypic data from fMRI scan is
 called decoding.
 
-
 \subsection{SVM}
-
-
 
 \subsubsection{Haxby dataset}
 
@@ -539,12 +541,19 @@ from sklearn.pipeline import Pipeline
 anova_svc = Pipeline([('anova', feature_selection), ('svc', clf)])
 \end{pyglist}
 
-\subsubsection{Displaying the results}
-~\\
-\alex{Should we define a visualization function once and for all?}
+\subsubsection{Results}
+
+We display here the support vectors of the classifiers. These are the features
+used by the classifier to discriminate between face and houses. Green and blue
+lines surround features exhibited in the reference paper. We can see that our
+classifier uses mostly voxels presents in the regions used to discriminate
+houses.
+
+\includegraphics[width=.3\linewidth]{img/svm.pdf}
+
 
 \subsection{Searchlight}
-
+\label{searchlight}
 For this example, we use the same dataset as the first one (one subject from
 Haxby).
 
@@ -589,8 +598,6 @@ fitting a \verb!NearestNeighbours! on the \verb!mask! and applying it on
 
     clf = neighbors.NearestNeighbors(radius=radius)
     A = clf.fit(mask_coords).radius_neighbors_graph(process_mask_coords)
-    del process_mask_coords, mask_coords
-    A = A.tolil()
 \end{pyglist}
 
 Then, for each row of our adjacency matrix, we do a cross validation using a
@@ -607,11 +614,20 @@ written with a simple for-loop.
     return scores
 \end{pyglist}
 
+\subsubsection{Results}
+
+In order to evaluate the performance of Searchlight, we compare it to the
+f\_score measure which is the simplest statistical test we can make on the data.
+We can see that Searchlight localizes information mainly in the region of
+interest corresponding to house. The smoothing effect is inherent to Searchlight
+and is caused by the fact that a ball is used to iterate on the voxels.
+\includegraphics[width=.3\linewidth]{img/searchlight.pdf}
+\includegraphics[width=.3\linewidth]{img/f_score.pdf}
 
 \subsection{Classification of M/EEG sensor space data}
 
 
-\subsection{Orthogonal Matching Pursuit}
+\subsection{Decoding: reconstructing image from brain activity}
 
 \subsubsection{Kamitani dataset}
 
@@ -633,16 +649,24 @@ encoding.
 In the present example, we will do both encoding and decoding and see if the
 results match.
 
-\subsubsection{Preprocessing}
+\subsubsection{Principle} % Should be 'protocol'?
 
 Common pre-treatment have been applied to the data (detrending and
 standardization).
 
-\subsubsection{Decoding: reconstructing image from brain activity}
-
 In the original paper (\cite{miyawaki2008}), Miyawaki uses a sparse multinomial
-logistic regression to reconstruct the image.
+logistic regression and a sophisticated multiscale strategy to reconstruct the image.
+For this use case, we will compare a l1 logistic regression and an Orthogonal
+Matching Pursuit (\cite{mallat1993}). The OMP is a linear model that uses
+timeseries as a dictionary and an l1 constraint on the loadings. Its
+paritcularity is to add one atom at each step and update all coefficients
+based on the orthogonal projection on preivously selected atoms.
 
+To measure the performance of each approach, we will use a log of the
+reconstruction error, which is closed to a log likelihood. Thanks to
+scikit-learn, applying a cross validation to get score is a oneliner.
+
+\subsubsection{}
 
 
 
@@ -699,7 +723,8 @@ to separate a
 multivariate signal into several components by maximizing their non-gaussianity.
 Several strategies have been used to syndicate ICA
 results across several subjects. \cite{calhoun2001a} proposes a dimension
-reduction (using PCA) followed by a concatenation of timeseries.
+reduction (using PCA) followed by a concatenation of timeseries, which we use
+this example.
 \cite{varoquaux2010} use dimension reduction and canonical correlation analysis
 to aggregate subject data.
 
@@ -711,17 +736,28 @@ FastICA does not look for linear trends, only constant one.
 
 \subsubsection{Application}
 
+The code to apply ICA is very straitforward. Note the trnasposition of data
+matrix to apply it on the right dimension.
 
-\subsubsection{Postprocessing}
+\begin{pyglist}
+from sklearn.decomposition import FastICA
+X = np.vstack(Xs)
+ica = FastICA(n_components=n_components)
+components_masked = ica.fit_transform(data_masked.T).T
+\end{pyglist}
 
-A thresholding on the maps is necessary.
+After computation, normalization and thresholding of the map is necessary to
+obtain brain networks.
 
 \subsubsection{Results}
 
 In addition of classical ICA shown above, we have computed results using the
 others evoked methods (CanICA, MELODIC).
 
+The default network is visible in all methods.
 \includegraphics[width=.5\linewidth]{img/plot_canica_resting_state_17.png}
+
+\alex{Put other networks in evidence}
 
 \subsection{Clustering}
 
@@ -734,13 +770,15 @@ provides different clustering algorithms, each one holding its own properties:
     \item{\bf Ward's clustering} uses a bottom-up hierarchical approach. Features are
         progressively aggregated into clusters until a whole tree is built. This
         tree is then cut to get the requested number of clusters.
-    \item{\bf k-means} is a centroid based approach.
+    \item{\bf k-means} is a centroid based approach. Clusters are represented by
+        a central vector: a feature belongs to the cluster of the nearest
+        centroid.
     \item{\bf spectral clustering} is a graph based approach. It separates
-        features into cliques by maximizing intra-group connectivity and
+        the feature graph into subgraphs by maximizing intra-group connectivity and
         minimizing inter-group connectivity.
 \end{itemize}
 
-For eadch algorithm, one must specify the number of clusters. This parameter is
+For each algorithm, one must specify the number of clusters. This parameter is
 not easy to set as we have few information about the data.
 
 In this use case, we will use Ward's clustering and will compare its results to
@@ -749,8 +787,19 @@ tree of features, such that varying the number of clusters is costless.
 
 \subsubsection{Preprocessing}
 
-We use a PCA to reduce the dimensionality of the problem. Some clustering
-algorithms (like k-means) give better results if data is smoothed.
+We use a PCA to reduce the dimensionality of the problem. We also apply
+smoothing to k-means.
+
+\subsubsection{Application}
+
+\begin{pyglist}
+connectivity = grid_to_graph(n_x=mask.shape[0], n_y=mask.shape[1],
+                             n_z=mask.shape[2], mask=mask)
+ward = WardAgglomeration(n_clusters=1000, connectivity=connectivity)
+ward.fit(X)
+\end{pyglist}
+
+
 
 
 \includegraphics[width=.3\linewidth]{img/plot_rest_clustering_1.png}

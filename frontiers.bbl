@@ -1,0 +1,81 @@
+\begin{thebibliography}{11}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \expandafter\ifx\csname doi\endcsname\relax
+  \def\doi#1{doi:\discretionary{}{}{}#1}\fi \else
+  \expandafter\ifx\csname doi\endcsname\relax
+  \def\doi{doi:\discretionary{}{}{}\begingroup \urlstyle{rm}\Url}\fi \fi
+\expandafter\ifx\csname selectlanguage\endcsname\relax
+  \def\selectlanguage#1{}\fi
+
+\bibitem[{Millman and Brett(2007)}]{millman2007analysis}
+Millman, K.~J. and Brett, M. (2007) Analysis of functional magnetic resonance
+  imaging in python.
+\newblock {\em Computing in Science \& Engineering\/} 9 52--55.
+
+\bibitem[{Hanke et~al.(2009)Hanke, Halchenko, Sederberg, Hanson, Haxby, and
+  Pollmann}]{hanke2009pymvpa}
+Hanke, M., Halchenko, Y.~O., Sederberg, P.~B., Hanson, S.~J., Haxby, J.~V., and
+  Pollmann, S. (2009) Pymvpa: A python toolbox for multivariate pattern
+  analysis of fmri data.
+\newblock {\em Neuroinformatics\/} 7 37--53.
+
+\bibitem[{Pedregosa et~al.(2011)Pedregosa, Varoquaux, Gramfort, Michel,
+  Thirion, Grisel et~al.}]{pedregosa2011}
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel,
+  O., et~al. (2011) Scikit-learn: Machine learning in {Python}.
+\newblock {\em Journal of Machine Learning Research\/} 12 2825.
+
+\bibitem[{Haxby et~al.(2001)Haxby, Gobbini, Furey, Ishai, Schouten, and
+  Pietrini}]{haxby2001}
+Haxby, J.~V., Gobbini, I.~M., Furey, M.~L., Ishai, A., Schouten, J.~L., and
+  Pietrini, P. (2001) Distributed and overlapping representations of faces and
+  objects in ventral temporal cortex.
+\newblock {\em Science\/} 293 2425.
+
+\bibitem[{Miyawaki et~al.(2008)Miyawaki, Uchida, Yamashita, Sato, Morito,
+  Tanabe et~al.}]{miyawaki2008}
+Miyawaki, Y., Uchida, H., Yamashita, O., Sato, M.-a., Morito, Y., Tanabe,
+  H.~C., et~al. (2008) Visual image reconstruction from human brain activity
+  using a combination of multiscale local image decoders.
+\newblock {\em Neuron\/} 60 915--929.
+
+\bibitem[{Mallat and Zhang(1993)}]{mallat1993}
+Mallat, S.~G. and Zhang, Z. (1993) Matching pursuits with time-frequency
+  dictionaries.
+\newblock {\em Signal Processing, IEEE Transactions on\/} 41 3397--3415.
+
+\bibitem[{Biswal et~al.(1995)Biswal, Zerrin~Yetkin, Haughton, and
+  Hyde}]{biswal1995}
+Biswal, B., Zerrin~Yetkin, F., Haughton, V., and Hyde, J. (1995) {Functional
+  connectivity in the motor cortex of resting human brain using echo-planar
+  MRI}.
+\newblock {\em Magn Reson Med\/} 34 53719.
+
+\bibitem[{Varoquaux et~al.(2010{\natexlab{a}})Varoquaux, Baronnet,
+  Kleinschmidt, Fillard, and Thirion}]{varoquaux2010b}
+Varoquaux, G., Baronnet, F., Kleinschmidt, A., Fillard, P., and Thirion, B.,
+  Detection of brain functional-connectivity difference in post-stroke patients
+  using group-level covariance modeling.
+\newblock {\em MICCAI\/} (2010{\natexlab{a}}). 200--208.
+
+\bibitem[{Biswal and Ulmer(1999)}]{biswal1999}
+Biswal, B. and Ulmer, J. (1999) {Blind source separation of multiple signal
+  sources of fMRI data sets using independent component analysis.}
+\newblock {\em Journal of computer assisted tomography\/} 23 265.
+
+\bibitem[{Calhoun et~al.(2001)Calhoun, Adali, Pearlson, and
+  Pekar}]{calhoun2001a}
+Calhoun, V.~D., Adali, T., Pearlson, G.~D., and Pekar, J.~J. (2001) A method
+  for making group inferences from {fMRI} data using independent component
+  analysis.
+\newblock {\em Hum Brain Mapp\/} 14 140.
+
+\bibitem[{Varoquaux et~al.(2010{\natexlab{b}})Varoquaux, Sadaghiani, Pinel,
+  Kleinschmidt, Poline, and Thirion}]{varoquaux2010}
+Varoquaux, G., Sadaghiani, S., Pinel, P., Kleinschmidt, A., Poline, J.~B., and
+  Thirion, B. (2010{\natexlab{b}}) {A group model for stable multi-subject
+  {ICA} on {fMRI} datasets}.
+\newblock {\em NeuroImage\/} 51 288.
+
+\end{thebibliography}
