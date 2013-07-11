@@ -187,9 +187,7 @@ and reusable in various scientific areas.
 
 
 \section{Scikit-learn}
-
-% Present the underlying concepts of scikit­learn: estimator,­ data
-% representation, transformer...
+\label{scikitlearn}
 
 All objects within scikit-learn share a uniform common basic API consisting of three
 complementary interfaces: an \textit{estimator} interface for building and
@@ -247,6 +245,9 @@ algorithm that avoids the combinatorial explosion in grid search by sampling a
 fixed number of times from its parameter distributions.
 
 \fabian{should we put an example here ?}
+\alex{We should put a reference to searchlight, where cross\_val\_score is used
+    (we should explain cross\_val\_score here or in Searchlight. We should also
+    use GridSearchCV to cross validate the C of SVC Haxby}
 
 \section{From MR volumes to a data matrix}
 
@@ -262,8 +263,8 @@ used to transpose the data in its original space.
 Such matrix is needed because data may be anisotropic: the distance between
 two voxels is not the same depending on the direction.
 It is crucial to take that into account when dealing with
-algorithms that uses the geometric structure of the data (see Searchlight
-\ref{searchlight}).
+algorithms that iterates over the geometric structure of the data (see Searchlight
+in \ref{searchlight}).
 
 One way to take it into account is to transform the coordinates. Going from
 numpy indexing \verb!array[i, j, k]! to real coordinates $(x, y, z) \in
@@ -301,15 +302,15 @@ def get_real_coordinates(mask, affine):
     # get coordinates of non zero voxels
     mask_coords = np.where(mask != 0)
     # add an extra dimension for the offset
-    mask_coords = mask_coords + (np.ones(len(mask_coords[0]), dtype=np.int),)
+    mask_coords = mask_coords + (np.ones(len(mask_coords[0]),
+                                 dtype=np.int),)
     # apply the transformation
     mask_coords = np.dot(affine, np.asarray(mask_coords))[:3].T
     return mask_coords
 \end{lstlisting}
 
-This affine matrix can be different across files, e.g. when dealing when
-multi-subject dataset or when using an external mask. In this case, it is very
-important to resample all files on the same affine (see \ref{resampling}).
+Transformation matrix can be different across files. Be sure to resample your
+data on a reference affine matrix (see below) before applying any processing.
 
 \subsection{Resampling}
 \label{resampling}
@@ -331,19 +332,22 @@ For implementation, one should refer to \texttt{scipy.ndimage.affine\_transform}
 
 \subsection{Signal cleaning}
 
-Now that 3D scans have been resampled, we have to take care of the time series
-who stills have trends and scanner artifacts.
+We apply some signal processing techniques to get rid of unwanted trend and
+artifacts in the data:
 
-\subsubsection{Detrending} is an essential step when dealing with fMRI data. It removes a
+\begin{itemize}
+    \item{\bf Detrending} is an essential step when dealing with fMRI data. It removes a
 linear trend over the time series of each
 voxel. It is needed when you want to study the correlation between
-features. You have to use \texttt{scipy.signal.detrend}.
-\subsubsection{Normalization} is necessary for most processings.
-\subsubsection{Confound removal} consists in regressing out confounds like
+features. You have to use \texttt{scipy.signal.detrend}.\\
+\item{\bf Normalization} of the time series is necessary to compare variations
+between them.\\
+\item{\bf Confound removal} consists in regressing out confounds like
 estimated movements. Some datasets provide csv files that can be used to remove
-these artifacts.
-\subsubsection{Signal filtering}. Low-pass filtering improves specificity.
+these artifacts.\\
+\item{\bf Frequency filtering}. Low-pass filtering improves specificity.
 High-pass filtering should be kept small, to keep some sensitivity.
+\end{itemize}
 
 \subsection{Masking}
 
@@ -365,12 +369,12 @@ conversion is needed. The most simple way to achieve that would be to
 \emph{flatten} the 3D scans into a 1D array. However, we know that not every
 voxels in a neuroimaging scan is useful. In particular, outter-brain voxels are
 of no use and, worse, they can bring spurious noise and scanner artefacts (such
-as ghosts).\\
+as ghosts). To avoid this, we will apply a brain mask on our data. Such masks
+are often given along with datasets or may be computed thanks to softwares like
+FSL or SPM.\\
 
-To sort out voxels of interest, we will apply a mask on the data (which is
-already provided is most of public datasets).
-
-\includegraphics[width=.5\linewidth]{img/niimgs.jpg}
+\textbf{Figure \ref{fig:niimg}.}{Conversion of brain scans into 2-dimensional
+data}{fig:00}\\
 
 The implementation of masking procedure is fairly simple thanks to NumPy fancy
 indexing. Special attention must be paid to the type of the mask array: it must
@@ -424,30 +428,37 @@ adjacency matrix based upon your data while taking the mask into account:
         the image. This graph can be used in Spectral clustering.
 \end{itemize}
 
-\subsection{Label shifting}
+% \subsection{Label shifting}
 
-Functional MRI measures brain activity by using the Blood-Oxygen-Level-Dependent
-contrast (BOLD). In fact, like muscles, brain regions consume more oxygen and
-nutriments when stimulated. So when a part of the brain starts working,
-physiological mechanisms induce an oxygen-rich blood flood toward this
-particular region: this is called haemodynamic response.
+% Functional MRI measures brain activity by using the Blood-Oxygen-Level-Dependent
+% contrast (BOLD). In fact, like muscles, brain regions consume more oxygen and
+% nutriments when stimulated. So when a part of the brain starts working,
+% physiological mechanisms induce an oxygen-rich blood flood toward this
+% particular region: this is called haemodynamic response.
 
-However, this reaction takes time, usually around 3-4 seconds. This is the
-duration between the event and the reaction observed in the brain. To be able to
-match these two events, we will sometimes have to shift our data. The number of
-scans that must be shifted depends on the TR (repetition time) of the data.
-Usually, we remove the first two scans of the data and the two last values of the
-labels (to keep an homogeneous length).
+% However, this reaction takes time, usually around 3-4 seconds. This is the
+% duration between the event and the reaction observed in the brain. To be able to
+% match these two events, we will sometimes have to shift our data. The number of
+% scans that must be shifted depends on the TR (repetition time) of the data.
+% Usually, we remove the first two scans of the data and the two last values of the
+% labels (to keep an homogeneous length).
+
+% \begin{lstlisting}
+% X = X[2:]
+% y = y[:-2]
+% \end{lstlisting}
+
+\section{Decoding}
+
+The process of predicting behavioral or phenotypic data from fMRI scan is
+called decoding. Note that, as we are working with visual tasks, we have to take
+haemodynamic response into account. We do so by shifting values of the label
+array by 2 TR (about 5 seconds).
 
 \begin{lstlisting}
 X = X[2:]
 y = y[:-2]
 \end{lstlisting}
-
-\section{Decoding}
-
-The process of predicting behavioral or phenotypic data from fMRI scan is
-called decoding.
 
 \subsection{SVM}
 
@@ -487,18 +498,10 @@ of feature values across classes.
 \verb!sklearn.feature_selection! contains a panel of feature selection
 strategies. One can choose to take a percentile of the features
 (\verb!SelectPercentile!), or a fixed number of features (\verb!SelectKBest!)
-for example. All these objects are implemented as transformers.
+for example. All these objects are implemented as transformers (see
+\ref{scikitlearn}) and are inversible (see code below).
 Here we use a fixed number of features and we use the \verb!f_classif! function
 (ANOVA F-Test) for scoring.
-
-\begin{lstlisting}
-from sklearn.feature_selection import SelectKBest, f_classif
-
-### Define the dimension reduction to be used.
-# Here we use a classical univariate feature selection based on F-test,
-# namely Anova. We set the number of features to be selected to 500
-feature_selection = SelectKBest(f_classif, k=500)
-\end{lstlisting}
 
 \subsubsection{Classification}
 
@@ -509,19 +512,19 @@ give reliable results even when the number of dimensions is greater than the
 number of samples.
 
 The decision is taken based upon a subset of training data called support
-vectors. We can say that these support vectors hold the information allowing to
-discriminate the two classes, this is why we will display them and try to see if
-they match some neuroscientific knowledge.
+vectors: this is the information we are interested in as we can make a
+neuroscientific interpretation of it (we are not interested by scores).
 
 \begin{lstlisting}
-from sklearn.svm import SVC
+feature_selection = SelectKBest(f_classif, k=500)
 clf = SVC(kernel='linear', C=1.)
-clf.fit(?)
+X = feature_selection.fit_transform(X)
+clf.fit(X)
 
 ### Look at the discriminating weights
-svc = clf.support_vectors_
+sv = clf.support_vectors_
 # reverse feature selection
-svc = feature_selection.inverse_transform(svc)
+sv = feature_selection.inverse_transform(sv)
 \end{lstlisting}
 
 \subsubsection{Pipeline}
@@ -536,8 +539,9 @@ fit...) depends on its type.
 This allow the developpers to write a complete processing as a one-liner.
 
 \begin{lstlisting}
-from sklearn.pipeline import Pipeline
 anova_svc = Pipeline([('anova', feature_selection), ('svc', clf)])
+anova_svc.fit(X)
+sv = anova_svc.inverse_tranform(clf.support_vectors_)
 \end{lstlisting}
 
 \subsubsection{Results}
@@ -579,7 +583,7 @@ some basic bricks provided by the scikit learn. They key elements here are
 As Searchlight is computationnaly expensive, we will add one constraint to our
 code: it should be able to run on part of the mask. Thus we will have the
 traditionnal \verb!mask! and a \verb!process_mask! that restraint computation
-only to some voxels (in our case, a half axial slice).
+only to some voxels (in our case, a single axial slice).
 
 First, we compute an adjacency graph between voxels. 
 We build (fit) a connectivity graph on the mask using \texttt{NearestNeighbours}
@@ -703,8 +707,8 @@ to form functional networks concording with neuroscientific knowledge.
 
 Resting-state fMRI is useful when dealing with subjects that cannot execute a
 specific task. In fact, no task-driven protocol is capable of diagnosing precisely
-damaged brain areas in stroke patients, as no task can highlight these problems.
-\cite{varoquaux2010b} exhibits differences in correlation between functional
+damaged brain areas e.g. in stroke patients, as no task can highlight these problems.
+\cite{varoquaux2010b} exhibit differences in correlation between functional
 networks between control and post-stroke patients.
 
 As resting state fMRI are unlabeled data, we have to use unsupervised methods to
@@ -832,6 +836,12 @@ conflict of interest.
 \bibliography{biblio}
 
 \newpage
+
+\begin{figure}[h]
+    \includegraphics[width=.5\linewidth]{img/niimgs.jpg}
+    \caption{Conversion of brain scans into 2-dimensional data}
+    \label{fig:niimg}
+\end{figure}
 
 \begin{figure}[h]
   \begin{center}
