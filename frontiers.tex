@@ -154,7 +154,7 @@ maturity of its scientific stack.
 
 SciPy and NumPy packages are the basis of scientific computing in Python.
 NumPy provides the \verb!ndarray! data type, an efficient $n$-dimensional data
-representation. These vectors holds all common operations (transpose...) and
+representation. These arrays holds all common operations (transpose...) and
 can be easily manipulated thanks to a simple, yet powerful, indexing scheme.
 SciPy provides higher level mathematical functions that operate on ndarrays for
 a variety of domains including linear algebra, optimization and signal
@@ -165,34 +165,37 @@ algorithms.
 \subsubsection{Matplotlib}
 
 Matplotlib is a Python plotting library that is tightly integrated into the
-rest of the scientific python stack. It offers publication quality figures in
-a variety of formats and allows to display plots, images or 3D plots in a
+rest of the scientific python stack. It offers publication-quality figures in
+a variety of formats and allows to display plots or images in a
 graphical user interface. All figures in this paper have been generated using
 this library.
 
 
 \subsubsection{Nibabel}
 
-Nibabel is a neuroimaging data loading package. Nibabel can load or save data in
-popular neuroimaging data format. This is indeed an entry point of all
+Nibabel can load or save data in
+popular neuroimaging data format. This is indeed the starting point of all
 our scripts.
 
-\subsubsection{scikit-learn}
+\section{Scikit-learn}
+\label{scikitlearn}
 
 The {\em scikit-learn} project, \cite{pedregosa2011}, is an open source machine
 learning library for the Python programming language. The ambition of the
 project is to provide efficient and well-established machine learning tools within
 a programming environment that is accessible to non-machine learning experts
 and reusable in various scientific areas.
-
-
-\section{Scikit-learn}
-\label{scikitlearn}
-
+    
 All objects within scikit-learn share a uniform common basic API consisting of three
 complementary interfaces: an \textit{estimator} interface for building and
 fitting models, a \textit{predictor} interface for making predictions and a
 \textit{transformer} interface for converting data into a different representation.
+
+In the {\em scikit-learn}, data is represented in a generic 2-dimensional format
+accepted by all cited objects. One dimension is dedicated to the features and
+the other one to the samples. This format brings \textit{i)}
+consistency across all scikit-learn objects \textit{ii)} fast array iteration
+\textit{iii)} compressed sparse representation thanks to NumPy.
 
 Interoperation with third-party code is made not on base on inheriting from a
 particular class but on the base of implementing the appropriate methods for a
@@ -225,18 +228,18 @@ given interface.
 
 \end{itemize}
 
-{\em scikit-learn} also offers a way to concatenate Estimators (known as
+{\em scikit-learn} also offers a way to concatenate estimators (known as
 pipelining) and offers some routines for model selection.
 
 \subsection{Model selection and cross validation}
 
 The problem of model selection is to find, within some space, the best
-combination of hyper-parameters with respect to some user-specifed criterion,
+combination of hyper-parameters with respect to some user-specified criterion,
 usually the prediction score on unseen data.
 
 In {\em scikit-learn}, model selection is supported in two distinct
 estimators, \texttt{GridSearchCV} and \texttt{RandomizedSearchCV}.  They take
-as input an estimator (basic or composite), whose hyper-parameters must be
+as input an estimator, whose hyper-parameters must be
 optimized, and a set of hyperparameter settings to search through. This set is
 represented as a mapping of parameter names to a set of discrete choices in
 the case of grid search, which exhaustively enumerates the ``grid'' (cartesian
@@ -253,22 +256,24 @@ fixed number of times from its parameter distributions.
 
 At this point, we suppose that standard preprocessings have been applied to the
 data (motion correction, slice timing, coregistration on a common template like
-MNI if necessary).
+MNI if necessary). This part deals with transforming the data to a shape that
+can be fed to scikit-learn's functions.
 
 \subsection{Transformation matrix}
 
 Neuroimaging data are represented by 3D scans composed of voxels and their
 associated timeseries along with a transformation matrix (called affine)
-used to transpose the data in its original space.
+used to compute voxel locations in world coordinates from voxel coordinates.
 Such matrix is needed because data may be anisotropic: the distance between
 two voxels is not the same depending on the direction.
 It is crucial to take that into account when dealing with
-algorithms that iterates over the geometric structure of the data (see Searchlight
+algorithms that iterate over the geometric structure of the data (see Searchlight
 in \ref{searchlight}).
 
-One way to take it into account is to transform the coordinates. Going from
+Going from
 numpy indexing \verb!array[i, j, k]! to real coordinates $(x, y, z) \in
-\mathbb{R}^3$ is a simple matrix product:
+\mathbb{R}^3$ is a simple matrix product. For example, if your transformation
+matrix is diagonal (with an offset):
 
 \[
     \begin{bmatrix}
@@ -292,19 +297,18 @@ numpy indexing \verb!array[i, j, k]! to real coordinates $(x, y, z) \in
     \end{bmatrix}
 \]
 
-We can write a Pyhton helper function to transpose coordinates of a mask into
+We can write a Python helper function to transpose coordinates of a mask into
 its original space:
 
 % I use that in the Searchlight example
 
 % XXX: Gael: you are getting too much into the details, here
 \begin{lstlisting}
-def get_real_coordinates(mask, affine):
+def get_real_world_coordinates(mask, affine):
     # get coordinates of non zero voxels
     mask_coords = np.where(mask != 0)
     # add an extra dimension for the offset
-    mask_coords = mask_coords + (np.ones(len(mask_coords[0]),
-                                 dtype=np.int),)
+    mask_coords = mask_coords + (np.ones(len(mask_coords[0])),)
     # apply the transformation
     mask_coords = np.dot(affine, np.asarray(mask_coords))[:3].T
     return mask_coords
@@ -318,32 +322,32 @@ data on a reference affine matrix (see below) before applying any processing.
 
 Resampling consists in changing the spatial resolution of the data. This is
 typically needed
-when dealing when data coming from an heterogenous dataset, as shape depends
+when dealing with data coming from an heterogenous dataset, as shape depends
 on acquisition parameters.
 
-Resampling is an interpolation and may alter the data integrity. That is
+Resampling is an interpolation and alters the data. That is
 why it should be used carefully. Oversampling (increasing
 data resolution) leads to higher memory consumption and computation resources
 with no gain in information.
-Downsampling is commonly used to reduce the size of the data to process.
-Typical sizes are 2mm or 3mm resolutions, but the spread of high field MR
+Downsampling is commonly used to reduce the size of data to process.
+Typical sizes are 2mm or 3mm resolutions, but the spread of high-field MR
 scanner tends to lower these values.
 
 For implementation, one should refer to \texttt{scipy.ndimage.affine\_transform}.
 
 \subsection{Signal cleaning}
 
-We apply some signal processing techniques to get rid of unwanted trend and
+We apply some signal processing techniques to get rid of unwanted trends and
 artifacts in the data:
 
 \begin{itemize}
     \item{\bf Detrending} is an essential step when dealing with fMRI data. It removes a
 linear trend over the time series of each
-voxel. It is needed when you want to study the correlation between
-features. You have to use \texttt{scipy.signal.detrend}.\\
-\item{\bf Normalization} of the time series is necessary to compare variations
-between them.\\
-\item{\bf Confound removal} consists in regressing out confounds like
+voxel and is needed when studying correlation between
+features. Detrending can be done thanks to SciPy (\texttt{scipy.signal.detrend}).\\
+\item{\bf Normalization} consists in setting the timseries variance to 1. It is
+    necessary to study their covariance.\\
+\item{\bf Confounds removal} consists in regressing out confounds like
 estimated movements. Some datasets provide csv files that can be used to remove
 these artifacts.\\
 \item{\bf Frequency filtering}. Low-pass filtering improves specificity.
@@ -356,21 +360,19 @@ High-pass filtering should be kept small, to keep some sensitivity.
 
 Neuroimaging data are represented in 4 dimensions: 3 dimensions for the scans,
 which are positioned in a coordinate space, and one dimension for the time.
-Scikit-learn algorithms, on the other hand, only accept 2-dimensional data: one
-dimension for the features and one for the samples. This format brings \textit{i)}
-consistency across all scikit-learn objects \textit{ii)} fast array iteration
-\textit{iii)} compressed sparse representation thanks to NumPy.
+Scikit-learn algorithms, on the other hand, only accept 2-dimensional data (see
+\ref{scikit-learn}).
 In most
 cases, voxels will be considered as features and timeseries as samples (these
-roles are inversed for clustering methods because they group samples).\\
+roles are inverted for clustering methods because they group samples).\\
 
 
 In order to use neuroimaging data in the scikit-learn, a
 conversion is needed. The most simple way to achieve that would be to
 \emph{flatten} the 3D scans into a 1D array. However, we know that not every
-voxels in a neuroimaging scan is useful. In particular, outter-brain voxels are
+voxels in a neuroimaging scan is useful. In particular, outer-brain voxels are
 of no use and, worse, they can bring spurious noise and scanner artefacts (such
-as ghosts). To avoid this, we will apply a brain mask on our data. Such masks
+as ghosts). To avoid this, a brain masks should be applied on the data. Such masks
 are often given along with datasets or may be computed thanks to softwares like
 FSL or SPM.\\
 
@@ -379,9 +381,11 @@ data}{fig:00}\\
 
 The implementation of masking procedure is fairly simple thanks to NumPy fancy
 indexing. Special attention must be paid to the type of the mask array: it must
-be boolean otherwise it will be considered as broadcasting and fill your memory.
+be boolean. Otherwise the indexing will be considered as broadcasting and the
+result will usually fill the whole memory.
+your memory.
 2-dimensional masked data will be refered as \texttt{X} to follow scikit-learn
-convetions.
+conventions.
 
 \begin{lstlisting}
 def apply_mask(mask_data, mask_affine, func_data, func_affine):
@@ -419,14 +423,15 @@ X = apply_mask(mask_data, mask_affine, func_data, func_affine)
 \subsubsection{Preserving geometrical structure}
 
 Applying a mask on the data obviously remove the 3-dimensional structure of the
-data. However, some algorithms, like the Ward, need this structural information.
-\verb!sklearn.feature_extraction.image! provides two methods that builds an
+data. However, some algorithms, like Ward's clustering, need this structural
+information.
+\verb!sklearn.feature_extraction.image! provides two methods that build an
 adjacency matrix based upon your data while taking the mask into account:
 \begin{itemize}
     \item \verb!grid_to_graph! creates a binary adjacency graph based upon the
         data shape. This is useful for Ward's clustering.
     \item \verb!image_to_graph! creates a distance matrix using the gradient of
-        the image. This graph can be used in Spectral clustering.
+        the image. This graph can be used in spectral clustering.
 \end{itemize}
 
 % \subsection{Label shifting}
@@ -452,9 +457,9 @@ adjacency matrix based upon your data while taking the mask into account:
 \section{Decoding}
 
 The process of predicting behavioral or phenotypic data from fMRI scan is
-called decoding. Note that, as we are working with visual tasks, we have to take
-haemodynamic response into account. We do so by shifting values of the label
-array by 2 TR (about 5 seconds).
+called decoding. Note that, as working with visual tasks, haemodynamic response
+must be taken into account. We do so by shifting values of the label
+array by an offset of 2 (about 5 seconds).
 
 \begin{lstlisting}
 X = X[2:]
@@ -465,50 +470,48 @@ y = y[:-2]
 
 \subsubsection{Haxby dataset}
 
-For this example and the following, we will use the Haxby dataset
-(\cite{haxby2001}).
-The Haxby dataset is from a study about face and object representation into the
-brain (in particular in high-level visual cortex). It is composed of 12 runs for
-each of the 6 subjects. Grayscale images representing faces, houses, cats,
-bottles, scissors, shoes, chairs and random textures were presented in
-24-second blocks separated by rest periods. The repetition time (TR) between each
-scan is 2.5s. Full acquisition information are available in the reference paper.
+This example and the following solves the classification problem presented in
+Haxby dataset (\cite{haxby2001}). In this protocol, grayscale images
+representing several image categories are presented to 6 subjects during 12
+runs. The goal is to predict, from fMRI data, which image category is presented
+to the subject and see where the discriminating brain voxels for this task are
+located. Full protocol information are available in the reference paper.
 
-To make this example easier, we will work on a subset of this dataset. We will
-consider only one subject and will classify faces versus houses.
+For the sake of simplicity, this example focuses on one subject for the
+particular task of discriminating face against house images.
 
 \subsubsection{Feature selection: ANOVA F-Test}
 
-Even if the resolution of brain-imaging data seems low (3mm cubes, around 100000
-neurones), from a computational point of view, this is huge. For example,
-Haxby dataset has a resolution of $64\times64\times40 = 163840\text{ voxels}$.
-After applying the mask, only 39912 voxels are left, which is still high.
+Image resolution of this dataset is standard (3mm cubes, 160 000 voxels),
+and applying the brain mask leaves about 40 000 voxels. This is still a
+high number of features regarding the fact that we only have 1 400 samples.
 
-In order to reduce the number of features, we can aggregate them (in regions of
-interest for example) or we can select only the most relevant ones (those who
-correlates most with the task). As we expect a lot of feature to be irrelevant
-for our task, we opt for a feature selection method.
+However, it is possible to reduce the number of voxels (i.e. the number of
+features) by selecting only the most relevant to our task. The neuroscientific
+approach would be to restrain the study to the occipital area of the brain
+(where the visual cortex is located). The statistical approach consists in
+selecting the most relevant voxels based on a simple statistical test.
 
 In supervised learning, the most popular feature selection method is the
 ANalysis Of VAriance (ANOVA) F-Test. This is a generalization of the t-test to
 more than 2 features. ANOVA compares several
-groups to determine if they are similar (i.e. randomly drawn from the same
-population, this is the null hypothesis). We use it to compare the distribution
+groups to determine if they are not similar (the null hypothesis being that they
+are randomly drawn from the same population). It is used to compare the distribution
 of feature values across classes.
 
 \verb!sklearn.feature_selection! contains a panel of feature selection
 strategies. One can choose to take a percentile of the features
 (\verb!SelectPercentile!), or a fixed number of features (\verb!SelectKBest!)
 for example. All these objects are implemented as transformers (see
-\ref{scikitlearn}) and are inversible (see code below).
-Here we use a fixed number of features and we use the \verb!f_classif! function
-(ANOVA F-Test) for scoring.
+\ref{scikitlearn}) and are invertible (see code below).
+In this use case, \verb!f_classif! function (ANOVA F-Test) along with selection
+of a fixed number of features will be used.
 
 \subsubsection{Classification}
 
 A Support Vector Classifier (SVC) is a simple classifier that finds a linear
 hyperplane that separates the samples. Classifying a new sample boils down to
-seeing on which side of the hyperplane the example is. SVC has the advantage to
+seeing on which side of the hyperplane it is. SVC has the advantage to
 give reliable results even when the number of dimensions is greater than the
 number of samples.
 
@@ -521,29 +524,24 @@ feature_selection = SelectKBest(f_classif, k=500)
 clf = SVC(kernel='linear', C=1.)
 X = feature_selection.fit_transform(X)
 clf.fit(X)
-
-### Look at the discriminating weights
-sv = clf.support_vectors_
-# reverse feature selection
-sv = feature_selection.inverse_transform(sv)
 \end{lstlisting}
 
-\subsubsection{Pipeline}
+% \subsubsection{Pipeline}
 
-The workflow described above (feature selection + estimator) is a standard one.
-In fact, in most cases, the workflow will consist in atomic steps
-\textit{linked} together (the output of a step is the input of the next one).
-For this purpose, scikit-learn offers a pipeline object that allows such
-linking. A pipeline is simply a list of scikit-learn objects through which the
-input data will be conveyed. The function to call for each object (transform,
-fit...) depends on its type.
-This allow the developpers to write a complete processing as a one-liner.
+% The workflow described above (feature selection + estimator) is a standard one.
+% In fact, in most cases, it will consist in atomic steps
+% \textit{linked} together (the output of a step is the input of the next one).
+% For this purpose, scikit-learn offers a pipeline object that allows such
+% linking. A pipeline is simply a list of scikit-learn objects through which the
+% input data will be conveyed. The function to call for each object (transform,
+% fit...) depends on its type.
+% This allow developpers to create new estimators based on existing ones.
 
-\begin{lstlisting}
-anova_svc = Pipeline([('anova', feature_selection), ('svc', clf)])
-anova_svc.fit(X)
-sv = anova_svc.inverse_tranform(clf.support_vectors_)
-\end{lstlisting}
+% \begin{lstlisting}
+% anova_svc = Pipeline([('anova', feature_selection), ('svc', clf)])
+% anova_svc.fit(X)
+% sv = anova_svc.inverse_tranform(clf.support_vectors_)
+% \end{lstlisting}
 
 \subsubsection{Results}
 
@@ -552,6 +550,13 @@ used by the classifier to discriminate between face and houses. Green and blue
 lines surround features exhibited in the reference paper. We can see that our
 classifier uses mostly voxels presents in the regions used to discriminate
 houses.
+
+\begin{lstlisting}
+### Look at the discriminating weights
+sv = clf.support_vectors_
+# reverse feature selection
+sv = feature_selection.inverse_transform(sv)
+\end{lstlisting}
 
 \textbf{Figure \ref{fig:haxby}.}{Voxel importance in prediction decision for Haxby experiment
 using \textit{a.} SVC, \textit{b.} Searchlight and \textit{c.} f\_score}{fig:01}
@@ -576,31 +581,25 @@ centered on the voxel, instead of applying a smoothing.
 \subsubsection{Implementation}
 
 Even if this algorithm seems complicated, it can be easily implemented thanks to
-some basic bricks provided by the scikit learn. They key elements here are
-\textit{i)} the neighbourhood (\verb!sklearn.neighobors.NearestNeighbors!),
-\textit{ii)} the classifier (\verb!sklearn.svm.LinearSVC!),
-\textit{iii)} the cross-validation (\verb!sklearn.svm.LinearSVC!).
+some basic bricks provided by the scikit-learn. They key elements here are
+\textit{i)} the neighbourhood (\texttt{sklearn.neighbors.NearestNeighbors}),
+\textit{ii)} the classifier (\texttt{sklearn.svm.LinearSVC}),
+\textit{iii)} the cross-validation (\texttt{sklearn.svm.LinearSVC}).
 
-As Searchlight is computationnaly expensive, we will add one constraint to our
-code: it should be able to run on part of the mask. Thus we will have the
-traditionnal \verb!mask! and a \verb!process_mask! that restraint computation
-only to some voxels (in our case, a single axial slice).
-
-First, we compute an adjacency graph between voxels. 
-We build (fit) a connectivity graph on the mask using \texttt{NearestNeighbours}
-but take the connectivity graph restrained to the
-process mask so that the graph contains only our voxels of interest.
-
-fitting a \verb!NearestNeighbours! on the \verb!mask! and applying it on
-\verb!process_mask!.
+Searchlight prohibitive computational cost makes it hardly runnable on a whole
+brain. To avoid this problem, computation will be limited to voxels present in a
+\texttt{process\_mask} (in this use case, a single axial slice). This is easily
+doable thanks to scikit-learn: a connectivity graph is build upon the
+\texttt{mask} and then restricted to voxels of interest contained in the 
+\texttt{process\_mask}.
 
 \begin{lstlisting}
 # Compute world coordinates of all in-mask voxels.
-mask_coords = get_real_coordinates(mask_data, mask_affine)
+mask_coords = get_real_world_coordinates(mask_data, mask_affine)
 
-# Compute world coordinates of all in-process mask voxels
-process_mask_coords = get_real_coordinates(process_mask_data,
-                                           process_mask_affine)
+# Compute world coordinates of all in-processing region voxels
+process_mask_coords = get_real_world_coordinates(process_mask_data,
+                                                 process_mask_affine)
 
 clf = neighbors.NearestNeighbors(radius=radius)
 A = clf.fit(mask_coords).radius_neighbors_graph(process_mask_coords)
@@ -622,18 +621,18 @@ return scores
 
 \subsubsection{Results}
 
-Results are presented in figure \ref{fig:haxby}. Searchlight result is centered
-and f\_score is on the right.
-In order to evaluate the performance of Searchlight, we compare it to the
-f\_score measure which is the simplest statistical test we can make on the data.
-We can see that Searchlight localizes information mainly in the region of
-interest corresponding to house. The smoothing effect is inherent to Searchlight
-and is caused by the fact that a ball is used to iterate on the voxels.
+Results are presented in figure \ref{fig:haxby}. Searchlight results
+(\textit{b}) are compared to the previous use case and to the F-score measure
+(\textit{c}), the simplest statistical test we can make on the data.
+All methods mainly localizes information in the region of
+interest corresponding to house detection. The smoothing effect present in the
+Searchlight results is inherent to the fact that a ball is used to iterate on
+the voxels.
 
-\subsection{Classification of M/EEG sensor space data}
+% \subsection{Classification of M/EEG sensor space data}
 
-\alex{For the moment we don't have enough space and A. Gramfort told that this
-may not fit as the whole paper is very fMRI oriented}
+% \alex{For the moment we don't have enough space and A. Gramfort told that this
+% may not fit as the whole paper is very fMRI oriented}
 
 \subsection{Decoding: reconstructing image from brain activity}
 
@@ -641,38 +640,38 @@ may not fit as the whole paper is very fMRI oriented}
 
 Kamitani dataset is based on a visual task like Haxby. In this experiment,
 several series of $10\times10$ binary images are presented to two subjects.
-Our goal will be to use the scikit-learn to learn a correlation between brain
-activation and pixel color. Full details are available in the reference paper
+Full details are available in the reference paper
 (\cite{miyawaki2008}).
 
 Kamitani training set is composed of random images (where black and white pixels
 are balanced). The testing set is composed of structured images containing
-geometric shapes (square, cross...) and letters.
+geometric shapes (square, cross...) and letters. The goal is to use the
+scikit-learn to learn a correlation between brain
+activation and pixel color. 
 
 There are two ways to establish a link between brain voxels and image pixels: we
-can either try to reconstruct image from brain voxel activation, this is called
-decoding, or we can try to predict brain activation from an image, this is called
-encoding.
-
-In the present example, we will do both encoding and decoding and see if the
-results match.
+can either try to reconstruct images from brain voxel activation, this is called
+decoding, or we can try to predict brain activation from images, this is called
+encoding. In this use case, both approaches are explored and their results are
+compared to see if they match. 
 
 \subsubsection{Principle} % Should be 'protocol'?
 
-Common pre-treatment have been applied to the data (detrending and
+Common pre-processing have been applied to the data (detrending and
 standardization).
 
-In the original paper (\cite{miyawaki2008}), Miyawaki uses a sparse multinomial
+In the original paper (\cite{miyawaki2008}), Miyawaki et al. use a sparse multinomial
 logistic regression and a sophisticated multiscale strategy to reconstruct the image.
-For this use case, we will compare a l1 logistic regression and an Orthogonal
+This example uses the simpler version of this approach, a l1 logistic
+regression, and compare it to the Orthogonal
 Matching Pursuit (\cite{mallat1993}). The OMP is a linear model that uses
-timeseries as a dictionary and an l1 constraint on the loadings. Its
-paritcularity is to add one atom at each step and update all coefficients
-based on the orthogonal projection on preivously selected atoms.
+time series as a dictionary and an l1 constraint on the loadings. Its
+particularity is to add one atom at each step and update all coefficients
+based on the orthogonal projection on previously selected atoms.
 
 To measure the performance of each approach, we will use a log of the
-reconstruction error, which is closed to a log likelihood. Thanks to
-scikit-learn, applying a cross validation to get score is a oneliner.
+reconstruction error, which is close to a log likelihood. Thanks to
+scikit-learn, applying a cross validation to get the score is a oneliner.
 
 \begin{lstlisting}
 from sklearn.linear_model import OrthogonalMatchingPursuit as OMP
@@ -687,7 +686,8 @@ scores_omp = [cross_val_score(pipeline_OMP, X_train, y,
 
 \subsubsection{Results}
 
-As Miyawaki, in figure \ref{fig:omp} we observe that reconstruction is more accurate in the fovea. This
+As Miyawaki et al., in figure \ref{fig:omp} we observe that reconstruction
+is more accurate in the fovea. This
 may be caused by the fact that there are more neurons dedicated to foveal
 representation in the primary visual area than for the borders.
 
@@ -702,17 +702,17 @@ position in the stimulus.}\label{fig:02}
 
 \section{Functional Connectivity}
 
-In \cite{biswal1995}, Biswal was the first to exhibit coherent patterns in the
+In \cite{biswal1995}, Biswal was the first to exhibit coherent patterns in
 brain activation during resting state. These correlated voxel activations seemed
-to form functional networks concording with neuroscientific knowledge.
+to form functional networks consistent with neuroscientific knowledge.
 
-Resting-state fMRI is useful when dealing with subjects that cannot execute a
-specific task. In fact, no task-driven protocol is capable of diagnosing precisely
-damaged brain areas e.g. in stroke patients, as no task can highlight these problems.
-\cite{varoquaux2010b} exhibit differences in correlation between functional
-networks between control and post-stroke patients.
+% Resting-state fMRI is useful when dealing with subjects that cannot execute a
+% specific task. In fact, no task-driven protocol is capable of diagnosing precisely
+% damaged brain areas e.g. in stroke patients, as no task can highlight these problems.
+% \cite{varoquaux2010b} found differences in correlation between functional
+% networks between control and post-stroke patients.
 
-As resting state fMRI are unlabeled data, we have to use unsupervised methods to
+As resting state fMRI are unlabeled data, unsupervised methods must be used to
 mine them. The most popular method to extract functional networks is ICA and
 is the subject of our first use case. We will then show results obtained with
 clustering methods as several efficient implementations are available in
@@ -734,16 +734,16 @@ craddock).
 \subsubsection{Principle}
 
 A typical example is the \emph{cocktail party problem} where ICA separates the
-voices of people using signal from several mikes.
+voices of people using signal from several microphones.
 
 ICA is historically the reference method to extract networks from resting state
 fMRI \cite{biswal1999}. It is a blind source separation method. Its principle is
 to separate a
 multivariate signal into several components by maximizing their non-gaussianity.
 Several strategies have been used to syndicate ICA
-results across several subjects. \cite{calhoun2001a} proposes a dimension
-reduction (using PCA) followed by a concatenation of timeseries, which we use
-this example.
+results across several subjects. \cite{calhoun2001a} propose a dimension
+reduction (using PCA) followed by a concatenation of timeseries (used in this
+example).
 \cite{varoquaux2010} use dimension reduction and canonical correlation analysis
 to aggregate subject data.
 
@@ -755,7 +755,10 @@ FastICA does not look for linear trends, only constant one.
 
 \subsubsection{Application}
 
-The code to apply ICA is very straitforward. Note the trnasposition of data
+% XXX: Fix that
+
+The code to apply ICA is very straightforward. Note that ICA 
+the transposition of the data
 matrix to apply it on the right dimension.
 
 \begin{lstlisting}
@@ -780,11 +783,12 @@ extract the default mode network, more or less precisely.
 \alex{MELODIC is missing}
 
 \subsection{Clustering}
-
+\ref{clustering}
 \subsubsection{Principle}
 
 A clustering method aggregates similar features into groups. Scikit-learn
-provides different clustering algorithms, each one holding its own properties:
+provides different clustering algorithms, each one having its own
+characteristics:
 
 \begin{itemize}
     \item{\bf Ward's clustering} uses a bottom-up hierarchical approach. Features are
@@ -799,14 +803,14 @@ provides different clustering algorithms, each one holding its own properties:
 \end{itemize}
 
 For each algorithm, one must specify the number of clusters. This parameter is
-not easy to set as we have few information about the data.
+not easy to set as we have little information about the data.
 
 In this use case, we will use Ward's clustering and will compare its results to
 k-means and spectral clustering. Ward's clustering is fast and builds a complete
-tree of features, such that varying the number of clusters is costless.
+tree of features, so that varying the number of clusters is costless.
 
-We use a PCA to reduce the dimensionality of the problem. We also apply
-smoothing to k-means.
+As preprocessings, PCA is used to reduce dimensionality and smoothing is applied
+to enhance the results.
 
 \begin{lstlisting}
 connectivity = grid_to_graph(n_x=mask.shape[0], n_y=mask.shape[1],
