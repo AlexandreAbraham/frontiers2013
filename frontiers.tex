@@ -193,13 +193,14 @@ fitting models, a \textit{predictor} interface for making predictions and a
 
 In the {\em scikit-learn}, data is represented in a generic 2-dimensional format
 accepted by all cited objects. One dimension is dedicated to the features and
-the other one to the samples. This format brings \textit{i)}
-consistency across all scikit-learn objects \textit{ii)} fast array iteration
-\textit{iii)} compressed sparse representation thanks to NumPy.
+the other one to the samples. This format brings
+consistency across all scikit-learn objects, fast array iteration
+as well as compressed sparse representation thanks to SciPy's \texttt{sparse} module.
 
-Interoperation with third-party code is made not on base on inheriting from a
-particular class but on the base of implementing the appropriate methods for a
-given interface.
+Interoperation with third-party code is made not on base on inheritance but
+rather on implementing the appropriate methods for a given interface, so that
+classes wishing to blend in the scikit-learn API need only to implement a few
+methods rather than inheriting from a given class.
 
 \begin{itemize}
 \item {\bf Estimator}. The \textit{estimator} interface is at the core of the library. It exposes a
