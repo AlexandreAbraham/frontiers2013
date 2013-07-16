@@ -388,23 +388,16 @@ your memory.
 2-dimensional masked data will be refered as \texttt{X} to follow scikit-learn
 conventions.
 
-% XXX GAEL: don't define functions or use assert: you are not writing
-% library code, but trying to provide the most concise illustration of
-% the ideas.
 \begin{lstlisting}
-def apply_mask(mask_data, mask_affine, func_data, func_affine):
-    assert(np.all(mask_affine == func_affine))
-    mask_data = mask_data.astype(np.bool)
-    X = func_data[mask_data].T
-    return X
+# Apply a mask
+# Ensure that the mask is boolean
+mask_data = mask_data.astype(np.bool)
+# Apply the mask
+X = func_data[mask_data].T
 
-def unmask(X, mask_data, mask_affine):
-    func_data = np.zeros(mask_data.shape, dtype=X.dtype)
-    func_data[mask_data] = X
-    return func_data, mask_affine
-
-% For single subject data
-X = apply_mask(mask_data, mask_affine, func_data, func_affine)
+# Unmask data
+unmasked_data = np.zeros(mask_data.shape, dtype=X.dtype)
+unmasked_data[mask_data] = X
 \end{lstlisting}
 
 
