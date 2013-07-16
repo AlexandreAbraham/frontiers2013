@@ -379,6 +379,9 @@ be boolean otherwise it will be considered as broadcasting and fill your memory.
 2-dimensional masked data will be refered as \texttt{X} to follow scikit-learn
 convetions.
 
+% XXX GAEL: don't define functions or use assert: you are not writing
+% library code, but trying to provide the most concise illustration of
+% the ideas.
 \begin{lstlisting}
 def apply_mask(mask_data, mask_affine, func_data, func_affine):
     assert(np.all(mask_affine == func_affine))
