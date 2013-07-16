@@ -1,4 +1,4 @@
-\begin{thebibliography}{12}
+\begin{thebibliography}{11}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \expandafter\ifx\csname doi\endcsname\relax
@@ -59,13 +59,6 @@ Biswal, B., Zerrin~Yetkin, F., Haughton, V., and Hyde, J. (1995) {Functional
   MRI}.
 \newblock {\em Magn Reson Med\/} 34 53719.
 
-\bibitem[{Varoquaux et~al.(2010{\natexlab{a}})Varoquaux, Baronnet,
-  Kleinschmidt, Fillard, and Thirion}]{varoquaux2010b}
-Varoquaux, G., Baronnet, F., Kleinschmidt, A., Fillard, P., and Thirion, B.,
-  Detection of brain functional-connectivity difference in post-stroke patients
-  using group-level covariance modeling.
-\newblock {\em MICCAI\/} (2010{\natexlab{a}}). 200--208.
-
 \bibitem[{Biswal and Ulmer(1999)}]{biswal1999}
 Biswal, B. and Ulmer, J. (1999) {Blind source separation of multiple signal
   sources of fMRI data sets using independent component analysis.}
@@ -78,11 +71,11 @@ Calhoun, V.~D., Adali, T., Pearlson, G.~D., and Pekar, J.~J. (2001) A method
   analysis.
 \newblock {\em Hum Brain Mapp\/} 14 140.
 
-\bibitem[{Varoquaux et~al.(2010{\natexlab{b}})Varoquaux, Sadaghiani, Pinel,
-  Kleinschmidt, Poline, and Thirion}]{varoquaux2010}
+\bibitem[{Varoquaux et~al.(2010)Varoquaux, Sadaghiani, Pinel, Kleinschmidt,
+  Poline, and Thirion}]{varoquaux2010}
 Varoquaux, G., Sadaghiani, S., Pinel, P., Kleinschmidt, A., Poline, J.~B., and
-  Thirion, B. (2010{\natexlab{b}}) {A group model for stable multi-subject
-  {ICA} on {fMRI} datasets}.
+  Thirion, B. (2010) {A group model for stable multi-subject {ICA} on {fMRI}
+  datasets}.
 \newblock {\em NeuroImage\/} 51 288.
 
 \end{thebibliography}
