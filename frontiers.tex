@@ -692,10 +692,59 @@ representation in the primary visual area than for the borders.
 position in the stimulus.}\label{fig:02}
 
 \section{Encoding}
+In the context of machine learning in neuroimaging, learning a forward model which predicts BOLD signal given a stimulus is often referred to as \textit{encoding} \cite{Naselaris2011}.
+Given an appropriate model of the stimulus, e.g. one which can provide an approximately linear representation of BOLD activation, an encoding approach allows one to quantify for each voxel to what extent its variability is captured by the model. A popular evaluation method is the predictive \(r^2\) score, which uses a prediction on left out data to quantify the decrease in residual norm brought about by fitting a regression function as opposed to fitting a constant. %We have \[r^2 = \frac{\|y_{\textrm{true}} - y_{\textrm{pred}}\|^2}{\|y_{\textrm{true}} - \bar y_{\textrm{true}}\|^2}\]
+The remaining variance consists of potentially unmodelled, but reproducible signal and spurious noise.
+
+On the Kamitani dataset, we can observe that mere black and white pixel values can explain a large part of the BOLD variance in many visual voxels. Sticking to the notation that \(X\) represesents BOLD signal and \(y\) the stimulus, we can write an encoding model using the ridge regression estimator of the scikit-learn:
+
+\begin{lstlisting}
+from sklearn.linear_model import Ridge
+from sklearn.cross_validation import KFold
+
+cv = KFold(len(y_train), 10)
+# Fit ridge model and calculate predictions on left out data
+predictions = [Ridge(alpha=100.).fit(
+        y_train[train], X_train[train]).predict(y_train[test])
+        for train, test in cv]
+
+# evaluate r^2 score for each voxel
+scores = [1. - ((X_train[test] - prediction) ** 2).sum(axis=0) /
+        ((X_train[test] - X_train[test].mean(axis=0)) ** 2).sum(axis=0)
+        for prediction, (_, test) in zip(predictions, cv)]
+
+mean_scores = np.array(scores).mean(axis=0)
+
+\end{lstlisting}
+
+\subsubsection{Results}
+The variable \texttt{mean\_scores} contains a score for each voxel. Visualized in a brain volume we obtain figure \ref{fig:encoding}, in which we can observe that the BOLD signal especially in early visual areas, most notably V1, is very well explained as a linear function of the pixel intensities, with a predictive score of up to \(r^2 = 0.6\).
+
+\subsubsection{Receptive fields}
+Given the retinotopic structure of early visual areas, we are led to expect their voxels to have strongly localized so-called population receptive fields (\textit{prf}). This suggests that per voxel only very few stimulus pixels should suffice to explain its activity. This information can be exploited by using a sparse coding approach to find the receptive fields.
+
+\begin{lstlisting}
+from sklearn.linear_model import LassoLarsCV
+
+# choose number of voxels to treat, set to None for all voxels
+n_voxels = 50
+# choose best voxels
+indices = mean_scores.argsort()[::-1][:n_voxels]
+
+lasso = LassoLarsCV(max_iter=10)
+
+receptive_fields = [lasso.fit(y_train, X_train[:, index]
+        ).coef_.reshape(10, 10)
+        for index in indices]
+
+\end{lstlisting}
+%y_train_centered = (y_train - y_train.mean(axis=0)) / y_train.std(axis=0)
 
 \alex{After talking with Michael, he told me that he could make a fairly simple
     example for encoding, which I think is a plus for the paper. The example will
     be integrated in Nisl.}
+
+
 
 \section{Functional Connectivity}
 
