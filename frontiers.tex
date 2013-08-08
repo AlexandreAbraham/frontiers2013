@@ -602,13 +602,13 @@ support = feature_selection.inverse_transform(support)
 
 \begin{figure}[hbtp]
   \begin{center}
-  \subfigure[F\_score]{\includegraphics[width=.3\linewidth]{img/f_score.pdf}}
-  \subfigure[SVC]{\includegraphics[width=.3\linewidth]{img/svm.pdf}}
-  \subfigure[Searchlight]{\includegraphics[width=.3\linewidth]{img/searchlight.pdf}}
+  \subfigure[f\_score]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_fscore.png}}
+  \subfigure[SVC]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_svm.png}}
+  \subfigure[Searchlight]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_searchlight.png}}
   \end{center}
 \caption{Voxel importance in prediction decision for Haxby experiment
-using \textit{a.} SVC, \textit{b.} Searchlight and \textit{c.}
-f\_score}
+using \textit{a.} f\_score, \textit{b.} SVC and \textit{c.}
+Searchlight}
 \label{fig:haxby}
 \end{figure}
 
@@ -916,7 +916,8 @@ Common preprocessing are applied, along with a PCA to reduce dimensionality and
 smoothing to enhance k-means result. Note that clustering algorithms group
 samples and that we want to group features: a transposition is needed to apply
 clustering in the wanted dimension. Scikit-learn provides a
-\texttt{WardAgglomeration} object that takes care of this step.
+\texttt{WardAgglomeration} object that takes care of this step, this is not the
+case when using K-Means.
 
 \begin{lstlisting}
 connectivity = grid_to_graph(n_x=mask.shape[0], n_y=mask.shape[1],
