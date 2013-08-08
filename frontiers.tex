@@ -42,9 +42,16 @@
 
 % XXX Review the order of authors
 
-\def\Authors{Alexandre Abraham\,$^{1,2,*}$, Philippe Gervais\,$^{1,2}$, Fabian
-Pedregosa\,$^{1,2}$, Andreas Muller, Jean Kossaifi, Michael Eickenberg, Alexandre Gramfort, Bertrand
-Thirion\,$^{1,2}$ and Ga\"el Varoquaux\,$^{1,2}$}
+\def\Authors{
+    Alexandre Abraham\,$^{1,2,*}$,
+    Fabian Pedregosa\,$^{1,2}$,
+    Michael Eickenberg\,$^{1,2}$,
+    Philippe Gervais\,$^{1,2}$,
+    Andreas Muller,
+    Jean Kossaifi,
+    Alexandre Gramfort,
+    Bertrand Thirion\,$^{1,2}$
+    and Ga\"el Varoquaux\,$^{1,2}$}
 % Affiliations should be keyed to the author's name with superscript numbers and be listed as follows: Laboratory, Institute, Department, Organization, City, State abbreviation (USA, Canada, Australia), and Country (without detailed address information such as city zip codes or street names).
 % If one of the authors has a change of address, list the new address below the correspondence details using a superscript symbol and use the same symbol to indicate the author in the author list.
 \def\Address{
@@ -185,7 +192,9 @@ learning library for the Python programming language. The ambition of the
 project is to provide efficient and well-established machine learning tools within
 a programming environment that is accessible to non-machine learning experts
 and reusable in various scientific areas.
-    
+
+\subsection{Concepts}
+
 All objects within scikit-learn share a uniform common basic API consisting of three
 complementary interfaces: an \textit{estimator} interface for building and
 fitting models, a \textit{predictor} interface for making predictions and a
@@ -221,9 +230,8 @@ methods rather than inheriting from a given class.
 
 \item {\bf Transformer}. Since it is common to modify or filter data before feeding it to a learning
     algorithm, some estimators in the library implement a \textit{transformer}
-    interface which defines a \texttt{transform} method. It takes as input some new
-    data \texttt{X\_test} and yields as output a transformed version of
-    \texttt{X\_test}. Preprocessing, feature selection and dimensionality reduction
+    interface which defines a \texttt{transform} method. Preprocessing, feature selection and
+    dimensionality reduction
     algorithms are all provided as transformers within the library. If the transformation
     can be inverted, a method called \verb!inverse_transform! also exists.
 
@@ -255,21 +263,23 @@ fixed number of times from its parameter distributions.
 
 \section{From MR volumes to a data matrix}
 
-At this point, we suppose that standard preprocessings have been applied to the
-data (motion correction, slice timing, coregistration on a common template like
-MNI if necessary). This part deals with transforming the data to a shape that
-can be fed to scikit-learn's functions.
+From this point, it is supposed that common MRI preprocessings have been applied
+to the data (namely motion correction, slice timing, coregistration on a common template like
+MNI if necessary). Refernce softwares for this task are SPM and FSL.
+This section deals with transforming neuroimaging data into a format that can be
+fed to scikit-learn's functions.
+
 
 \subsection{Transformation matrix}
 
-Neuroimaging data are represented by 3D scans composed of voxels and their
-associated timeseries along with a transformation matrix (called affine)
-used to compute voxel locations in world coordinates from voxel coordinates.
+Neuroimaging data are represented by 4-dimensional data (3D scans composed of
+voxels and their associated time series) along with a transformation matrix
+(called affine) used to compute voxel locations from voxel coordinated to
+world coordinates.
 Such matrix is needed because data may be anisotropic: the distance between
 two voxels is not the same depending on the direction.
-It is crucial to take that into account when dealing with
-algorithms that iterate over the geometric structure of the data (see Searchlight
-in \ref{searchlight}).
+This information is used by algorithms relying on the geometric structure of the
+data (e.g. Searchlight).
 
 Going from
 numpy indexing \verb!array[i, j, k]! to real coordinates $(x, y, z) \in
@@ -298,61 +308,62 @@ matrix is diagonal (with an offset):
     \end{bmatrix}
 \]
 
-We can write a Python helper function to transpose coordinates of a mask into
-its original space:
+% Too much information here.
 
-% I use that in the Searchlight example
+% We can write a Python helper function to transpose coordinates of a mask into
+% its original space:
 
-% XXX: Gael: you are getting too much into the details, here
-\begin{lstlisting}
-def get_real_world_coordinates(mask, affine):
-    # get coordinates of non zero voxels
-    mask_coords = np.where(mask != 0)
-    # add an extra dimension for the offset
-    mask_coords = mask_coords + (np.ones(len(mask_coords[0])),)
-    # apply the transformation
-    mask_coords = np.dot(affine, np.asarray(mask_coords))[:3].T
-    return mask_coords
-\end{lstlisting}
+% \begin{lstlisting}
+% def get_real_world_coordinates(mask, affine):
+%     # get coordinates of non zero voxels
+%     mask_coords = np.where(mask != 0)
+%     # add an extra dimension for the offset
+%     mask_coords = mask_coords + (np.ones(len(mask_coords[0])),)
+%     # apply the transformation
+%     mask_coords = np.dot(affine, np.asarray(mask_coords))[:3].T
+%     return mask_coords
+% \end{lstlisting}
 
-Transformation matrix can be different across files. Be sure to resample your
-data on a reference affine matrix (see below) before applying any processing.
+SciPy provides routines taking affine into account in its ndimage module.
+When dealing with heterogeneous dataset (multiple subjects or sessions), it is
+necessary to resample data upon a reference affine. This can be done using
+\texttt{scipy.ndimage.affine\_transform}.
 
 \subsection{Resampling}
 \label{resampling}
 
 Resampling consists in changing the spatial resolution of the data. This is
-typically needed
-when dealing with data coming from an heterogenous dataset, as shape depends
-on acquisition parameters.
-
-Resampling is an interpolation and alters the data. That is
-why it should be used carefully. Oversampling (increasing
-data resolution) leads to higher memory consumption and computation resources
-with no gain in information.
+an interpolation and alters the data, that is why it should be used carefully.
+Oversampling (increasing data resolution) leads to higher memory consumption
+and computation resources with no gain in information.
 Downsampling is commonly used to reduce the size of data to process.
 Typical sizes are 2mm or 3mm resolutions, but the spread of high-field MR
 scanner tends to lower these values.
-
-For implementation, one should refer to \texttt{scipy.ndimage.affine\_transform}.
+Data scaling factor for each direction can be modified in the affine matrix.
 
 \subsection{Signal cleaning}
 
-We apply some signal processing techniques to get rid of unwanted trends and
-artifacts in the data:
-
+Due to its acquisition process and poor resolution, neuroimaging data has a low
+signal-to-noise ratio. It contains trends and artifacts that must be removed
+to ensure maximum machine learning algorithms efficiency. Signal cleaning
+includes:
 \begin{itemize}
-    \item{\bf Detrending} is an essential step when dealing with fMRI data. It removes a
-linear trend over the time series of each
-voxel and is needed when studying correlation between
-features. Detrending can be done thanks to SciPy (\texttt{scipy.signal.detrend}).\\
-\item{\bf Normalization} consists in setting the timseries variance to 1. It is
-    necessary to study their covariance.\\
-\item{\bf Confounds removal} consists in regressing out confounds like
-estimated movements. Some datasets provide csv files that can be used to remove
-these artifacts.\\
-\item{\bf Frequency filtering}. Low-pass filtering improves specificity.
-High-pass filtering should be kept small, to keep some sensitivity.
+    \item{\bf Detrending} removes a linear trend over the time series of each
+        voxel. This is a mandatory step when studying fMRI data, as the voxel
+        intensity itself has no meaning and we want to study its variation and
+        correlation with other voxels. Detrending can be done thanks to SciPy
+        (\texttt{scipy.signal.detrend}).\\
+    \item{\bf Normalization} consists in setting the timseries variance to 1.
+        This harmonization is necessary as some machine learning algorithms are
+        sensible to different value ranges.\\
+    \item{\bf Confounds removal} consists in regressing out confounding factors.
+        Typical neuroimaging confounds are head movements. These spurious
+        variables induce spurious correlation between all brain voxels.
+        Some datasets provide estimated confounds (usually in csv files) but
+        they can also be estimated (XXX: ref to compcorr).
+    \item{\bf Frequency filtering} consists in removing signal which frequency is
+        abnormally high or low. Low-frequency signals in fMRI data are caused by
+        physiological mechanism or scanner drifts.
 \end{itemize}
 
 \subsection{Masking}
@@ -363,28 +374,29 @@ Neuroimaging data are represented in 4 dimensions: 3 dimensions for the scans,
 which are positioned in a coordinate space, and one dimension for the time.
 Scikit-learn algorithms, on the other hand, only accept 2-dimensional data (see
 \ref{scikit-learn}).
-In most
-cases, voxels will be considered as features and timeseries as samples (these
-roles are inverted for clustering methods because they group samples).\\
+In most cases, voxels will be considered as features and timeseries as samples (these
+roles are inverted for spatial clustering methods that group samples).\\
 
-
-In order to use neuroimaging data in the scikit-learn, a
-conversion is needed. The most simple way to achieve that would be to
-\emph{flatten} the 3D scans into a 1D array. However, we know that not every
-voxels in a neuroimaging scan is useful. In particular, outer-brain voxels are
-of no use and, worse, they can bring spurious noise and scanner artefacts (such
-as ghosts). To avoid this, a brain masks should be applied on the data. Such masks
-are often given along with datasets or may be computed thanks to softwares like
+The natural way to reduce data dimension is to flatten it, losing its original
+structure. However, this is not the most clever strategy. In fact, it is known
+that not all voxels in fMRI data holds information: outer-brain voxels are of no
+use and, worse, they may bring spurious noise and scanner artefacts.
+A brain mask should be applied to avoid this problem. Such masks
+are often given along with datasets or can be computed thanks to softwares like
 FSL or SPM.\\
 
-\textbf{Figure \ref{fig:niimg}.}{Conversion of brain scans into 2-dimensional
-data}{fig:00}\\
+\begin{figure}[hbtp]
+    \begin{center}
+        \includegraphics[width=.5\linewidth]{img/niimgs.jpg}
+    \end{center}
+    \caption{Conversion of brain scans into 2-dimensional data}
+    \label{fig:niimg}
+\end{figure}
 
-The implementation of masking procedure is fairly simple thanks to NumPy fancy
+Implementating masking procedure is made easy by NumPy fancy
 indexing. Special attention must be paid to the type of the mask array: it must
 be boolean. Otherwise the indexing will be considered as broadcasting and the
 result will usually fill the whole memory.
-your memory.
 2-dimensional masked data will be refered as \texttt{X} to follow scikit-learn
 conventions.
 
@@ -417,13 +429,12 @@ unmasked_data[mask_data] = X
 % Multi subject computation is simply done by intersecting subjects maps
 % relatively to a chosen threshold.
 
-\subsubsection{Preserving geometrical structure}
+\subsubsection{Preserving structural information}
 
-Applying a mask on the data obviously remove the 3-dimensional structure of the
-data. However, some algorithms, like Ward's clustering, need this structural
-information.
-\verb!sklearn.feature_extraction.image! provides two methods that build an
-adjacency matrix based upon your data while taking the mask into account:
+In scikit-learn, structural information is stored apart from the data matrix
+into a graph. \verb!sklearn.feature_extraction.image! provides two methods
+that build an adjacency matrix based upon your data while taking the mask
+into account:
 \begin{itemize}
     \item \verb!grid_to_graph! creates a binary adjacency graph based upon the
         data shape. This is useful for Ward's clustering.
@@ -431,7 +442,12 @@ adjacency matrix based upon your data while taking the mask into account:
         the image. This graph can be used in spectral clustering.
 \end{itemize}
 
-% \subsection{Label shifting}
+\subsubsection{Label shifting}
+
+Functional MRI acquisition is not immediate: BOLD response peak occurs between 3
+and 5 seconds after the stimulus. We take this time shift into account by
+shifting values of the label array by an offset of 2 time repetition (about 5
+seconds).
 
 % Functional MRI measures brain activity by using the Blood-Oxygen-Level-Dependent
 % contrast (BOLD). In fact, like muscles, brain regions consume more oxygen and
@@ -446,23 +462,15 @@ adjacency matrix based upon your data while taking the mask into account:
 % Usually, we remove the first two scans of the data and the two last values of the
 % labels (to keep an homogeneous length).
 
-% \begin{lstlisting}
-% X = X[2:]
-% y = y[:-2]
-% \end{lstlisting}
-
-\section{Decoding}
-
-The process of predicting behavioral or phenotypic data from fMRI scan is
-called decoding. Note that, as working with visual tasks, haemodynamic response
-must be taken into account. We do so by shifting values of the label
-array by an offset of 2 (about 5 seconds).
-
 \begin{lstlisting}
 X = X[2:]
 y = y[:-2]
 \end{lstlisting}
 
+\section{Decoding}
+
+The process of predicting behavioral or phenotypic data from fMRI scan is
+called decoding.
 \subsection{SVM}
 
 \subsubsection{Haxby dataset}
@@ -555,8 +563,17 @@ sv = clf.support_vectors_
 sv = feature_selection.inverse_transform(sv)
 \end{lstlisting}
 
-\textbf{Figure \ref{fig:haxby}.}{Voxel importance in prediction decision for Haxby experiment
-using \textit{a.} SVC, \textit{b.} Searchlight and \textit{c.} f\_score}{fig:01}
+\begin{figure}[hbtp]
+  \begin{center}
+  \subfigure[SVC]{\includegraphics[width=.3\linewidth]{img/svm.pdf}}
+  \subfigure[Searchlight]{\includegraphics[width=.3\linewidth]{img/searchlight.pdf}}
+  \subfigure[F\_score]{\includegraphics[width=.3\linewidth]{img/f_score.pdf}}
+  \end{center}
+\caption{Voxel importance in prediction decision for Haxby experiment
+using \textit{a.} SVC, \textit{b.} Searchlight and \textit{c.}
+f\_score}
+\label{fig:haxby}
+\end{figure}
 
 \subsection{Searchlight}
 \label{searchlight}
@@ -688,8 +705,14 @@ is more accurate in the fovea. This
 may be caused by the fact that there are more neurons dedicated to foveal
 representation in the primary visual area than for the borders.
 
-\textbf{Figure \ref{fig:omp}.}{Reconstruction accuracy depending on pixel
-position in the stimulus.}\label{fig:02}
+\begin{figure}[hbtp]
+  \begin{center}
+    \includegraphics[width=.3\linewidth]{img/logistic_l1_scores.png}
+  \end{center}
+  \caption{Reconstruction accuracy depending on pixel
+           position in the stimulus.}
+\label{fig:omp}
+\end{figure}
 
 \section{Encoding}
 In the context of machine learning in neuroimaging, learning a forward model which predicts BOLD signal given a stimulus is often referred to as \textit{encoding} \cite{Naselaris2011}.
@@ -823,8 +846,15 @@ In addition of classical ICA shown above, we have computed results using the
 others evoked methods (CanICA, MELODIC). We can see that with each method we can
 extract the default mode network, more or less precisely.
 
-\textbf{Figure \ref{fig:ica}.}{Extraction of default mode network using \textit{a} Group ICA
-  \textit{b} CanICA}\label{fig:03}
+\begin{figure}[hbtp]
+  \begin{center}
+      \subfigure[ICA]{\includegraphics[width=.3\linewidth]{img/ica.pdf}}
+      \subfigure[CanICA]{\includegraphics[width=.3\linewidth]{img/plot_canica_resting_state_17.png}}
+  \end{center}
+  \caption{Extraction of default mode network using \textit{a} Group ICA
+  \textit{b} CanICA}
+  \label{fig:ica}
+\end{figure}
 
 \alex{MELODIC is missing}
 
@@ -867,7 +897,13 @@ ward.fit(X)
 
 \subsubsection{Results}
 
-\textbf{Figure \ref{fig:clustering}.}{Brain decomposition using different clustering techniques.}\label{fig:04}
+\begin{figure}[hbtp]
+  \begin{center}
+  \subfigure[Ward's clustering]{\includegraphics[width=.3\linewidth]{img/plot_rest_clustering_1.png}}
+  \end{center}
+  \caption{Brain decomposition using different clustering techniques.}
+  \label{fig:clustering}
+\end{figure}
 
 
 \section*{Disclosure/Conflict-of-Interest Statement}
@@ -886,49 +922,4 @@ conflict of interest.
 \bibliographystyle{frontiersinSCNS} % for Science articles
 \bibliography{biblio}
 
-\newpage
-
-\begin{figure}[h]
-    \includegraphics[width=.5\linewidth]{img/niimgs.jpg}
-    \caption{Conversion of brain scans into 2-dimensional data}
-    \label{fig:niimg}
-\end{figure}
-
-\begin{figure}[h]
-  \begin{center}
-  \subfigure[SVC]{\includegraphics[width=.3\linewidth]{img/svm.pdf}}
-  \subfigure[Searchlight]{\includegraphics[width=.3\linewidth]{img/searchlight.pdf}}
-  \subfigure[F\_score]{\includegraphics[width=.3\linewidth]{img/f_score.pdf}}
-  \end{center}
-\caption{Voxel importance in prediction decision for Haxby experiment
-using \textit{a.} SVC, \textit{b.} Searchlight and \textit{c.}
-f\_score}
-\label{fig:haxby}
-\end{figure}
-\begin{figure}[h]
-  \begin{center}
-    \includegraphics[width=.3\linewidth]{img/logistic_l1_scores.png}
-  \end{center}
-  \caption{Reconstruction accuracy depending on pixel
-           position in the stimulus.}
-\label{fig:omp}
-\end{figure}
-
-\begin{figure}[h]
-  \begin{center}
-      \subfigure[ICA]{\includegraphics[width=.3\linewidth]{img/ica.pdf}}
-      \subfigure[CanICA]{\includegraphics[width=.3\linewidth]{img/plot_canica_resting_state_17.png}}
-  \end{center}
-  \caption{Extraction of default mode network using \textit{a} Group ICA
-  \textit{b} CanICA}
-  \label{fig:ica}
-\end{figure}
-
-\begin{figure}[h]
-  \begin{center}
-  \subfigure[Ward's clustering]{\includegraphics[width=.3\linewidth]{img/plot_rest_clustering_1.png}}
-  \end{center}
-  \caption{Brain decomposition using different clustering techniques.}
-  \label{fig:clustering}
-\end{figure}
 \end{document}
