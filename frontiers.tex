@@ -467,45 +467,54 @@ X = X[2:]
 y = y[:-2]
 \end{lstlisting}
 
-\section{Decoding}
+\section{Object representation in the brain}
 
-The process of predicting behavioral or phenotypic data from fMRI scan is
-called decoding.
-\subsection{SVM}
+In the context of machine learning in neuroimaging, learning a forward model
+which predicts behavioral or phenotypic data given BOLD signal is referred to as
+decoding, the inverse procedure being called encoding \cite{Naselaris2011}.
 
-\subsubsection{Haxby dataset}
+This use case explores the relation between brain activity and visual
+stimuli. More precisely, we want to know if there is a significant difference
+in brain activity when presenting to the subject images of different categories.
 
-This example and the following solves the classification problem presented in
-Haxby dataset (\cite{haxby2001}). In this protocol, grayscale images
-representing several image categories are presented to 6 subjects during 12
-runs. The goal is to predict, from fMRI data, which image category is presented
+This classification problem is presented in Haxby experiment (\cite{haxby2001}).
+In this protocol, grayscale images representing different image categories
+are presented to 6 subjects during 12 sessions. The goal is to predict,
+from fMRI data, which image category is presented
 to the subject and see where the discriminating brain voxels for this task are
-located. Full protocol information are available in the reference paper.
+located. Full protocol information is available in the reference paper.
 
 For the sake of simplicity, this example focuses on one subject for the
 particular task of discriminating face against house images.
 
+\subsection{SVM}
+
 \subsubsection{Feature selection: ANOVA F-Test}
 
-Image resolution of this dataset is standard (3mm cubes, 160 000 voxels),
-and applying the brain mask leaves about 40 000 voxels. This is still a
-high number of features regarding the fact that we only have 1 400 samples.
+The common preprocessing pipeline is applied on Haxby dataset. After masking, 40
+000 features are left for only 1 400 samples (due to the penibility of fMRI
+acquisition procedure). This is not an optimal setting for machine learning
+algorithm which efficiency strongly depends on the ration between feature and
+samples.
 
-However, it is possible to reduce the number of voxels (i.e. the number of
-features) by selecting only the most relevant to our task. The neuroscientific
-approach would be to restrain the study to the occipital area of the brain
-(where the visual cortex is located). The statistical approach consists in
-selecting the most relevant voxels based on a simple statistical test.
+Reducing the number of features (ie voxels) can be done by selecting the most
+relevent ones to our task. A neuroscientific approach could be to restrain the
+mask to occipital area which contains the visual cortex. The statistical
+approach consists in using a simple test to select most relevant features prior
+to applying a more sophisticated algorithm.
 
-In supervised learning, the most popular feature selection method is the
+Scikit-learn offers a panel of strategies to select features. In supervised
+learning, the most popular feature selection method is the
 ANalysis Of VAriance (ANOVA) F-Test. This is a generalization of the t-test to
-more than 2 features. ANOVA compares several
-groups to determine if they are not similar (the null hypothesis being that they
-are randomly drawn from the same population). It is used to compare the distribution
-of feature values across classes.
+more than 2 features.i
+ANOVA compares several groups to determine if they are similar or not (the null
+hypothesis being that they are randomly drawn from the same population).
+It is used to compare feature distributions across classes: a feature chose
+distribution is similar for all classes is not likely to contain much
+information.
 
-\verb!sklearn.feature_selection! contains a panel of feature selection
-strategies. One can choose to take a percentile of the features
+After ranking the features, \verb!sklearn.feature_selection! proposes a panel
+of feature selection strategies. One can choose to take a percentile of the features
 (\verb!SelectPercentile!), or a fixed number of features (\verb!SelectKBest!)
 for example. All these objects are implemented as transformers (see
 \ref{scikitlearn}) and are invertible (see code below).
@@ -520,9 +529,10 @@ seeing on which side of the hyperplane it is. SVC has the advantage to
 give reliable results even when the number of dimensions is greater than the
 number of samples.
 
-The decision is taken based upon a subset of training data called support
-vectors: this is the information we are interested in as we can make a
-neuroscientific interpretation of it (we are not interested by scores).
+The decision is taken based upon a subset of training data called
+support vectors (this is not a black box). From them, one can deduce which
+features are the most important, and yield a neuroscientific interpretation out
+of these results.
 
 \begin{lstlisting}
 feature_selection = SelectKBest(f_classif, k=500)
@@ -548,26 +558,53 @@ clf.fit(X)
 % sv = anova_svc.inverse_tranform(clf.support_vectors_)
 % \end{lstlisting}
 
+\subsubsection{Searchlight}
+\label{searchlight}
+
+Searchlight is a popular algorithm in the neuroscience community.
+Presented in \cite{kriegeskorte2006}, it aims to score
+brain voxels depending on the amount of information they hold. Concretely, a
+cross validated classification is run on each voxel: the better its results are,
+the more information it holds.
+
+However, considering the fact that the information of a voxel is not only
+contained in the voxel itself but in its neighbourhood, Kriegeskorte decided to run
+the classification on a ball centered on the voxel instead of a single voxel,
+thus the name of Searchlight.
+
+An efficient implementation of this algorithm is way beyond the scope of this
+paper also it is not detailed here. However, the code, along with this example,
+are available in nilearn python package.
+
 \subsubsection{Results}
 
-We display here the support vectors of the classifiers. These are the features
-used by the classifier to discriminate between face and houses. Green and blue
-lines surround features exhibited in the reference paper. We can see that our
-classifier uses mostly voxels presents in the regions used to discriminate
-houses.
+We compare here three differents methods. On all figures, green, resp. blue,
+lines surround features corresponding to face, resp. house, recognition
+exhibited in the reference paper.
+
+The F\_score (\textit{a}) is a basic statistical test and can be seen as a basic
+classifier. We can see that the voxels selected by this method match
+Haxby results pretty well. These results are validated by the SVM in figure
+\textit{b} which is, not suprisingly, very similar.
+The Searchlight highlights more voxels around the reference regions. This is not
+surprising as its strategy to take a ball around a voxel can be seen as a blur.
+
+These results are also neuroscientifically valid as the activation occurs in the
+high level regions of the visual cortex which is known to contain semantic
+information about vision.
 
 \begin{lstlisting}
 ### Look at the discriminating weights
-sv = clf.support_vectors_
+support = clf.support_vectors_
 # reverse feature selection
-sv = feature_selection.inverse_transform(sv)
+support = feature_selection.inverse_transform(support)
 \end{lstlisting}
 
 \begin{figure}[hbtp]
   \begin{center}
+  \subfigure[F\_score]{\includegraphics[width=.3\linewidth]{img/f_score.pdf}}
   \subfigure[SVC]{\includegraphics[width=.3\linewidth]{img/svm.pdf}}
   \subfigure[Searchlight]{\includegraphics[width=.3\linewidth]{img/searchlight.pdf}}
-  \subfigure[F\_score]{\includegraphics[width=.3\linewidth]{img/f_score.pdf}}
   \end{center}
 \caption{Voxel importance in prediction decision for Haxby experiment
 using \textit{a.} SVC, \textit{b.} Searchlight and \textit{c.}
@@ -575,101 +612,82 @@ f\_score}
 \label{fig:haxby}
 \end{figure}
 
-\subsection{Searchlight}
-\label{searchlight}
-For this example, we use the same dataset as the first one (one subject from
-Haxby).
+% This is too technical
+%
+% \subsubsection{Implementation}
+% 
+% Even if this algorithm seems complicated, it can be easily implemented thanks to
+% some basic bricks provided by the scikit-learn. They key elements here are
+% \textit{i)} the neighbourhood (\texttt{sklearn.neighbors.NearestNeighbors}),
+% \textit{ii)} the classifier (\texttt{sklearn.svm.LinearSVC}),
+% \textit{iii)} the cross-validation (\texttt{sklearn.svm.LinearSVC}).
+% 
+% Searchlight prohibitive computational cost makes it hardly runnable on a whole
+% brain. To avoid this problem, computation will be limited to voxels present in a
+% \texttt{process\_mask} (in this use case, a single axial slice). This is easily
+% doable thanks to scikit-learn: a connectivity graph is build upon the
+% \texttt{mask} and then restricted to voxels of interest contained in the 
+% \texttt{process\_mask}.
+% 
+% \begin{lstlisting}
+% # Compute world coordinates of all in-mask voxels.
+% mask_coords = get_real_world_coordinates(mask_data, mask_affine)
+% 
+% # Compute world coordinates of all in-processing region voxels
+% process_mask_coords = get_real_world_coordinates(process_mask_data,
+%                                                  process_mask_affine)
+% 
+% clf = neighbors.NearestNeighbors(radius=radius)
+% A = clf.fit(mask_coords).radius_neighbors_graph(process_mask_coords)
+% \end{lstlisting}
+% 
+% Then, for each row of our adjacency matrix, we do a cross validation using a
+% given estimator. This is the core of the algorithm and we see that it can be
+% written with a simple for-loop.
+% 
+% \begin{lstlisting}
+% scores = np.zeros(len(A.rows))
+% for i, row in enumerate(A.rows):
+%     scores[i] = np.mean(
+%             cross_val_score(estimator, X[:, row], y,
+%                             score_func=score_func,
+%                             cv=cv, n_jobs=1))
+% return scores
+% \end{lstlisting}
+% 
+% \subsubsection{Results}
+% 
+% Results are presented in figure \ref{fig:haxby}. Searchlight results
+% (\textit{b}) are compared to the previous use case and to the F-score measure
+% (\textit{c}), the simplest statistical test we can make on the data.
+% All methods mainly localizes information in the region of
+% interest corresponding to house detection. The smoothing effect present in the
+% Searchlight results is inherent to the fact that a ball is used to iterate on
+% the voxels.
 
-\subsubsection{Principle}
+\subsection{Linking image and brain activity}
 
-This Searchlight algorithm presented in \cite{kriegeskorte2006} aims to score
-brain voxels depending on the amount of information they hold. The underlying
-principle is the same as the previous example: each voxel in the brain is used
-to predict the labels.
+The previous experiment shows that it is possible to determine the category of a
+visual stimulus by mining brain functional data in high level visual cortex. It
+could be interesting if the same operation is possible in the primary visual
+cortex, which should contain informationa bout the visual patterns seen by the
+eyes. This is the task proposed in the Kamitani dataset.
 
-However, considering the fact that the information of a voxel is not only
-contained in the voxel itself but in its neighbours, Kriegeskorte decided to run
-a whole classification pipeline (learning and cross validation) in a ball
-centered on the voxel, instead of applying a smoothing.
-
-\subsubsection{Implementation}
-
-Even if this algorithm seems complicated, it can be easily implemented thanks to
-some basic bricks provided by the scikit-learn. They key elements here are
-\textit{i)} the neighbourhood (\texttt{sklearn.neighbors.NearestNeighbors}),
-\textit{ii)} the classifier (\texttt{sklearn.svm.LinearSVC}),
-\textit{iii)} the cross-validation (\texttt{sklearn.svm.LinearSVC}).
-
-Searchlight prohibitive computational cost makes it hardly runnable on a whole
-brain. To avoid this problem, computation will be limited to voxels present in a
-\texttt{process\_mask} (in this use case, a single axial slice). This is easily
-doable thanks to scikit-learn: a connectivity graph is build upon the
-\texttt{mask} and then restricted to voxels of interest contained in the 
-\texttt{process\_mask}.
-
-\begin{lstlisting}
-# Compute world coordinates of all in-mask voxels.
-mask_coords = get_real_world_coordinates(mask_data, mask_affine)
-
-# Compute world coordinates of all in-processing region voxels
-process_mask_coords = get_real_world_coordinates(process_mask_data,
-                                                 process_mask_affine)
-
-clf = neighbors.NearestNeighbors(radius=radius)
-A = clf.fit(mask_coords).radius_neighbors_graph(process_mask_coords)
-\end{lstlisting}
-
-Then, for each row of our adjacency matrix, we do a cross validation using a
-given estimator. This is the core of the algorithm and we see that it can be
-written with a simple for-loop.
-
-\begin{lstlisting}
-scores = np.zeros(len(A.rows))
-for i, row in enumerate(A.rows):
-    scores[i] = np.mean(
-            cross_val_score(estimator, X[:, row], y,
-                            score_func=score_func,
-                            cv=cv, n_jobs=1))
-return scores
-\end{lstlisting}
-
-\subsubsection{Results}
-
-Results are presented in figure \ref{fig:haxby}. Searchlight results
-(\textit{b}) are compared to the previous use case and to the F-score measure
-(\textit{c}), the simplest statistical test we can make on the data.
-All methods mainly localizes information in the region of
-interest corresponding to house detection. The smoothing effect present in the
-Searchlight results is inherent to the fact that a ball is used to iterate on
-the voxels.
-
-% \subsection{Classification of M/EEG sensor space data}
-
-% \alex{For the moment we don't have enough space and A. Gramfort told that this
-% may not fit as the whole paper is very fMRI oriented}
-
-\subsection{Decoding: reconstructing image from brain activity}
-
-\subsubsection{Kamitani dataset}
-
-Kamitani dataset is based on a visual task like Haxby. In this experiment,
-several series of $10\times10$ binary images are presented to two subjects.
-Full details are available in the reference paper
+In this experiment, several series of $10\times10$ binary images are presented
+to two subjects. Full details are available in the reference paper
 (\cite{miyawaki2008}).
 
-Kamitani training set is composed of random images (where black and white pixels
-are balanced). The testing set is composed of structured images containing
-geometric shapes (square, cross...) and letters. The goal is to use the
-scikit-learn to learn a correlation between brain
-activation and pixel color. 
+The training set is composed of random images (where black and white pixels
+are balanced) and the testing set is composed of structured images containing
+geometric shapes (square, cross...) and letters. For the sake of simplicity, in
+this use case, we consider only the training set and use cross-validation to
+obtain scores on unseen data.
 
-There are two ways to establish a link between brain voxels and image pixels: we
-can either try to reconstruct images from brain voxel activation, this is called
-decoding, or we can try to predict brain activation from images, this is called
-encoding. In this use case, both approaches are explored and their results are
-compared to see if they match. 
+The goal here is twofold: reconstructing visual stimulus from BOLD activation,
+which is a decoding task, and reconstructing brain activation from visual
+stimulus, which is an encoding task.
 
-\subsubsection{Principle} % Should be 'protocol'?
+\subsubsection{Decoding}
 
 Common pre-processing have been applied to the data (detrending and
 standardization).
@@ -679,7 +697,7 @@ logistic regression and a sophisticated multiscale strategy to reconstruct the i
 This example uses the simpler version of this approach, a l1 logistic
 regression, and compare it to the Orthogonal
 Matching Pursuit (\cite{mallat1993}). The OMP is a linear model that uses
-time series as a dictionary and an l1 constraint on the loadings. Its
+feature time series as a dictionary and an l1 constraint on the loadings. Its
 particularity is to add one atom at each step and update all coefficients
 based on the orthogonal projection on previously selected atoms.
 
@@ -715,7 +733,6 @@ representation in the primary visual area than for the borders.
 \end{figure}
 
 \section{Encoding}
-In the context of machine learning in neuroimaging, learning a forward model which predicts BOLD signal given a stimulus is often referred to as \textit{encoding} \cite{Naselaris2011}.
 Given an appropriate model of the stimulus, e.g. one which can provide an approximately linear representation of BOLD activation, an encoding approach allows one to quantify for each voxel to what extent its variability is captured by the model. A popular evaluation method is the predictive \(r^2\) score, which uses a prediction on left out data to quantify the decrease in residual norm brought about by fitting a regression function as opposed to fitting a constant. %We have \[r^2 = \frac{\|y_{\textrm{true}} - y_{\textrm{pred}}\|^2}{\|y_{\textrm{true}} - \bar y_{\textrm{true}}\|^2}\]
 The remaining variance consists of potentially unmodelled, but reproducible signal and spurious noise.
 
@@ -773,13 +790,18 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 
 In \cite{biswal1995}, Biswal was the first to exhibit coherent patterns in
 brain activation during resting state. These correlated voxel activations seemed
-to form functional networks consistent with neuroscientific knowledge.
+to be organized in functional networks consistent with neuroscientific knowledge.
 
 % Resting-state fMRI is useful when dealing with subjects that cannot execute a
 % specific task. In fact, no task-driven protocol is capable of diagnosing precisely
 % damaged brain areas e.g. in stroke patients, as no task can highlight these problems.
 % \cite{varoquaux2010b} found differences in correlation between functional
 % networks between control and post-stroke patients.
+
+In this use case, data from Attention Disorder Hyperactivity Disorder is used to
+mine brain functional network. This dataset contains control and ADHD patients
+resting state data (subjects are scanned without giving them any specific task
+to capture the cerebral background activity).
 
 As resting state fMRI are unlabeled data, unsupervised methods must be used to
 mine them. The most popular method to extract functional networks is ICA and
@@ -789,32 +811,29 @@ scikit-learn.
 
 The main problem with functional connectivity (and unsupervised methods in
 general) is the lack of labels or ground truth. It is therefore very difficult
-to score the computed models and cross validate it. At first, you can
-compare your results with some reference atlas or neuroscientific knowledge. In
-fact, it is believed that functional network should match anatomical division
-\alex{Well, I believe that. Any reference ?}. It is also possible to relate to
-networks discovered in task or other resting state experiments (eg default mode
-network, visual and auditory networks...). Some researchers even released
-functional atlases built upon one of their experiment (cite yeo, smith,
-craddock).
+to score the computed models and cross validate them. A first approach is to
+validate results thanks to prior knowledge, obtained in task-driven experiments
+for example. Another way is to compare to functional atlases that have already
+been released (cite yeo, smith, craddock), the problem being that these atlases
+do not agree on the number
+and position of many function brain areas.
 
 \subsection{Independent Component Analysis (ICA)}
 
 \subsubsection{Principle}
 
-A typical example is the \emph{cocktail party problem} where ICA separates the
-voices of people using signal from several microphones.
+ICA is a blind source separation method. Its principle is to separate a
+multivariate signal into several components by maximizing their non-gaussianity.
+A typical example is the \emph{cocktail party problem} where ICA is able to separate
+voices from several people using signal from microphones located across the room.
 
 ICA is historically the reference method to extract networks from resting state
-fMRI \cite{biswal1999}. It is a blind source separation method. Its principle is
-to separate a
-multivariate signal into several components by maximizing their non-gaussianity.
-Several strategies have been used to syndicate ICA
+fMRI \cite{biswal1999}. Several strategies have been used to syndicate ICA
 results across several subjects. \cite{calhoun2001a} propose a dimension
 reduction (using PCA) followed by a concatenation of timeseries (used in this
-example).
-\cite{varoquaux2010} use dimension reduction and canonical correlation analysis
-to aggregate subject data.
+example). \cite{varoquaux2010} use dimension reduction and canonical correlation analysis
+to aggregate subject data. Melodic, ICA program from the FSL suite uses a Tensor
+ICA approach which is not detailed here.
 
 \subsubsection{Preprocessing}
 
@@ -826,9 +845,9 @@ FastICA does not look for linear trends, only constant one.
 
 % XXX: Fix that
 
-The code to apply ICA is very straightforward. Note that ICA 
-the transposition of the data
-matrix to apply it on the right dimension.
+Applying the scikit-learn ICA is very straightforward thanks to the transformer
+concept. As for clustering methods, a transposition of our data is required to
+operate on the spatial dimension (and not on time series).
 
 \begin{lstlisting}
 from sklearn.decomposition import FastICA
@@ -842,9 +861,9 @@ obtain brain networks.
 
 \subsubsection{Results}
 
-In addition of classical ICA shown above, we have computed results using the
-others evoked methods (CanICA, MELODIC). We can see that with each method we can
-extract the default mode network, more or less precisely.
+Classical spatial ICA is compared to other evoked methods (CanICA and MELODIC).
+We focus here on the default mode network because it is commonly used to
+validate ICA results.
 
 \begin{figure}[hbtp]
   \begin{center}
@@ -858,35 +877,46 @@ extract the default mode network, more or less precisely.
 
 \alex{MELODIC is missing}
 
+% On Jennifer's data, results are quite similar across methods. However, I still
+% have difficulties to make CanICA properly run on ADHD dataset.
+
+
 \subsection{Clustering}
 \ref{clustering}
 \subsubsection{Principle}
 
-A clustering method aggregates similar features into groups. Scikit-learn
-provides different clustering algorithms, each one having its own
-characteristics:
+A clustering method aggregates samples into groups (called clusters) based on a similarity
+measure. Several approaches exists, each one having its own characteristics,
+avantages and drawbacks.
 
+The common parameter to all approaches is the number of clusters to extract.
+Setting this parameter is not easy as we have no information about the real
+number of clusters in our data (ie functional regions in the brain).
+
+There are several ways to cross-validate this parameter (using signal variance
+explained by the model for example) but this is not the subject of this paper.
+In this use case, we present several clustering methods and focus on their
+ability to segment well known anatomical features such as CerebroSpinal Fluid
+(CSF), and amygdala.
+
+Chosen approached are:
 \begin{itemize}
     \item{\bf Ward's clustering} uses a bottom-up hierarchical approach. Features are
         progressively aggregated into clusters until a whole tree is built. This
         tree is then cut to get the requested number of clusters.
     \item{\bf k-means} is a centroid based approach. Clusters are represented by
         a central vector: a feature belongs to the cluster of the nearest
-        centroid.
+        centroid. This algorithm gives better results when data is smoothed.
     \item{\bf spectral clustering} is a graph based approach. It separates
         the feature graph into subgraphs by maximizing intra-group connectivity and
         minimizing inter-group connectivity.
 \end{itemize}
 
-For each algorithm, one must specify the number of clusters. This parameter is
-not easy to set as we have little information about the data.
-
-In this use case, we will use Ward's clustering and will compare its results to
-k-means and spectral clustering. Ward's clustering is fast and builds a complete
-tree of features, so that varying the number of clusters is costless.
-
-As preprocessings, PCA is used to reduce dimensionality and smoothing is applied
-to enhance the results.
+Common preprocessing are applied, along with a PCA to reduce dimensionality and
+smoothing to enhance k-means result. Note that clustering algorithms group
+samples and that we want to group features: a transposition is needed to apply
+clustering in the wanted dimension. Scikit-learn provides a
+\texttt{WardAgglomeration} object that takes care of this step.
 
 \begin{lstlisting}
 connectivity = grid_to_graph(n_x=mask.shape[0], n_y=mask.shape[1],
