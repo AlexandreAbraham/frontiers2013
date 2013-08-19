@@ -256,16 +256,11 @@ product) of complete parameter combinations. Randomized search is a smarter
 algorithm that avoids the combinatorial explosion in grid search by sampling a
 fixed number of times from its parameter distributions.
 
-\fabian{should we put an example here ?}
-\alex{We should put a reference to searchlight, where cross\_val\_score is used
-    (we should explain cross\_val\_score here or in Searchlight. We should also
-    use GridSearchCV to cross validate the C of SVC Haxby}
-
 \section{From MR volumes to a data matrix}
 
 From this point, it is supposed that common MRI preprocessings have been applied
 to the data (namely motion correction, slice timing, coregistration on a common template like
-MNI if necessary). Refernce softwares for this task are SPM and FSL.
+MNI if necessary). Reference softwares for this task are SPM and FSL.
 This section deals with transforming neuroimaging data into a format that can be
 fed to scikit-learn's functions.
 
@@ -274,7 +269,7 @@ fed to scikit-learn's functions.
 
 Neuroimaging data are represented by 4-dimensional data (3D scans composed of
 voxels and their associated time series) along with a transformation matrix
-(called affine) used to compute voxel locations from voxel coordinated to
+(called affine) used to compute voxel locations from voxel coordinates to
 world coordinates.
 Such matrix is needed because data may be anisotropic: the distance between
 two voxels is not the same depending on the direction.
@@ -352,10 +347,10 @@ includes:
         voxel. This is a mandatory step when studying fMRI data, as the voxel
         intensity itself has no meaning and we want to study its variation and
         correlation with other voxels. Detrending can be done thanks to SciPy
-        (\texttt{scipy.signal.detrend}).\\
+        (\texttt{scipy.signal.detrend}).
     \item{\bf Normalization} consists in setting the timseries variance to 1.
         This harmonization is necessary as some machine learning algorithms are
-        sensible to different value ranges.\\
+        sensible to different value ranges.
     \item{\bf Confounds removal} consists in regressing out confounding factors.
         Typical neuroimaging confounds are head movements. These spurious
         variables induce spurious correlation between all brain voxels.
@@ -368,14 +363,16 @@ includes:
 
 \subsection{Masking}
 
-\subsubsection{From 4-dimensional image to 2-dimensional array}
-
 Neuroimaging data are represented in 4 dimensions: 3 dimensions for the scans,
 which are positioned in a coordinate space, and one dimension for the time.
 Scikit-learn algorithms, on the other hand, only accept 2-dimensional data (see
 \ref{scikit-learn}).
-In most cases, voxels will be considered as features and timeseries as samples (these
-roles are inverted for spatial clustering methods that group samples).\\
+Depending on the purpose and on the used estimator, voxels and time series can be
+considered as features
+or samples. For example, to reduce dimensionality of input data,
+time series can be passed as features to a Principal Component Analysis.
+
+\subsubsection{From 4-dimensional image to 2-dimensional array}
 
 The natural way to reduce data dimension is to flatten it, losing its original
 structure. However, this is not the most clever strategy. In fact, it is known
@@ -393,7 +390,7 @@ FSL or SPM.\\
     \label{fig:niimg}
 \end{figure}
 
-Implementating masking procedure is made easy by NumPy fancy
+Implementing masking procedure is made easy by NumPy fancy
 indexing. Special attention must be paid to the type of the mask array: it must
 be boolean. Otherwise the indexing will be considered as broadcasting and the
 result will usually fill the whole memory.
@@ -404,7 +401,7 @@ conventions.
 # Apply a mask
 # Ensure that the mask is boolean
 mask_data = mask_data.astype(np.bool)
-# Apply the mask
+# Apply the mask, X = timeseries * voxels
 X = func_data[mask_data].T
 
 # Unmask data
@@ -437,9 +434,9 @@ that build an adjacency matrix based upon your data while taking the mask
 into account:
 \begin{itemize}
     \item \verb!grid_to_graph! creates a binary adjacency graph based upon the
-        data shape. This is useful for Ward's clustering.
+        data shape; it is used in Ward's clustering.
     \item \verb!image_to_graph! creates a distance matrix using the gradient of
-        the image. This graph can be used in spectral clustering.
+        the image which is used in spectral clustering.
 \end{itemize}
 
 \subsubsection{Label shifting}
@@ -471,7 +468,9 @@ y = y[:-2]
 
 In the context of machine learning in neuroimaging, learning a forward model
 which predicts behavioral or phenotypic data given BOLD signal is referred to as
-decoding, the inverse procedure being called encoding \cite{Naselaris2011}.
+decoding and is presented in the following use case. The inverse procedure is
+called encoding \cite{Naselaris2011} and is introduced in the next use case
+(\ref{kamitani}).
 
 This use case explores the relation between brain activity and visual
 stimuli. More precisely, we want to know if there is a significant difference
@@ -498,18 +497,18 @@ algorithm which efficiency strongly depends on the ration between feature and
 samples.
 
 Reducing the number of features (ie voxels) can be done by selecting the most
-relevent ones to our task. A neuroscientific approach could be to restrain the
+relevant ones to our task. A neuroscientific approach could be to restrain the
 mask to occipital area which contains the visual cortex. The statistical
-approach consists in using a simple test to select most relevant features prior
-to applying a more sophisticated algorithm.
+approach consists in using a simple and costless test to reduce roughly the
+number of features, before applying a more sophisticated algorothm.
 
 Scikit-learn offers a panel of strategies to select features. In supervised
 learning, the most popular feature selection method is the
 ANalysis Of VAriance (ANOVA) F-Test. This is a generalization of the t-test to
-more than 2 features.i
+more than 2 features.
 ANOVA compares several groups to determine if they are similar or not (the null
 hypothesis being that they are randomly drawn from the same population).
-It is used to compare feature distributions across classes: a feature chose
+It is used to compare feature distributions across classes: a feature which
 distribution is similar for all classes is not likely to contain much
 information.
 
@@ -586,8 +585,9 @@ The F\_score (\textit{a}) is a basic statistical test and can be seen as a basic
 classifier. We can see that the voxels selected by this method match
 Haxby results pretty well. These results are validated by the SVM in figure
 \textit{b} which is, not suprisingly, very similar.
-The Searchlight highlights more voxels around the reference regions. This is not
-surprising as its strategy to take a ball around a voxel can be seen as a blur.
+The Searchlight highlights more voxels around the reference regions. This is
+explained by the fact that its strategy to take a ball around a voxel
+is similar to a blur.
 
 These results are also neuroscientifically valid as the activation occurs in the
 high level regions of the visual cortex which is known to contain semantic
@@ -665,12 +665,13 @@ Searchlight}
 % Searchlight results is inherent to the fact that a ball is used to iterate on
 % the voxels.
 
-\subsection{Linking image and brain activity}
+\section{Linking image and brain activity}
+\label{kamitani}
 
 The previous experiment shows that it is possible to determine the category of a
 visual stimulus by mining brain functional data in high level visual cortex. It
 could be interesting if the same operation is possible in the primary visual
-cortex, which should contain informationa bout the visual patterns seen by the
+cortex, which should contain information about the visual patterns seen by the
 eyes. This is the task proposed in the Kamitani dataset.
 
 In this experiment, several series of $10\times10$ binary images are presented
@@ -687,7 +688,7 @@ The goal here is twofold: reconstructing visual stimulus from BOLD activation,
 which is a decoding task, and reconstructing brain activation from visual
 stimulus, which is an encoding task.
 
-\subsubsection{Decoding}
+\subsection{Decoding}
 
 Common pre-processing have been applied to the data (detrending and
 standardization).
@@ -732,7 +733,7 @@ representation in the primary visual area than for the borders.
 \label{fig:omp}
 \end{figure}
 
-\section{Encoding}
+\subsection{Encoding}
 Given an appropriate model of the stimulus, e.g. one which can provide an approximately linear representation of BOLD activation, an encoding approach allows one to quantify for each voxel to what extent its variability is captured by the model. A popular evaluation method is the predictive \(r^2\) score, which uses a prediction on left out data to quantify the decrease in residual norm brought about by fitting a regression function as opposed to fitting a constant. %We have \[r^2 = \frac{\|y_{\textrm{true}} - y_{\textrm{pred}}\|^2}{\|y_{\textrm{true}} - \bar y_{\textrm{true}}\|^2}\]
 The remaining variance consists of potentially unmodelled, but reproducible signal and spurious noise.
 
@@ -779,11 +780,6 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 
 \end{lstlisting}
 %y_train_centered = (y_train - y_train.mean(axis=0)) / y_train.std(axis=0)
-
-\alex{After talking with Michael, he told me that he could make a fairly simple
-    example for encoding, which I think is a plus for the paper. The example will
-    be integrated in Nisl.}
-
 
 
 \section{Functional Connectivity}
@@ -835,15 +831,11 @@ example). \cite{varoquaux2010} use dimension reduction and canonical correlation
 to aggregate subject data. Melodic, ICA program from the FSL suite uses a Tensor
 ICA approach which is not detailed here.
 
-\subsubsection{Preprocessing}
+\subsubsection{Application}
 
 ICA requires whitened timeseries to run properly. Scikit-learn FastICA takes care
 of this step. However, we still detrend them because
 FastICA does not look for linear trends, only constant one.
-
-\subsubsection{Application}
-
-% XXX: Fix that
 
 Applying the scikit-learn ICA is very straightforward thanks to the transformer
 concept. As for clustering methods, a transposition of our data is required to
@@ -867,26 +859,26 @@ validate ICA results.
 
 \begin{figure}[hbtp]
   \begin{center}
-      \subfigure[ICA]{\includegraphics[width=.3\linewidth]{img/ica.pdf}}
-      \subfigure[CanICA]{\includegraphics[width=.3\linewidth]{img/plot_canica_resting_state_17.png}}
+      \subfigure[ICA]{\includegraphics[width=.3\linewidth]{img/ica/ica.png}}
+      \subfigure[CanICA]{\includegraphics[width=.3\linewidth]{img/ica/canica.png}}
+      \subfigure[Melodic]{\includegraphics[width=.3\linewidth]{img/ica/melodic.png}}
   \end{center}
-  \caption{Extraction of default mode network using \textit{a} Group ICA
-  \textit{b} CanICA}
+  \caption{Extraction of default mode network using different approches}
   \label{fig:ica}
 \end{figure}
 
-\alex{MELODIC is missing}
-
-% On Jennifer's data, results are quite similar across methods. However, I still
-% have difficulties to make CanICA properly run on ADHD dataset.
-
+\alex{This is not very informative, maybe we could precise computation times?}
 
 \subsection{Clustering}
-\ref{clustering}
-\subsubsection{Principle}
+\label{clustering}
 
 A clustering method aggregates samples into groups (called clusters) based on a similarity
-measure. Several approaches exists, each one having its own characteristics,
+measure. Unlike pure statistical methods, some clustering approaches make use of
+spatial information, which is relevant in our case as we are looking for blobs.
+
+\subsection{Approaches}
+
+Several clustering approaches exists, each one having its own characteristics,
 avantages and drawbacks.
 
 The common parameter to all approaches is the number of clusters to extract.
@@ -928,13 +920,22 @@ ward.fit(X)
 
 \subsubsection{Results}
 
+Clustering results are shown in figure~\ref{fig:clustering}. Cluster colors are
+random.
+
 \begin{figure}[hbtp]
   \begin{center}
-  \subfigure[Ward's clustering]{\includegraphics[width=.3\linewidth]{img/plot_rest_clustering_1.png}}
+  \subfigure[Ward's clustering]{
+    \includegraphics[width=.3\linewidth]{img/clustering/ward.png}}
+  \subfigure[KMeans clustering]{
+    \includegraphics[width=.3\linewidth]{img/clustering/kmeans.png}}
   \end{center}
   \caption{Brain decomposition using different clustering techniques.}
   \label{fig:clustering}
 \end{figure}
+
+\alex{I have nothing to say about the results... Maybe we could show compress
+images and underline the fact that it can be used as a compression ?}
 
 
 \section*{Disclosure/Conflict-of-Interest Statement}
@@ -948,7 +949,7 @@ The authors declare that the research was conducted in the absence of any
 commercial or financial relationships that could be construed as a potential
 conflict of interest.
 
-\paragraph{Funding\textcolon} Text Text Text Text Text Text  Text Text.
+\paragraph{Funding\textcolon} We acknowledge funding from the NiConnect project.
 
 \bibliographystyle{frontiersinSCNS} % for Science articles
 \bibliography{biblio}
