@@ -503,7 +503,7 @@
   \parbox[c]{4pc}{%
     \helvetica
     \hfil
-    \flushright  \includegraphics[width=2.5pc,angle=0]{./logo2.eps}\\
+    \flushright  \includegraphics[width=2.5pc,angle=0]{./logo2}\\
   }}
  \rule{\textwidth}{1\p@}\par%
   \helvetica
