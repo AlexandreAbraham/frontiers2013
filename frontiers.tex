@@ -577,12 +577,14 @@ are available in nilearn python package.
 
 \subsubsection{Results}
 
-We compare here three differents methods. On all figures, green, resp. blue,
-lines surround features corresponding to face, resp. house, recognition
+The results of this experience are show in figure~\ref{fig:haxby}.
+On all figures, green, resp.\ blue,
+lines surround features corresponding to face, resp.\ house, recognition
 exhibited in the reference paper.
 
 The F\_score (\textit{a}) is a basic statistical test and can be seen as a basic
-classifier. We can see that the voxels selected by this method match
+classifier (it is the method used in ANOVA to select the features).
+We can see that the voxels selected by this method match
 Haxby results pretty well. These results are validated by the SVM in figure
 \textit{b} which is, not suprisingly, very similar.
 The Searchlight highlights more voxels around the reference regions. This is
@@ -606,9 +608,7 @@ support = feature_selection.inverse_transform(support)
   \subfigure[SVC]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_svm.png}}
   \subfigure[Searchlight]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_searchlight.png}}
   \end{center}
-\caption{Voxel importance in prediction decision for Haxby experiment
-using \textit{a.} f\_score, \textit{b.} SVC and \textit{c.}
-Searchlight}
+\caption{Voxel importance in prediction decision for Haxby experiment}
 \label{fig:haxby}
 \end{figure}
 
