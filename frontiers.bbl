@@ -1,4 +1,4 @@
-\begin{thebibliography}{11}
+\begin{thebibliography}{13}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \expandafter\ifx\csname doi\endcsname\relax
@@ -25,6 +25,17 @@ Hanke, M., Halchenko, Y.~O., Sederberg, P.~B., Hanson, S.~J., Haxby, J.~V., and
 Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel,
   O., et~al. (2011) Scikit-learn: Machine learning in {Python}.
 \newblock {\em Journal of Machine Learning Research\/} 12 2825.
+
+\bibitem[{Friston(2007)}]{friston2007}
+Friston, K., {\em Statistical parametric mapping: the analysis of functional
+  brain images\/} (Academic Press, 2007).
+
+\bibitem[{Smith et~al.(2004)Smith, Jenkinson, Woolrich, Beckmann, Behrens,
+  Johansen-Berg et~al.}]{smith2004}
+Smith, S.~M., Jenkinson, M., Woolrich, M.~W., Beckmann, C.~F., Behrens, T.~E.,
+  Johansen-Berg, H., et~al. (2004) Advances in functional and structural mr
+  image analysis and implementation as fsl.
+\newblock {\em Neuroimage\/} 23 S208--S219.
 
 \bibitem[{Haxby et~al.(2001)Haxby, Gobbini, Furey, Ishai, Schouten, and
   Pietrini}]{haxby2001}
