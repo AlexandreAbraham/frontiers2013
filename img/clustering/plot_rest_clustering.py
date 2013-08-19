@@ -35,7 +35,7 @@ def plot_labels(labels):
     
     # Cluster '-1' should be black (it's outside the brain)
     colors[-1] = 0
-    pl.figure()
+    pl.figure(figsize=(4, 4.5))
     pl.axis('off')
     pl.imshow(colors[np.rot90(cut)], interpolation='nearest')
 
@@ -86,6 +86,7 @@ labels = labels - 1
 
 plot_labels(labels)
 pl.title('K-Means clustering')
+#pl.tight_layout()
 pl.savefig('kmeans.png')
 
 

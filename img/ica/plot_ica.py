@@ -29,39 +29,55 @@ canica = CanICA(n_components=n_components,
                 random_state=1)
 canica.fit(dataset.func)
 masker = canica.masker_
+affine = masker.mask_img_.get_affine()
 
-canica_components = masker.inverse_transform(canica.components_)
-nibabel.save(canica_components, 'canica.nii.gz')
+if not os.path.exists('canica.nii.gz'):
+    canica_components = masker.inverse_transform(canica.components_)
+    nibabel.save(canica_components, 'canica.nii.gz')
 
-c = canica_components.get_data()[:, :, :, 16]
-plot_map(c, canica_components.get_affine(), cut_coords=[37], threshold=0.002,
-        slicer='z')
+if not os.path.exists('canica.png'):
+    cc = np.load('canica.nii.gz')
 
-pl.savefig('canica.png')
+    c = cc.get_data()[:, :, :, 16]
+    plot_map(c, canica_components.get_affine(), cut_coords=[37],
+            threshold=0.002, slicer='z')
+
+    pl.savefig('canica.png')
 
 smooth_masked = masker.transform(dataset.func)
 
 ### Melodic ICA ############################################################
 # To have MELODIC results, please use my melodic branch of nilearn
-from nilearn.decomposition.melodic import MelodicICA
 
-if not os.path.exists('melodic.png'):
+if not os.path.exists('melodic.nii.gz'):
+    from nilearn.decomposition.melodic import MelodicICA
     smoothed_func = masker.inverse_transform(smooth_masked)
     melodic = MelodicICA(mask=masker.mask_img_)
     melodic.fit(smoothed_func)
     melodic_components = melodic.maps_img_
     nibabel.save(melodic_components, 'melodic.nii.gz')
+
+if not os.path.exists('melodic.png'):
+    melodic_components = nibabel.load('melodic.nii.gz')
     c = melodic_components.get_data()[:, :, :, 5]
-    plot_map(c, melodic_components.get_affine(), cut_coords=[37], threshold=1.5,
-            slicer='z')
+    plot_map(c, melodic_components.get_affine(), cut_coords=[37],
+            threshold=1.5, slicer='z')
     pl.savefig('melodic.png')
 
 ### FastICA ##################################################################
 
 # Concatenate all the subjects
-from sklearn.decomposition import FastICA
-X = np.vstack(smooth_masked)
-ica = FastICA(n_components=n_components)
-ica.fit(X)
-ica_components = masker.inverse_transform(ica.components_)
-nibabel.save(ica_components, 'ica.nii.gz')
+if not os.path.exists('ica.nii.gz'):
+    from sklearn.decomposition import FastICA
+    X = np.vstack(smooth_masked)
+    ica = FastICA(n_components=n_components)
+    ica.fit(X)
+    ica_components = masker.inverse_transform(ica.components_)
+    nibabel.save(ica_components, 'ica.nii.gz')
+
+if not os.path.exists('ica.png'):
+    ica_components = nibabel.load('ica.nii.gz')
+    plot_map(ica_components.get_data()[:, :, :, 2], affine, cut_coords=[37],
+            threshold=1e-7, slicer='z')
+
+    pl.savefig('ica.png')
