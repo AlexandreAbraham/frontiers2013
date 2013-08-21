@@ -87,7 +87,7 @@ import pylab as pl
 from matplotlib.patches import Rectangle
 pl.figure(figsize=(5,7))
 pl.axis('off')
-pl.title('SVM vectors')
+# pl.title('SVM vectors')
 pl.imshow(np.rot90(mean_img[..., z]), cmap=pl.cm.gray,
           interpolation='nearest')
 pl.imshow(np.rot90(act[..., z]), cmap=pl.cm.hot,
@@ -97,16 +97,17 @@ mask_house = nibabel.load(h.mask_house[0]).get_data()
 mask_face = nibabel.load(h.mask_face[0]).get_data()
 
 pl.contour(np.rot90(mask_house[..., z].astype(np.bool)), contours=1,
-        antialiased=False, linewidths=1., levels=[0], interpolation='nearest',
-    colors=['blue'])
+        antialiased=False, linewidths=3., levels=[0], interpolation='nearest',
+    colors=['indigo'])
 
 pl.contour(np.rot90(mask_face[..., z].astype(np.bool)), contours=1,
-        antialiased=False, linewidths=1., levels=[0], interpolation='nearest',
-    colors=['green'])
+        antialiased=False, linewidths=3., levels=[0], interpolation='nearest',
+    colors=['deeppink'])
 
-p_h = Rectangle((0, 0), 1, 1, fc="blue")
-p_f = Rectangle((0, 0), 1, 1, fc="green")
+p_h = Rectangle((0, 0), 1, 1, fc="indigo")
+p_f = Rectangle((0, 0), 1, 1, fc="deeppink")
 pl.legend([p_h, p_f], ["house", "face"])
 pl.tight_layout()
 
-pl.savefig('haxby_svm.png')
+pl.savefig('haxby_svm.pdf')
+pl.savefig('haxby_svm.eps')

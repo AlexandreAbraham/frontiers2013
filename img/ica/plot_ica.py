@@ -35,14 +35,16 @@ if not os.path.exists('canica.nii.gz'):
     canica_components = masker.inverse_transform(canica.components_)
     nibabel.save(canica_components, 'canica.nii.gz')
 
-if not os.path.exists('canica.png'):
-    cc = np.load('canica.nii.gz')
+if not os.path.exists('canica.pdf'):
+    cc = nibabel.load('canica.nii.gz')
 
     c = cc.get_data()[:, :, :, 16]
-    plot_map(c, canica_components.get_affine(), cut_coords=[37],
-            threshold=0.002, slicer='z')
+    vmax = np.max(np.abs(c[:, :, 37]))
+    plot_map(c, cc.get_affine(), cut_coords=[37],
+            threshold=0.002, slicer='z', vmin=-vmax, vmax=vmax)
 
-    pl.savefig('canica.png')
+    pl.savefig('canica.pdf')
+    pl.savefig('canica.eps')
 
 smooth_masked = masker.transform(dataset.func)
 
@@ -57,12 +59,14 @@ if not os.path.exists('melodic.nii.gz'):
     melodic_components = melodic.maps_img_
     nibabel.save(melodic_components, 'melodic.nii.gz')
 
-if not os.path.exists('melodic.png'):
+if not os.path.exists('melodic.pdf'):
     melodic_components = nibabel.load('melodic.nii.gz')
     c = melodic_components.get_data()[:, :, :, 5]
+    vmax = np.max(np.abs(c[:, :, 37]))
     plot_map(c, melodic_components.get_affine(), cut_coords=[37],
-            threshold=1.5, slicer='z')
-    pl.savefig('melodic.png')
+            threshold=1.5, slicer='z', vmin=-vmax, vmax=vmax)
+    pl.savefig('melodic.pdf')
+    pl.savefig('melodic.eps')
 
 ### FastICA ##################################################################
 
@@ -75,9 +79,12 @@ if not os.path.exists('ica.nii.gz'):
     ica_components = masker.inverse_transform(ica.components_)
     nibabel.save(ica_components, 'ica.nii.gz')
 
-if not os.path.exists('ica.png'):
+if not os.path.exists('ica.pdf'):
     ica_components = nibabel.load('ica.nii.gz')
-    plot_map(ica_components.get_data()[:, :, :, 2], affine, cut_coords=[37],
-            threshold=1e-7, slicer='z')
+    c = ica_components.get_data()[:, :, :, 2]
+    vmax = np.max(np.abs(c[:, :, 37]))
+    plot_map(c, affine, cut_coords=[37], threshold=1e-7, slicer='z',
+            vmin=-vmax, vmax=vmax)
 
-    pl.savefig('ica.png')
+    pl.savefig('ica.pdf')
+    pl.savefig('ica.eps')

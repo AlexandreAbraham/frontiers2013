@@ -27,10 +27,10 @@ mask = nifti_masker.mask_img_.get_data().astype(np.bool)
     
 n_clusters = 42
 
-def plot_labels(labels):
+def plot_labels(labels, seed):
     cut = labels[:, :, 45].astype(int)
     n_clusters = len(np.unique(labels)) - 1
-    np.random.seed(2)
+    np.random.seed(seed)
     colors = np.random.random(size=(ward.n_clusters + 1, 3))
     
     # Cluster '-1' should be black (it's outside the brain)
@@ -64,9 +64,11 @@ if 1:
     labels = labels - 1
 
     # Display the labels
-    plot_labels(labels)
-    pl.title('Ward parcellation')
-    pl.savefig('ward.png')
+    plot_labels(labels, 8)
+#    pl.title('Ward parcellation')
+#    pl.tight_layout()
+    pl.savefig('ward.eps')
+    pl.savefig('ward.pdf')
 
 ### Kmeans ####################################################################
 from sklearn.cluster import MiniBatchKMeans
@@ -84,10 +86,11 @@ labels = nifti_masker.inverse_transform(labels).get_data()
 # 0 is the background, putting it to -1
 labels = labels - 1
 
-plot_labels(labels)
-pl.title('K-Means clustering')
+plot_labels(labels, 5)
+#pl.title('K-Means clustering')
 #pl.tight_layout()
-pl.savefig('kmeans.png')
+pl.savefig('kmeans.eps')
+pl.savefig('kmeans.pdf')
 
 
 ### Spectral ##################################################################

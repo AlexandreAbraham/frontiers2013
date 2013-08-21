@@ -66,6 +66,44 @@
 
 % \color{FrontiersBlue} Is the blue color, used in the Journal name, in the title, and the names of the sections
 
+% Bunch of code for 3D cubes
+
+\usepackage{tikz}
+\usetikzlibrary{calc, spy}
+
+% Three counters
+\newcounter{x}
+\newcounter{y}
+\newcounter{z}
+
+% The angles of x,y,z-axes
+\newcommand\xaxis{210}
+\newcommand\yaxis{-30}
+\newcommand\zaxis{90}
+
+% The top side of a cube
+\newcommand\topside[3]{
+  \fill[fill=white!50!blue, opacity=.9, draw=black, line width=.8pt,shift={(\xaxis:#1)},shift={(\yaxis:#2)},
+  shift={(\zaxis:#3)}] (0,0) -- (30:1) -- (90:1) --(150:1)--(0,0);
+}
+
+% The left side of a cube
+\newcommand\leftside[3]{
+  \fill[fill=white!80!blue, opacity=.9, draw=black, line width=.8pt, shift={(\xaxis:#1)},shift={(\yaxis:#2)},
+  shift={(\zaxis:#3)}] (0,0) -- (0,-1) -- (210:1) --(150:1)--(0,0);
+}
+
+% The right side of a cube
+\newcommand\rightside[3]{
+  \fill[fill=white!30!blue, opacity=.9, draw=black, line width=.8pt,shift={(\xaxis:#1)},shift={(\yaxis:#2)},
+  shift={(\zaxis:#3)}] (0,0) -- (30:1) -- (-30:1) --(0,-1)--(0,0);
+}
+
+% The cube 
+\newcommand\cube[3]{
+  \topside{#1}{#2}{#3 - 1} \leftside{#1 - 1}{#2}{#3} \rightside{#1}{#2 - 1}{#3}
+  \topside{#1}{#2}{#3} \leftside{#1}{#2}{#3} \rightside{#1}{#2}{#3}
+}
 
 % Example of table from template
 
@@ -122,8 +160,8 @@
 \begin{abstract}
 
 \section{}
-Statistical learning methods are increasingly used to perform
-neuroimaging analysis. Their main virtue for this type of application
+Statistical machine learning methods are increasingly used for
+neuroimage data analysis. Their main virtue for this type of application
 is their ability to model high-dimensional datasets, e.g.\ multivariate
 analysis of activation images, or capturing inter-subject variability.
 Supervised learning is typically used in “decoding” setting to relate
@@ -144,13 +182,15 @@ can be visualised easily.
 \tiny
 % XXX Fix keywords
 %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
-\section{Keywords:} machine learning, statistical learning, neuroimaging, scikit-learn, python
+\section{Keywords:} machine learning, statistical learning, neuroimaging,
+scikit-learn, Python
 \end{abstract}
 
 
 \section{Introduction}
 
-Python is being increasingly used in neuroimaging studies, \cite{millman2007analysis, hanke2009pymvpa}, which can be explained its
+Python is increasingly used in neuroimaging studies \citep{millman2007analysis,
+hanke2009pymvpa}. This popularity can be explained by its
 versatility, its ability to act as a glue between different components and the
 maturity of its scientific stack.
 
@@ -172,7 +212,7 @@ algorithms.
 \subsubsection{Matplotlib}
 
 Matplotlib is a Python plotting library that is tightly integrated into the
-rest of the scientific python stack. It offers publication-quality figures in
+rest of the scientific Python stack. It offers publication-quality figures in
 a variety of formats and allows to display plots or images in a
 graphical user interface. All figures in this paper have been generated using
 this library.
@@ -181,13 +221,13 @@ this library.
 \subsubsection{Nibabel}
 
 Nibabel can load or save data in
-popular neuroimaging data format. This is indeed the starting point of all
+popular neuroimaging data format. It is the starting point of all
 our scripts.
 
 \section{Scikit-learn}
 \label{scikitlearn}
 
-The {\em scikit-learn} project, \cite{pedregosa2011}, is an open source machine
+{\em Scikit-learn} \citep{pedregosa2011} is an open source machine
 learning library for the Python programming language. The ambition of the
 project is to provide efficient and well-established machine learning tools within
 a programming environment that is accessible to non-machine learning experts
@@ -195,28 +235,20 @@ and reusable in various scientific areas.
 
 \subsection{Concepts}
 
+In {\em scikit-learn}, data is represented in a generic 2-dimensional format
+accepted by all cited objects.
+
 All objects within scikit-learn share a uniform common basic API consisting of three
 complementary interfaces: an \textit{estimator} interface for building and
 fitting models, a \textit{predictor} interface for making predictions and a
 \textit{transformer} interface for converting data into a different representation.
-
-In the {\em scikit-learn}, data is represented in a generic 2-dimensional format
-accepted by all cited objects. One dimension is dedicated to the features and
-the other one to the samples. This format brings
-consistency across all scikit-learn objects, fast array iteration
-as well as compressed sparse representation thanks to SciPy's \texttt{sparse} module.
-
-Interoperation with third-party code is made not on base on inheritance but
-rather on implementing the appropriate methods for a given interface, so that
-classes wishing to blend in the scikit-learn API need only to implement a few
-methods rather than inheriting from a given class.
 
 \begin{itemize}
 \item {\bf Estimator}. The \textit{estimator} interface is at the core of the library. It exposes a
     \texttt{fit} method for learning a model from training data.  All supervised
     and unsupervised learning algorithms (e.g., for classification, regression or
     clustering) are offered as objects implementing this interface. Machine
-    learning tasks like feature extraction, feature selection or dimensionality
+    learning tasks such as feature extraction, feature selection or dimensionality
     reduction are also provided as estimators.
 
 \item {\bf Predictor}. The \textit{predictor} interface extends the notion of an estimator
@@ -228,7 +260,7 @@ methods rather than inheriting from a given class.
     supervised learning estimators, this method typically returns the predicted
     labels or values computed by the model.
 
-\item {\bf Transformer}. Since it is common to modify or filter data before feeding it to a learning
+\item {\bf Transformer}. As it is common to modify or filter data before feeding it to a learning
     algorithm, some estimators in the library implement a \textit{transformer}
     interface which defines a \texttt{transform} method. Preprocessing, feature selection and
     dimensionality reduction
@@ -237,32 +269,27 @@ methods rather than inheriting from a given class.
 
 \end{itemize}
 
-{\em scikit-learn} also offers a way to concatenate estimators (known as
-pipelining) and offers some routines for model selection.
-
 \subsection{Model selection and cross validation}
 
-The problem of model selection is to find, within some space, the best
+The problem of model selection is to find the best
 combination of hyper-parameters with respect to some user-specified criterion,
-usually the prediction score on unseen data.
+most often the prediction score on unseen data.
 
 In {\em scikit-learn}, model selection is supported in two distinct
-estimators, \texttt{GridSearchCV} and \texttt{RandomizedSearchCV}.  They take
+estimators, \texttt{GridSearchCV}. It takes
 as input an estimator, whose hyper-parameters must be
 optimized, and a set of hyperparameter settings to search through. This set is
 represented as a mapping of parameter names to a set of discrete choices in
 the case of grid search, which exhaustively enumerates the ``grid'' (cartesian
-product) of complete parameter combinations. Randomized search is a smarter
-algorithm that avoids the combinatorial explosion in grid search by sampling a
-fixed number of times from its parameter distributions.
+product) of complete parameter combinations.
 
 \section{From MR volumes to a data matrix}
 
 From this point, it is supposed that common MRI preprocessings have been applied
 to the data (namely motion correction, slice timing, coregistration on a common template like
 MNI if necessary). Reference softwares for this task are
-SPM\footnote{http://www.fil.ion.ucl.ac.uk/spm}~\cite{friston2007} and
-FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\cite{smith2004}.
+SPM\footnote{http://www.fil.ion.ucl.ac.uk/spm}~\citep{friston2007} and
+FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\citep{smith2004}.
 This section deals with transforming neuroimaging data into a format that can be
 fed to scikit-learn's functions.
 
@@ -340,13 +367,13 @@ Data scaling factor for each direction can be modified in the affine matrix.
 
 \subsection{Signal cleaning}
 
-Due to its acquisition process and poor resolution, neuroimaging data has a low
+Due to its acquisition process and poor resolution, neuroimaging data often has a low
 signal-to-noise ratio. It contains trends and artifacts that must be removed
 to ensure maximum machine learning algorithms efficiency. Signal cleaning
 includes:
 \begin{itemize}
     \item{\bf Detrending} removes a linear trend over the time series of each
-        voxel. This is a mandatory step when studying fMRI data, as the voxel
+        voxel. This is a useful step when studying fMRI data, as the voxel
         intensity itself has no meaning and we want to study its variation and
         correlation with other voxels. Detrending can be done thanks to SciPy
         (\texttt{scipy.signal.detrend}).
@@ -377,8 +404,8 @@ time series can be passed as features to a Principal Component Analysis.
 \subsubsection{From 4-dimensional image to 2-dimensional array}
 
 The natural way to reduce data dimension is to flatten it, losing its original
-structure. However, this is not the most clever strategy. In fact, it is known
-that not all voxels in fMRI data holds information: outer-brain voxels are of no
+structure. A better approach draws from the fact that not all voxels in fMRI data
+holds information: outer-brain voxels are of no
 use and, worse, they may bring spurious noise and scanner artefacts.
 A brain mask should be applied to avoid this problem. Such masks
 are often given along with datasets or can be computed thanks to softwares like
@@ -466,7 +493,7 @@ X = X[2:]
 y = y[:-2]
 \end{lstlisting}
 
-\section{Object representation in the brain}
+\section{Decoding object representation in the brain}
 
 In the context of machine learning in neuroimaging, learning a forward model
 which predicts behavioral or phenotypic data given BOLD signal is referred to as
@@ -493,16 +520,15 @@ particular task of discriminating face against house images.
 \subsubsection{Feature selection: ANOVA F-Test}
 
 The common preprocessing pipeline is applied on Haxby dataset. After masking, 40
-000 features are left for only 1 400 samples (due to the penibility of fMRI
-acquisition procedure). This is not an optimal setting for machine learning
-algorithm which efficiency strongly depends on the ration between feature and
-samples.
+000 features are left for only 1 400 samples. This is not an optimal setting
+for machine learning algorithm which efficiency strongly depends on the ratio
+between feature and samples.
 
 Reducing the number of features (ie voxels) can be done by selecting the most
 relevant ones to our task. A neuroscientific approach could be to restrain the
 mask to occipital area which contains the visual cortex. The statistical
 approach consists in using a simple and costless test to reduce roughly the
-number of features, before applying a more sophisticated algorothm.
+number of features, before applying a more sophisticated algorithm.
 
 Scikit-learn offers a panel of strategies to select features. In supervised
 learning, the most popular feature selection method is the
@@ -525,7 +551,8 @@ of a fixed number of features will be used.
 \subsubsection{Classification}
 
 A Support Vector Classifier (SVC) is a simple classifier that finds a linear
-hyperplane that separates the samples. Classifying a new sample boils down to
+hyperplane separating samples that belong to different classes. 
+Classifying a new sample boils down to
 seeing on which side of the hyperplane it is. SVC has the advantage to
 give reliable results even when the number of dimensions is greater than the
 number of samples.
@@ -575,7 +602,7 @@ thus the name of Searchlight.
 
 An efficient implementation of this algorithm is way beyond the scope of this
 paper also it is not detailed here. However, the code, along with this example,
-are available in nilearn python package.
+are available in nilearn Python package\footnote{http://nilearn.github.io}.
 
 \subsubsection{Results}
 
@@ -593,7 +620,7 @@ The Searchlight highlights more voxels around the reference regions. This is
 explained by the fact that its strategy to take a ball around a voxel
 is similar to a blur.
 
-These results are also neuroscientifically valid as the activation occurs in the
+These results are also neuroscientifically plausible as the activation occurs in the
 high level regions of the visual cortex which is known to contain semantic
 information about vision.
 
@@ -606,9 +633,9 @@ support = feature_selection.inverse_transform(support)
 
 \begin{figure}[hbtp]
   \begin{center}
-  \subfigure[f\_score]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_fscore.png}}
-  \subfigure[SVC]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_svm.png}}
-  \subfigure[Searchlight]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_searchlight.png}}
+  \subfigure[f\_score]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_fscore}}
+  \subfigure[SVC]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_svm}}
+  \subfigure[Searchlight]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_searchlight}}
   \end{center}
 \caption{Voxel importance in prediction decision for Haxby experiment}
 \label{fig:haxby}
@@ -667,7 +694,7 @@ support = feature_selection.inverse_transform(support)
 % Searchlight results is inherent to the fact that a ball is used to iterate on
 % the voxels.
 
-\section{Linking image and brain activity}
+\section{Encoding brain activity and decoding images}
 \label{kamitani}
 
 The previous experiment shows that it is possible to determine the category of a
@@ -783,6 +810,32 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 \end{lstlisting}
 %y_train_centered = (y_train - y_train.mean(axis=0)) / y_train.std(axis=0)
 
+\begin{figure}[hbtp]
+  \begin{center}
+    \begin{tikzpicture}
+        \begin{scope}[spy using outlines={blue, circle, line width=3pt,
+                magnification=6, size=60, connect spies}]
+                \node[rotate=90] {\includegraphics[width=5cm]{img/kamitani/encoding_scores}};
+            \spy [width=3cm, height=3cm, line width=3pt, spy connection path={\draw[line
+            width=2pt, blue] (tikzspyonnode) -- (tikzspyinnode);}]
+            on (-0.04, -1.7) in node (a) [line width=4pt] (a) at (1.2,1) (a) {};
+        \end{scope} 
+
+        \node (i1780) at (4.4, 1.3)
+            {\includegraphics[width=2.4cm]{img/kamitani/encoding_1780}};
+        \node (i1951) at (7, 1.3)
+            {\includegraphics[width=2.4cm]{img/kamitani/encoding_1951}};
+        \node (i2131) at (9.6, 1.3)
+            {\includegraphics[width=2.4cm]{img/kamitani/encoding_2131}};
+        \node (i1935) at (7, -1.3)
+            {\includegraphics[width=2.4cm]{img/kamitani/encoding_1935}};
+
+    \end{tikzpicture}
+  \end{center}
+  \caption{Reconstruction accuracy depending on pixel
+           position in the stimulus.}
+  \label{fig:encoding}
+\end{figure}
 
 \section{Functional Connectivity}
 
@@ -861,9 +914,9 @@ validate ICA results.
 
 \begin{figure}[hbtp]
   \begin{center}
-      \subfigure[ICA]{\includegraphics[width=.3\linewidth]{img/ica/ica.png}}
-      \subfigure[CanICA]{\includegraphics[width=.3\linewidth]{img/ica/canica.png}}
-      \subfigure[Melodic]{\includegraphics[width=.3\linewidth]{img/ica/melodic.png}}
+      \subfigure[ICA]{\includegraphics[width=.3\linewidth]{img/ica/ica}}
+      \subfigure[CanICA]{\includegraphics[width=.3\linewidth]{img/ica/canica}}
+      \subfigure[Melodic]{\includegraphics[width=.3\linewidth]{img/ica/melodic}}
   \end{center}
   \caption{Extraction of default mode network using different approches}
   \label{fig:ica}
@@ -928,9 +981,9 @@ random.
 \begin{figure}[hbtp]
   \begin{center}
   \subfigure[Ward's clustering]{
-    \includegraphics[width=.3\linewidth]{img/clustering/ward.png}}
+    \includegraphics[width=.3\linewidth]{img/clustering/ward}}
   \subfigure[KMeans clustering]{
-    \includegraphics[width=.3\linewidth]{img/clustering/kmeans.png}}
+    \includegraphics[width=.3\linewidth]{img/clustering/kmeans}}
   \end{center}
   \caption{Brain decomposition using different clustering techniques.}
   \label{fig:clustering}
