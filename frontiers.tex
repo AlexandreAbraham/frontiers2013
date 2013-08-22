@@ -189,6 +189,18 @@ scikit-learn, Python
 
 \section{Introduction}
 
+% 1995 : SPM impose matlab
+% 2000 : FSL
+
+Development of new imaging acquisition methods brought a lot of high dimensional
+datasets, which could not be handled by humans (ie doctors). This is why usage
+of statistical learning increased in this domain. There are 2 kind of people
+studying this field : neurosicentist that learned ML and mathematicians /
+Computer scientists that learned NS.
+
+As a reference language in ML,
+matlab has imposed itself to NS community, mainly thanks to SPM. 
+
 Python is increasingly used in neuroimaging studies \citep{millman2007analysis,
 hanke2009pymvpa}. This popularity can be explained by its
 versatility, its ability to act as a glue between different components and the
@@ -755,7 +767,14 @@ representation in the primary visual area than for the borders.
 
 \begin{figure}[hbtp]
   \begin{center}
-    \includegraphics[width=.3\linewidth]{img/logistic_l1_scores.png}
+  \subfigure[Logistic regression scores]{
+    \includegraphics[width=.22\linewidth]{img/kamitani/scores_log}}
+  \subfigure[Voxel coefficients for logistic]{
+    \includegraphics[width=.22\linewidth]{img/kamitani/pixel_logistic}}
+  \subfigure[OMP scores]{
+    \includegraphics[width=.22\linewidth]{img/kamitani/scores_omp}}
+  \subfigure[Voxel coefficients for OMP]{
+    \includegraphics[width=.22\linewidth]{img/kamitani/pixel_omp}}
   \end{center}
   \caption{Reconstruction accuracy depending on pixel
            position in the stimulus.}
