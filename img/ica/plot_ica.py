@@ -18,16 +18,19 @@ import os
 from nipy.labs.viz import plot_map
 import pylab as pl
 import numpy as np
+import time
 
 # CanICA
 from nilearn.decomposition.canica import CanICA
 
+t0 = time.time()
 canica = CanICA(n_components=n_components,
                 smoothing_fwhm=6.,
                 memory="nilearn_cache", memory_level=1,
                 threshold=None,
                 random_state=1)
 canica.fit(dataset.func)
+print('Canica: %f' % (time.time() - t0))
 masker = canica.masker_
 affine = masker.mask_img_.get_affine()
 
@@ -54,14 +57,16 @@ smooth_masked = masker.transform(dataset.func)
 if not os.path.exists('melodic.nii.gz'):
     from nilearn.decomposition.melodic import MelodicICA
     smoothed_func = masker.inverse_transform(smooth_masked)
-    melodic = MelodicICA(mask=masker.mask_img_)
+    melodic = MelodicICA(mask=masker.mask_img_, approach='concat')
+    t0 = time.time()
     melodic.fit(smoothed_func)
+    print('Melodic: %f' % (time.time() - t0))
     melodic_components = melodic.maps_img_
     nibabel.save(melodic_components, 'melodic.nii.gz')
 
 if not os.path.exists('melodic.pdf'):
     melodic_components = nibabel.load('melodic.nii.gz')
-    c = melodic_components.get_data()[:, :, :, 5]
+    c = melodic_components.get_data()[:, :, :, 8]
     vmax = np.max(np.abs(c[:, :, 37]))
     plot_map(c, melodic_components.get_affine(), cut_coords=[37],
             threshold=1.5, slicer='z', vmin=-vmax, vmax=vmax)
@@ -75,7 +80,9 @@ if not os.path.exists('ica.nii.gz'):
     from sklearn.decomposition import FastICA
     X = np.vstack(smooth_masked)
     ica = FastICA(n_components=n_components)
+    t0 = time.time()
     ica.fit(X)
+    print('FastICA: %f' % (time.time() - t0))
     ica_components = masker.inverse_transform(ica.components_)
     nibabel.save(ica_components, 'ica.nii.gz')
 

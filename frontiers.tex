@@ -189,52 +189,51 @@ scikit-learn, Python
 
 \section{Introduction}
 
-% 1995 : SPM impose matlab
-% 2000 : FSL
+Statistical machine learning is gaining an increasing interest in
+neuroimaging data analysis. These new problems are studied by
+neuroscientists, who use machine learning methods as black boxes, and computer scientists,
+who acquire neuroscientific knowledge by experience. From these cooperations are
+born tools, like SPM, which are now considered as standards. However,
+these tools have pros but also cons. For example, SPM is built upon Matlab, a
+proprietary language which cost may be prohibitive.
 
-Development of new imaging acquisition methods brought a lot of high dimensional
-datasets, which could not be handled by humans (ie doctors). This is why usage
-of statistical learning increased in this domain. There are 2 kind of people
-studying this field : neurosicentist that learned ML and mathematicians /
-Computer scientists that learned NS.
+With its mature scientific stack, Python is an alterative to consider when
+analysing neuroimaging data. It has already been used in several studies
+\citep{millman2007analysis} and some frameworks specialized in neuroimaging
+already exists \citep{hanke2009pymvpa}. % Nipy ?
 
-As a reference language in ML,
-matlab has imposed itself to NS community, mainly thanks to SPM. 
-
-Python is increasingly used in neuroimaging studies \citep{millman2007analysis,
-hanke2009pymvpa}. This popularity can be explained by its
-versatility, its ability to act as a glue between different components and the
-maturity of its scientific stack.
-
+In this paper, we show how scikit-learn, a Python machine learning library can
+be used on neuroimaging data. Through three use cases, we describe how to
+resolve common neuroimaging problems, which method should be use and why, and how to
+get the desired results. In fact, a neuroscientist is not only interest in the
+scores but in the interpretability of the results which leads us to avoid black
+box methods.
 
 \subsection{Scientific Python and neuroimaging ecosystem}
 
-\subsubsection{Scipy and Numpy}
+Thanks to its scientific libraries, Python is able to compete with languages
+originally made for scientific computation like Matlab or R. The main libraries
+are:
+\begin{itemize}
+    \item{\bf Scipy and Numpy} packages are the basis of scientific computing in Python.
+        NumPy provides the \verb!ndarray! data type, an efficient $n$-dimensional data
+        representation for array-based numerical computating, a la Matlab
+        \citep{vanderwalt2011}.
+        SciPy provides higher level mathematical functions that operate on ndarrays for
+        a variety of domains including linear algebra, optimization and signal
+        processing. Together, NumPy and SciPy provide a robust scientific environment
+        for numerical computing and they are the elementary bricks we use in all our
+        algorithms.
 
-SciPy and NumPy packages are the basis of scientific computing in Python.
-NumPy provides the \verb!ndarray! data type, an efficient $n$-dimensional data
-representation. These arrays holds all common operations (transpose...) and
-can be easily manipulated thanks to a simple, yet powerful, indexing scheme.
-SciPy provides higher level mathematical functions that operate on ndarrays for
-a variety of domains including linear algebra, optimization and signal
-processing. Together, NumPy and SciPy provide a robust scientific environment
-for numerical computing and they are the elementary bricks we use in all our
-algorithms.
+    \item{\bf Matplotlib} is a Python plotting library that is tightly integrated into the
+        rest of the scientific Python stack. It offers publication-quality figures in
+        a variety of formats and allows to display plots or images in a
+        graphical user interface. All figures in this paper have been generated using
+        Matplotlib \citep{hunter2007}.
 
-\subsubsection{Matplotlib}
-
-Matplotlib is a Python plotting library that is tightly integrated into the
-rest of the scientific Python stack. It offers publication-quality figures in
-a variety of formats and allows to display plots or images in a
-graphical user interface. All figures in this paper have been generated using
-this library.
-
-
-\subsubsection{Nibabel}
-
-Nibabel can load or save data in
-popular neuroimaging data format. It is the starting point of all
-our scripts.
+    \item{\bf Nibabel} can load or save data in popular neuroimaging data format.
+        It is the starting point of all our scripts.
+\end{itemize}
 
 \section{Scikit-learn}
 \label{scikitlearn}
@@ -256,8 +255,9 @@ fitting models, a \textit{predictor} interface for making predictions and a
 \textit{transformer} interface for converting data into a different representation.
 
 \begin{itemize}
-\item {\bf Estimator}. The \textit{estimator} interface is at the core of the library. It exposes a
-    \texttt{fit} method for learning a model from training data.  All supervised
+\item {\bf Estimator}. The \textit{estimator} interface, the core of the
+    library, exposes a \texttt{fit} method for learning a model from training data.
+    All supervised
     and unsupervised learning algorithms (e.g., for classification, regression or
     clustering) are offered as objects implementing this interface. Machine
     learning tasks such as feature extraction, feature selection or dimensionality
@@ -301,7 +301,8 @@ From this point, it is supposed that common MRI preprocessings have been applied
 to the data (namely motion correction, slice timing, coregistration on a common template like
 MNI if necessary). Reference softwares for this task are
 SPM\footnote{http://www.fil.ion.ucl.ac.uk/spm}~\citep{friston2007} and
-FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\citep{smith2004}.
+FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\citep{smith2004}. A python interface to
+these tools is available in nipype Python library \citep{gargolewski2011}.
 This section deals with transforming neuroimaging data into a format that can be
 fed to scikit-learn's functions.
 
@@ -467,19 +468,6 @@ unmasked_data[mask_data] = X
 % Multi subject computation is simply done by intersecting subjects maps
 % relatively to a chosen threshold.
 
-\subsubsection{Preserving structural information}
-
-In scikit-learn, structural information is stored apart from the data matrix
-into a graph. \verb!sklearn.feature_extraction.image! provides two methods
-that build an adjacency matrix based upon your data while taking the mask
-into account:
-\begin{itemize}
-    \item \verb!grid_to_graph! creates a binary adjacency graph based upon the
-        data shape; it is used in Ward's clustering.
-    \item \verb!image_to_graph! creates a distance matrix using the gradient of
-        the image which is used in spectral clustering.
-\end{itemize}
-
 \subsubsection{Label shifting}
 
 Functional MRI acquisition is not immediate: BOLD response peak occurs between 3
@@ -507,25 +495,31 @@ y = y[:-2]
 
 \section{Decoding object representation in the brain}
 
-In the context of machine learning in neuroimaging, learning a forward model
-which predicts behavioral or phenotypic data given BOLD signal is referred to as
-decoding and is presented in the following use case. The inverse procedure is
-called encoding \cite{Naselaris2011} and is introduced in the next use case
-(\ref{kamitani}).
+In the context of machine learning in neuroimaging, \textit{decoding} refers to learning a model
+which predicts behavioral or phenotypic data given BOLD signal. It is presented
+in the following use case. The inverse procedure is
+called \textit{encoding} \citep{naselaris2011} and is introduced in the next use case
+(section \ref{kamitani}).
 
 This use case explores the relation between brain activity and visual
 stimuli. More precisely, we want to know if there is a significant difference
 in brain activity when presenting to the subject images of different categories.
 
-This classification problem is presented in Haxby experiment (\cite{haxby2001}).
-In this protocol, grayscale images representing different image categories
+In this experiment, presented in \cite{haxby2001},
+grayscale images representing different image categories
 are presented to 6 subjects during 12 sessions. The goal is to predict,
 from fMRI data, which image category is presented
 to the subject and see where the discriminating brain voxels for this task are
 located. Full protocol information is available in the reference paper.
-
 For the sake of simplicity, this example focuses on one subject for the
-particular task of discriminating face against house images.
+particular task of discriminating face against house images.\\
+
+As the desired output value (face or house) is known, this problem is a
+supervised learning problem. Among all methods proposed in the scikit-learn, we
+chose the Support Vector Method (SVM) for this problem. In fact, it is a
+reference basic algorithm which has the advantage to
+give reliable results even when the number of dimensions is greater than the
+number of samples.
 
 \subsection{SVM}
 
@@ -565,10 +559,7 @@ of a fixed number of features will be used.
 A Support Vector Classifier (SVC) is a simple classifier that finds a linear
 hyperplane separating samples that belong to different classes. 
 Classifying a new sample boils down to
-seeing on which side of the hyperplane it is. SVC has the advantage to
-give reliable results even when the number of dimensions is greater than the
-number of samples.
-
+seeing on which side of the hyperplane it is.
 The decision is taken based upon a subset of training data called
 support vectors (this is not a black box). From them, one can deduce which
 features are the most important, and yield a neuroscientific interpretation out
@@ -598,43 +589,44 @@ clf.fit(X)
 % sv = anova_svc.inverse_tranform(clf.support_vectors_)
 % \end{lstlisting}
 
-\subsubsection{Searchlight}
+\subsection{Searchlight}
 \label{searchlight}
 
 Searchlight is a popular algorithm in the neuroscience community.
 Presented in \cite{kriegeskorte2006}, it aims to score
 brain voxels depending on the amount of information they hold. Concretely, a
-cross validated classification is run on each voxel: the better its results are,
+cross validated SVM-based classification is run on each voxel: the better its results are,
 the more information it holds.
 
 However, considering the fact that the information of a voxel is not only
-contained in the voxel itself but in its neighbourhood, Kriegeskorte decided to run
-the classification on a ball centered on the voxel instead of a single voxel,
-thus the name of Searchlight.
+contained in the voxel itself but in its neighbourhood. Hence the Searchlight
+runs the classification on a ball centered on the voxel instead of a single voxel.
+It can be seen as a sophisticated version of the dimension reduction used in our
+first setting.
 
 An efficient implementation of this algorithm is way beyond the scope of this
 paper also it is not detailed here. However, the code, along with this example,
 are available in nilearn Python package\footnote{http://nilearn.github.io}.
 
-\subsubsection{Results}
+\subsection{Results}
 
-The results of this experience are show in figure~\ref{fig:haxby}.
+The results of this experience are shown in figure~\ref{fig:haxby}.
 On all figures, green, resp.\ blue,
 lines surround features corresponding to face, resp.\ house, recognition
 exhibited in the reference paper.
+The F-score (\textit{a}) is the basic
+classifier used in ANOVA to select the features.
 
-The F\_score (\textit{a}) is a basic statistical test and can be seen as a basic
-classifier (it is the method used in ANOVA to select the features).
-We can see that the voxels selected by this method match
-Haxby results pretty well. These results are validated by the SVM in figure
-\textit{b} which is, not suprisingly, very similar.
-The Searchlight highlights more voxels around the reference regions. This is
+First, we see that voxels selected by all methods matches the results obtained
+in the original work. The F-scores are very salient, almost binary, compared to
+SVC. The Searchlight highlights more voxels around the reference regions. This is
 explained by the fact that its strategy to take a ball around a voxel
 is similar to a blur.
 
 These results are also neuroscientifically plausible as the activation occurs in the
 high level regions of the visual cortex which is known to contain semantic
-information about vision.
+information about vision. If Searchlight only gives a score of the voxels, the
+SVC allows us to classify unseen data.
 
 \begin{lstlisting}
 ### Look at the discriminating weights
@@ -710,14 +702,13 @@ support = feature_selection.inverse_transform(support)
 \label{kamitani}
 
 The previous experiment shows that it is possible to determine the category of a
-visual stimulus by mining brain functional data in high level visual cortex. It
-could be interesting if the same operation is possible in the primary visual
-cortex, which should contain information about the visual patterns seen by the
-eyes. This is the task proposed in the Kamitani dataset.
+visual stimulus by mining brain functional data in the visual cortex.
+The reverse operation, called \textit{encoding}, consists in predicting the
+brain activity evoked by a complex visual stimuli.
+This is the task proposed in the Kamitani dataset.
 
-In this experiment, several series of $10\times10$ binary images are presented
-to two subjects. Full details are available in the reference paper
-(\cite{miyawaki2008}).
+In the experiment proposed by \citep{miyawaki2008}, several series of $10\times10$ binary images are presented
+to two subjects while activity on the visual cortew is recorded.
 
 The training set is composed of random images (where black and white pixels
 are balanced) and the testing set is composed of structured images containing
@@ -725,7 +716,7 @@ geometric shapes (square, cross...) and letters. For the sake of simplicity, in
 this use case, we consider only the training set and use cross-validation to
 obtain scores on unseen data.
 
-The goal here is twofold: reconstructing visual stimulus from BOLD activation,
+Here, we will illustrate two problems: reconstructing visual stimulus from BOLD activation,
 which is a decoding task, and reconstructing brain activation from visual
 stimulus, which is an encoding task.
 
@@ -734,9 +725,15 @@ stimulus, which is an encoding task.
 Common pre-processing have been applied to the data (detrending and
 standardization).
 
-In the original paper (\cite{miyawaki2008}), Miyawaki et al. use a sparse multinomial
+Prior knowledge on the data can help for model selection. In this experiment, we
+want to find the relation between voxel activation and some pixel color. It is
+therefore reasonable to suppose that not all voxels in the brain will be related to one
+pixel color. we will consequently use sparsity inducing models who tends to
+reduce the number of features on which their decision is made.
+
+The original work uses a sparse multinomial
 logistic regression and a sophisticated multiscale strategy to reconstruct the image.
-This example uses the simpler version of this approach, a l1 logistic
+This example uses the simpler version of this approach, a $\ell_1$ logistic
 regression, and compare it to the Orthogonal
 Matching Pursuit (\cite{mallat1993}). The OMP is a linear model that uses
 feature time series as a dictionary and an l1 constraint on the loadings. Its
@@ -753,9 +750,11 @@ from sklearn.cross_validation import cross_val_score
 
 pipeline_OMP = Pipeline([('selection', SelectKBest(f_classif, 500)),
                          ('clf', OMP(n_nonzero_coefs=20)])
-scores_omp = [cross_val_score(pipeline_OMP, X_train, y,
+
+# Note the use of list comprehension to iterate on one line
+scores_omp = [cross_val_score(pipeline_OMP, X_train, voxel,
                               score_func=log_score, cv=5)
-              for y in y_train]
+              for pixel in y_train.T]
 \end{lstlisting}
 
 \subsubsection{Results}
@@ -764,20 +763,22 @@ As Miyawaki et al., in figure \ref{fig:omp} we observe that reconstruction
 is more accurate in the fovea. This
 may be caused by the fact that there are more neurons dedicated to foveal
 representation in the primary visual area than for the borders.
+Plus, both methods have selected the same voxel to base their decision upon.
+This particular voxel will be studied in the encoding task in the next section.
 
 \begin{figure}[hbtp]
   \begin{center}
   \subfigure[Logistic regression scores]{
     \includegraphics[width=.22\linewidth]{img/kamitani/scores_log}}
-  \subfigure[Voxel coefficients for logistic]{
-    \includegraphics[width=.22\linewidth]{img/kamitani/pixel_logistic}}
+  \subfigure[Voxel coefficients for logistic regression]{
+    \includegraphics[width=.22\linewidth, angle=90, origin=c]{img/kamitani/pixel_logistic}}
   \subfigure[OMP scores]{
     \includegraphics[width=.22\linewidth]{img/kamitani/scores_omp}}
   \subfigure[Voxel coefficients for OMP]{
-    \includegraphics[width=.22\linewidth]{img/kamitani/pixel_omp}}
+    \includegraphics[width=.22\linewidth, angle=90, origin=c]{img/kamitani/pixel_omp}}
   \end{center}
-  \caption{Reconstruction accuracy depending on pixel
-           position in the stimulus.}
+  \caption{Reconstruction accuracy depending on the methods. The brain voxels
+  corresponds to coefficients used to predict the blue bordered pixel.}
 \label{fig:omp}
 \end{figure}
 
@@ -792,18 +793,18 @@ from sklearn.linear_model import Ridge
 from sklearn.cross_validation import KFold
 
 cv = KFold(len(y_train), 10)
-# Fit ridge model and calculate predictions on left out data
-predictions = [Ridge(alpha=100.).fit(
-        y_train[train], X_train[train]).predict(y_train[test])
-        for train, test in cv]
-
-# evaluate r^2 score for each voxel
-scores = [1. - ((X_train[test] - prediction) ** 2).sum(axis=0) /
-        ((X_train[test] - X_train[test].mean(axis=0)) ** 2).sum(axis=0)
-        for prediction, (_, test) in zip(predictions, cv)]
-
+# Fit ridge model, calculate predictions on left out data
+# and evaluate r^2 score for each voxel
+scores = []
+for train, test in cv:
+    pred = (Ridge(alpha=100.).fit(y_train[train], X_train[train])
+                             .predict(y_train[test]))
+    X_true = X_train[test]
+    scores.append(
+        1. - ((X_true - pred) ** 2).sum(axis=0) /
+        ((X_true - X_true.mean(axis=0)) ** 2).sum(axis=0))
+    
 mean_scores = np.array(scores).mean(axis=0)
-
 \end{lstlisting}
 
 \subsubsection{Results}
@@ -829,6 +830,12 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 \end{lstlisting}
 %y_train_centered = (y_train - y_train.mean(axis=0)) / y_train.std(axis=0)
 
+Receptive fields are show on the right part of figure~\ref{fig:encoding}. We can
+see that receptive fields of neighboring voxels are neighbouring pixels, which
+is an expected result as we know that primary visual cortex direclty encodes
+visual stimuli. Moreover, we note that our two approaches give matching results 
+to the voxel.
+
 \begin{figure}[hbtp]
   \begin{center}
     \begin{tikzpicture}
@@ -851,16 +858,17 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 
     \end{tikzpicture}
   \end{center}
-  \caption{Reconstruction accuracy depending on pixel
-           position in the stimulus.}
+  \caption{Left: reconstruction accuracy depending on pixel
+           position in the stimulus. Right: receptive fields corresponding to
+       voxels with highest scores and neighbours.}
   \label{fig:encoding}
 \end{figure}
 
 \section{Functional Connectivity}
 
-In \cite{biswal1995}, Biswal was the first to exhibit coherent patterns in
-brain activation during resting state. These correlated voxel activations seemed
-to be organized in functional networks consistent with neuroscientific knowledge.
+\cite{biswal1995} exhibits coherent patterns in
+brain activation during resting state. These correlated voxel activations are
+organized in functional networks consistent with neuroscientific knowledge.
 
 % Resting-state fMRI is useful when dealing with subjects that cannot execute a
 % specific task. In fact, no task-driven protocol is capable of diagnosing precisely
@@ -868,13 +876,15 @@ to be organized in functional networks consistent with neuroscientific knowledge
 % \cite{varoquaux2010b} found differences in correlation between functional
 % networks between control and post-stroke patients.
 
-In this use case, data from Attention Disorder Hyperactivity Disorder is used to
-mine brain functional network. This dataset contains control and ADHD patients
+Here we use a dataset containing control and ADHD
+(Attention Disorder Hyperactivity Disorder) patients
 resting state data (subjects are scanned without giving them any specific task
 to capture the cerebral background activity).
 
 As resting state fMRI are unlabeled data, unsupervised methods must be used to
-mine them. The most popular method to extract functional networks is ICA and
+mine them. These methods group similar voxels together by comparing their time
+series.
+The most popular method to extract functional networks is ICA and
 is the subject of our first use case. We will then show results obtained with
 clustering methods as several efficient implementations are available in
 scikit-learn.
@@ -884,7 +894,7 @@ general) is the lack of labels or ground truth. It is therefore very difficult
 to score the computed models and cross validate them. A first approach is to
 validate results thanks to prior knowledge, obtained in task-driven experiments
 for example. Another way is to compare to functional atlases that have already
-been released (cite yeo, smith, craddock), the problem being that these atlases
+been released \citep{craddock2011,yeo2011}, the problem being that these atlases
 do not agree on the number
 and position of many function brain areas.
 
@@ -897,8 +907,8 @@ multivariate signal into several components by maximizing their non-gaussianity.
 A typical example is the \emph{cocktail party problem} where ICA is able to separate
 voices from several people using signal from microphones located across the room.
 
-ICA is historically the reference method to extract networks from resting state
-fMRI \cite{biswal1999}. Several strategies have been used to syndicate ICA
+ICA is the reference method to extract networks from resting state
+fMRI \citep{kiviniemi2003}. Several strategies have been used to syndicate ICA
 results across several subjects. \cite{calhoun2001a} propose a dimension
 reduction (using PCA) followed by a concatenation of timeseries (used in this
 example). \cite{varoquaux2010} use dimension reduction and canonical correlation analysis
@@ -907,18 +917,17 @@ ICA approach which is not detailed here.
 
 \subsubsection{Application}
 
-ICA requires whitened timeseries to run properly. Scikit-learn FastICA takes care
-of this step. However, we still detrend them because
+We detrend the time series because
 FastICA does not look for linear trends, only constant one.
 
-Applying the scikit-learn ICA is very straightforward thanks to the transformer
+Applying the scikit-learn ICA is straightforward thanks to the transformer
 concept. As for clustering methods, a transposition of our data is required to
 operate on the spatial dimension (and not on time series).
 
 \begin{lstlisting}
 from sklearn.decomposition import FastICA
 X = np.vstack(Xs)
-ica = FastICA(n_components=n_components)
+ica = FastICA(n_components=20)
 components_masked = ica.fit_transform(data_masked.T).T
 \end{lstlisting}
 
@@ -941,7 +950,8 @@ validate ICA results.
   \label{fig:ica}
 \end{figure}
 
-\alex{This is not very informative, maybe we could precise computation times?}
+\alex{After taking a closer look, it is very difficult to measure computation
+time as canica and melodic are interlaced with data loading and preprocessing.}
 
 \subsection{Clustering}
 \label{clustering}
@@ -950,11 +960,22 @@ A clustering method aggregates samples into groups (called clusters) based on a 
 measure. Unlike pure statistical methods, some clustering approaches make use of
 spatial information, which is relevant in our case as we are looking for blobs.
 
-\subsection{Approaches}
+\subsubsection{Preserving structural information}
 
-Several clustering approaches exists, each one having its own characteristics,
-avantages and drawbacks.
+In scikit-learn, structural information is stored apart from the data matrix
+into a graph. \verb!sklearn.feature_extraction.image! provides two methods
+that build an adjacency matrix based upon your data while taking the mask
+into account:
+\begin{itemize}
+    \item \verb!grid_to_graph! creates a binary adjacency graph based upon the
+        data shape; it is used in Ward's clustering.
+    \item \verb!image_to_graph! creates a distance matrix using the gradient of
+        the image which is used in spectral clustering.
+\end{itemize}
 
+\subsubsection{Approaches}
+
+Several clustering approaches exists, each one having its own pros and cons.
 The common parameter to all approaches is the number of clusters to extract.
 Setting this parameter is not easy as we have no information about the real
 number of clusters in our data (ie functional regions in the brain).
@@ -973,9 +994,10 @@ Chosen approached are:
     \item{\bf k-means} is a centroid based approach. Clusters are represented by
         a central vector: a feature belongs to the cluster of the nearest
         centroid. This algorithm gives better results when data is smoothed.
-    \item{\bf spectral clustering} is a graph based approach. It separates
-        the feature graph into subgraphs by maximizing intra-group connectivity and
-        minimizing inter-group connectivity.
+% Too long to compute
+%    \item{\bf spectral clustering} is a graph based approach. It separates
+%        the feature graph into subgraphs by maximizing intra-group connectivity and
+%        minimizing inter-group connectivity.
 \end{itemize}
 
 Common preprocessing are applied, along with a PCA to reduce dimensionality and
@@ -992,25 +1014,38 @@ ward = WardAgglomeration(n_clusters=1000, connectivity=connectivity)
 ward.fit(X)
 \end{lstlisting}
 
-\subsubsection{Results}
+\subsection{Results}
 
 Clustering results are shown in figure~\ref{fig:clustering}. Cluster colors are
-random.
+random. These clustering does not contain neuroscientifc information. However,
+as clustering group similar voxels together, it can be used as a compression
+method more sophisticated than the simple downsampling.
 
 \begin{figure}[hbtp]
   \begin{center}
-  \subfigure[Ward's clustering]{
-    \includegraphics[width=.3\linewidth]{img/clustering/ward}}
   \subfigure[KMeans clustering]{
-    \includegraphics[width=.3\linewidth]{img/clustering/kmeans}}
+    \includegraphics[width=.23\linewidth]{img/clustering/kmeans}}
+  \subfigure[Ward's clustering]{
+    \includegraphics[width=.23\linewidth]{img/clustering/ward}}
+  \subfigure[Ward's compression]{
+    \includegraphics[width=.23\linewidth]{img/clustering/ward_compressed}}
+  \subfigure[Original signal]{
+    \includegraphics[width=.23\linewidth]{img/clustering/original}}
   \end{center}
-  \caption{Brain decomposition using different clustering techniques.}
+  \caption{Brain decomposition using Ward's clustering and Kmeans. (c) shows how the original
+  signal (d) is compressed using the Ward's clustering decomposition (b).}
   \label{fig:clustering}
 \end{figure}
 
-\alex{I have nothing to say about the results... Maybe we could show compress
-images and underline the fact that it can be used as a compression ?}
+\section{Conclusion}
 
+These use cases show that neuroscientific problems can be easily handled thanks
+to scikit-learn python library. Diffculties lie in applying proper preprocessing of
+the data, chosing the right model depending on the problem and interpreting
+these results. An attempt to
+address the first problem has been made in the nilearn Pyhton library which
+provides convience tools to load neuroscientific data. However, the other
+problems require skill and experience.
 
 \section*{Disclosure/Conflict-of-Interest Statement}
 %All relationships financial, commercial or otherwise that might be perceived

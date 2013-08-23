@@ -79,14 +79,14 @@ for x, y in [(31, 9), (31, 10), (30, 10), (32, 10)]:
 from matplotlib.lines import Line2D
 
 
-def plot_lines(mask):
+def plot_lines(mask, linewidth=3):
     for i, j in np.ndindex(mask.shape):
         if i + 1 < mask.shape[0] and mask[i, j] != mask[i + 1, j]:
             pl.gca().add_line(Line2D([j - .5, j + .5], [i + .5, i + .5],
-                color='b', linewidth=3))
+                color='b', linewidth=linewidth))
         if j + 1 < mask.shape[1] and mask[i, j] != mask[i, j + 1]:
             pl.gca().add_line(Line2D([j + .5, j + .5], [i - .5, i + .5],
-                color='b', linewidth=3))
+                color='b', linewidth=linewidth))
 
 
 sbrain = masker.inverse_transform(np.array(scores).mean(0))
@@ -110,10 +110,16 @@ from sklearn.linear_model import LassoLarsCV
 
 lasso = LassoLarsCV(max_iter=10,)
 
+p = (4, 2)
+# Mask for chosen pixel
+pixmask = np.zeros((10, 10), dtype=bool)
+pixmask[p] = 1
+
 for index in [1780, 1951, 2131, 1935]:
     rf = lasso.fit(y_train, X_train[:, index]).coef_.reshape(10, 10)
     pl.figure(figsize=(8, 8))
     pl.imshow(rf, vmin=0, interpolation="nearest", cmap='hot')
+    plot_lines(pixmask, linewidth=6)
     pl.axis('off')
     pl.subplots_adjust(left=0., right=1., bottom=0., top=1.)
     pl.savefig('encoding_%d.pdf' % index)

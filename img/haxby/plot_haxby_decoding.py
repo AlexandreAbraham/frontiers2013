@@ -97,15 +97,15 @@ mask_house = nibabel.load(h.mask_house[0]).get_data()
 mask_face = nibabel.load(h.mask_face[0]).get_data()
 
 pl.contour(np.rot90(mask_house[..., z].astype(np.bool)), contours=1,
-        antialiased=False, linewidths=3., levels=[0], interpolation='nearest',
-    colors=['indigo'])
+        antialiased=False, linewidths=4., levels=[0], interpolation='nearest',
+    colors=['blue'])
 
 pl.contour(np.rot90(mask_face[..., z].astype(np.bool)), contours=1,
-        antialiased=False, linewidths=3., levels=[0], interpolation='nearest',
-    colors=['deeppink'])
+        antialiased=False, linewidths=4., levels=[0], interpolation='nearest',
+    colors=['limegreen'])
 
-p_h = Rectangle((0, 0), 1, 1, fc="indigo")
-p_f = Rectangle((0, 0), 1, 1, fc="deeppink")
+p_h = Rectangle((0, 0), 1, 1, fc="blue")
+p_f = Rectangle((0, 0), 1, 1, fc="limegreen")
 pl.legend([p_h, p_f], ["house", "face"])
 pl.tight_layout()
 

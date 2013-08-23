@@ -95,19 +95,19 @@ mask_house = nibabel.load(h.mask_house[0]).get_data()
 mask_face = nibabel.load(h.mask_face[0]).get_data()
 
 pl.contour(np.rot90(mask_house[..., 25].astype(np.bool)), contours=1,
-        antialiased=False, linewidths=1., levels=[0], interpolation='nearest',
-    colors=['indigo'])
+        antialiased=False, linewidths=4., levels=[0], interpolation='nearest',
+    colors=['blue'])
 
 pl.contour(np.rot90(mask_face[..., 25].astype(np.bool)), contours=1,
-        antialiased=False, linewidths=1., levels=[0], interpolation='nearest',
-    colors=['darkgreen'])
+        antialiased=False, linewidths=4., levels=[0], interpolation='nearest',
+    colors=['limegreen'])
 
-p_h = Rectangle((0, 0), 1, 1, fc="indigo")
-p_f = Rectangle((0, 0), 1, 1, fc="darkgreen")
+p_h = Rectangle((0, 0), 1, 1, fc="blue")
+p_f = Rectangle((0, 0), 1, 1, fc="limegreen")
 pl.legend([p_h, p_f], ["house", "face"])
 
 pl.axis('off')
-pl.title('Searchlight')
+# pl.title('Searchlight')
 pl.tight_layout()
 pl.savefig('haxby_searchlight.pdf')
 pl.savefig('haxby_searchlight.eps')
@@ -120,17 +120,17 @@ pl.imshow(np.rot90(mean_fmri[..., 25]), interpolation='nearest',
 pl.imshow(np.rot90(p_ma[..., 25]), interpolation='nearest',
           cmap=pl.cm.hot)
 pl.contour(np.rot90(mask_house[..., 25].astype(np.bool)), contours=1,
-        antialiased=False, linewidths=1., levels=[0], interpolation='nearest',
-    colors=['indigo'])
+        antialiased=False, linewidths=4., levels=[0], interpolation='nearest',
+    colors=['blue'])
 
 pl.contour(np.rot90(mask_face[..., 25].astype(np.bool)), contours=1,
-        antialiased=False, linewidths=1., levels=[0], interpolation='nearest',
-    colors=['darkgreen'])
-p_h = Rectangle((0, 0), 1, 1, fc="indigo")
-p_f = Rectangle((0, 0), 1, 1, fc="darkgreen")
+        antialiased=False, linewidths=4., levels=[0], interpolation='nearest',
+    colors=['limegreen'])
+p_h = Rectangle((0, 0), 1, 1, fc="blue")
+p_f = Rectangle((0, 0), 1, 1, fc="limegreen")
 pl.legend([p_h, p_f], ["house", "face"])
 
-pl.title('F-scores')
+# pl.title('F-scores')
 pl.axis('off')
 pl.tight_layout()
 pl.savefig('haxby_fscore.pdf')

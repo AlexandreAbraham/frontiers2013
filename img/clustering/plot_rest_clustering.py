@@ -29,46 +29,70 @@ n_clusters = 42
 
 def plot_labels(labels, seed):
     cut = labels[:, :, 45].astype(int)
-    n_clusters = len(np.unique(labels)) - 1
     np.random.seed(seed)
-    colors = np.random.random(size=(ward.n_clusters + 1, 3))
+    colors = np.random.random(size=(n_clusters + 1, 3))
     
     # Cluster '-1' should be black (it's outside the brain)
     colors[-1] = 0
     pl.figure(figsize=(4, 4.5))
     pl.axis('off')
+    pl.tight_layout()
     pl.imshow(colors[np.rot90(cut)], interpolation='nearest')
 
 ### Ward ######################################################################
 
-if 1:
+# Compute connectivity matrix: which voxel is connected to which
+from sklearn.feature_extraction import image
+shape = mask.shape
+connectivity = image.grid_to_graph(n_x=shape[0], n_y=shape[1],
+                                   n_z=shape[2], mask=mask)
 
-    # Compute connectivity matrix: which voxel is connected to which
-    from sklearn.feature_extraction import image
-    shape = mask.shape
-    connectivity = image.grid_to_graph(n_x=shape[0], n_y=shape[1],
-                                       n_z=shape[2], mask=mask)
+# Computing the ward for the first time, this is long...
+from sklearn.cluster import WardAgglomeration
+import time
+start = time.time()
+ward = WardAgglomeration(n_clusters=n_clusters, connectivity=connectivity,
+                         memory='nilearn_cache', compute_full_tree=True)
+ward.fit(fmri_masked)
+print "Ward agglomeration %d clusters: %.2fs" % (n_clusters, time.time() - start)
 
-    # Computing the ward for the first time, this is long...
-    from sklearn.cluster import WardAgglomeration
-    import time
-    start = time.time()
-    ward = WardAgglomeration(n_clusters=n_clusters, connectivity=connectivity,
-                             memory='nilearn_cache', compute_full_tree=True)
-    ward.fit(fmri_masked)
-    print "Ward agglomeration %d clusters: %.2fs" % (n_clusters, time.time() - start)
+labels = ward.labels_ + 1
+labels = nifti_masker.inverse_transform(labels).get_data()
+# 0 is the background, putting it to -1
+labels = labels - 1
 
-    labels = ward.labels_ + 1
-    labels = nifti_masker.inverse_transform(labels).get_data()
-    # 0 is the background, putting it to -1
-    labels = labels - 1
+# Display the labels
+plot_labels(labels, 8)
+pl.savefig('ward.eps')
+pl.savefig('ward.pdf')
 
-    # Display the labels
-    plot_labels(labels, 8)
-#    pl.title('Ward parcellation')
-#    pl.tight_layout()
-    pl.savefig('ward.eps')
-    pl.savefig('ward.pdf')
+pl.figure(figsize=(4, 4.5))
+first_epi = nifti_masker.inverse_transform(fmri_masked[0]).get_data()
+# Outside the mask: a uniform value, smaller than inside the mask
+vmax = np.max(np.abs(first_epi[..., 45]))
+first_epi[np.logical_not(mask)] = -vmax - 1
+pl.imshow(np.rot90(first_epi[..., 45]),
+          interpolation='nearest', cmap=pl.cm.spectral, vmin=-vmax, vmax=vmax)
+pl.axis('off')
+pl.tight_layout()
+pl.savefig('original.eps')
+pl.savefig('original.pdf')
+
+# dimension
+fmri_reduced = ward.transform(fmri_masked)
+
+# Display the corresponding data compressed using the parcellation
+fmri_compressed = ward.inverse_transform(fmri_reduced)
+compressed = nifti_masker.inverse_transform(
+    fmri_compressed[0]).get_data()
+compressed[np.logical_not(mask)] = -vmax - 1
+pl.figure(figsize=(4, 4.5))
+pl.imshow(np.rot90(compressed[:, :, 45]),
+          interpolation='nearest', cmap=pl.cm.spectral, vmin=-vmax, vmax=vmax)
+pl.axis('off')
+pl.tight_layout()
+pl.savefig('ward_compressed.eps')
+pl.savefig('ward_compressed.pdf')
 
 ### Kmeans ####################################################################
 from sklearn.cluster import MiniBatchKMeans

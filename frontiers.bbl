@@ -1,4 +1,4 @@
-\begin{thebibliography}{13}
+\begin{thebibliography}{18}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \expandafter\ifx\csname doi\endcsname\relax
@@ -20,6 +20,16 @@ Hanke, M., Halchenko, Y.~O., Sederberg, P.~B., Hanson, S.~J., Haxby, J.~V., and
   analysis of fmri data.
 \newblock {\em Neuroinformatics\/} 7 37--53.
 
+\bibitem[{Van Der~Walt et~al.(2011)Van Der~Walt, Colbert, and
+  Varoquaux}]{vanderwalt2011}
+Van Der~Walt, S., Colbert, S.~C., and Varoquaux, G. (2011) The numpy array: a
+  structure for efficient numerical computation.
+\newblock {\em Computing in Science \& Engineering\/} 13 22--30.
+
+\bibitem[{Hunter(2007)}]{hunter2007}
+Hunter, J.~D. (2007) Matplotlib: A 2d graphics environment.
+\newblock {\em Computing In Science \& Engineering\/} 9 90--95.
+
 \bibitem[{Pedregosa et~al.(2011)Pedregosa, Varoquaux, Gramfort, Michel,
   Thirion, Grisel et~al.}]{pedregosa2011}
 Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel,
@@ -36,6 +46,12 @@ Smith, S.~M., Jenkinson, M., Woolrich, M.~W., Beckmann, C.~F., Behrens, T.~E.,
   Johansen-Berg, H., et~al. (2004) Advances in functional and structural mr
   image analysis and implementation as fsl.
 \newblock {\em Neuroimage\/} 23 S208--S219.
+
+\bibitem[{Naselaris et~al.(2011)Naselaris, Kay, Nishimoto, and
+  Gallant}]{naselaris2011}
+Naselaris, T., Kay, K.~N., Nishimoto, S., and Gallant, J.~L. (2011) Encoding
+  and decoding in fmri.
+\newblock {\em Neuroimage\/} 56 400--410.
 
 \bibitem[{Haxby et~al.(2001)Haxby, Gobbini, Furey, Ishai, Schouten, and
   Pietrini}]{haxby2001}
@@ -70,10 +86,24 @@ Biswal, B., Zerrin~Yetkin, F., Haughton, V., and Hyde, J. (1995) {Functional
   MRI}.
 \newblock {\em Magn Reson Med\/} 34 53719.
 
-\bibitem[{Biswal and Ulmer(1999)}]{biswal1999}
-Biswal, B. and Ulmer, J. (1999) {Blind source separation of multiple signal
-  sources of fMRI data sets using independent component analysis.}
-\newblock {\em Journal of computer assisted tomography\/} 23 265.
+\bibitem[{Craddock et~al.(2011)Craddock, James, Holtzheimer~III, Hu, and
+  Mayberg}]{craddock2011}
+Craddock, R., James, G., Holtzheimer~III, P., Hu, X., and Mayberg, H. (2011) A
+  whole brain fmri atlas generated via spatially constrained spectral
+  clustering.
+\newblock {\em Hum Brain Mapp\/} .
+
+\bibitem[{Yeo et~al.(2011)Yeo, Krienen, Sepulcre, Sabuncu et~al.}]{yeo2011}
+Yeo, B., Krienen, F., Sepulcre, J., Sabuncu, M., et~al. (2011) The organization
+  of the human cerebral cortex estimated by intrinsic functional connectivity.
+\newblock {\em J Neurophysio\/} 106 1125--1165.
+
+\bibitem[{Kiviniemi et~al.(2003)Kiviniemi, Kantola, Jauhiainen, Hyv{\"a}rinen,
+  and Tervonen}]{kiviniemi2003}
+Kiviniemi, V., Kantola, J., Jauhiainen, J., Hyv{\"a}rinen, A., and Tervonen, O.
+  (2003) Independent component analysis of nondeterministic fmri signal
+  sources.
+\newblock {\em Neuroimage\/} 19 253.
 
 \bibitem[{Calhoun et~al.(2001)Calhoun, Adali, Pearlson, and
   Pekar}]{calhoun2001a}
