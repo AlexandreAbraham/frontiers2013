@@ -9,7 +9,6 @@
 
 %\usepackage{lineno}
 \usepackage{todonotes}
-\usepackage{subfigure}
 \usepackage{listings}
 \lstset{language=python,
         basicstyle=\ttfamily,
@@ -19,6 +18,17 @@
 \usepackage{caption}
 \captionsetup{figurewithin=none}  
 \captionsetup{tablewithin=none}
+\usepackage[tight]{subfigure}
+\def\subfigbottomskip{0pt}
+
+\makeatletter
+% Space between floats
+%\setlength\floatsep    {4\p@}
+% Space between floats and text
+%\setlength\textfloatsep{4\p@}
+% Space above and below an inline figure
+%\setlength\intextsep   {4\p@}
+\makeatother
 
 
 \newcommand{\alex}[1]{\todo[inline, color=green!40]{#1}}
@@ -637,9 +647,9 @@ support = feature_selection.inverse_transform(support)
 
 \begin{figure}[hbtp]
   \begin{center}
-  \subfigure[f\_score]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_fscore}}
-  \subfigure[SVC]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_svm}}
-  \subfigure[Searchlight]{\includegraphics[width=.3\linewidth]{img/haxby/haxby_searchlight}}
+  \includegraphics[width=.3\linewidth]{img/haxby/haxby_fscore}
+  \includegraphics[width=.3\linewidth]{img/haxby/haxby_svm}
+  \includegraphics[width=.3\linewidth]{img/haxby/haxby_searchlight}
   \end{center}
 \caption{Voxel importance in prediction decision for Haxby experiment}
 \label{fig:haxby}
@@ -771,11 +781,31 @@ This particular voxel will be studied in the encoding task in the next section.
   \subfigure[Logistic regression scores]{
     \includegraphics[width=.22\linewidth]{img/kamitani/scores_log}}
   \subfigure[Voxel coefficients for logistic regression]{
-    \includegraphics[width=.22\linewidth, angle=90, origin=c]{img/kamitani/pixel_logistic}}
+      \begin{tikzpicture}
+          \begin{scope}[spy using outlines={blue, circle, line width=3pt,
+                magnification=7.5, size=60, connect spies}]
+            \node[rotate=90]{\includegraphics[width=.22\linewidth]{img/kamitani/pixel_logistic}};
+            \spy [width=2.5cm, height=2.5cm, line width=3pt, spy connection path={\draw[line
+            width=2pt, blue] (tikzspyonnode) -- (tikzspyinnode);}]
+            on (-0.035, -1.33) in node (a) [line width=4pt] (a) at (1, .8) (a) {};
+        \end{scope}
+    \end{tikzpicture}
+    }
+    %\includegraphics[width=.22\linewidth, angle=90, origin=c]{img/kamitani/pixel_logistic}}
   \subfigure[OMP scores]{
     \includegraphics[width=.22\linewidth]{img/kamitani/scores_omp}}
   \subfigure[Voxel coefficients for OMP]{
-    \includegraphics[width=.22\linewidth, angle=90, origin=c]{img/kamitani/pixel_omp}}
+      \begin{tikzpicture}
+          \begin{scope}[spy using outlines={blue, circle, line width=3pt,
+                magnification=7.5, size=60, connect spies}]
+            \node[rotate=90]{\includegraphics[width=.22\linewidth]{img/kamitani/pixel_omp}};
+            \spy [width=2.5cm, height=2.5cm, line width=3pt, spy connection path={\draw[line
+            width=2pt, blue] (tikzspyonnode) -- (tikzspyinnode);}]
+            on (-0.035, -1.33) in node (a) [line width=4pt] (a) at (1, .8) (a) {};
+        \end{scope}
+    \end{tikzpicture}
+    %\includegraphics[width=.22\linewidth, angle=90, origin=c]{img/kamitani/pixel_omp}
+    }
   \end{center}
   \caption{Reconstruction accuracy depending on the methods. The brain voxels
   corresponds to coefficients used to predict the blue bordered pixel.}
