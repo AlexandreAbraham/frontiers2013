@@ -1,4 +1,4 @@
-\begin{thebibliography}{18}
+\begin{thebibliography}{19}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \expandafter\ifx\csname doi\endcsname\relax
@@ -46,6 +46,14 @@ Smith, S.~M., Jenkinson, M., Woolrich, M.~W., Beckmann, C.~F., Behrens, T.~E.,
   Johansen-Berg, H., et~al. (2004) Advances in functional and structural mr
   image analysis and implementation as fsl.
 \newblock {\em Neuroimage\/} 23 S208--S219.
+
+\bibitem[{Gorgolewski et~al.(2011)Gorgolewski, Burns, Madison, Clark,
+  Halchenko, Waskom et~al.}]{gorgolewski2011}
+Gorgolewski, K., Burns, C.~D., Madison, C., Clark, D., Halchenko, Y.~O.,
+  Waskom, M.~L., et~al. (2011) Nipype: a flexible, lightweight and extensible
+  neuroimaging data processing framework in python.
+\newblock {\em Front Neuroinform\/} 5.
+\newblock \doi{10.3389/fninf.2011.00013}.
 
 \bibitem[{Naselaris et~al.(2011)Naselaris, Kay, Nishimoto, and
   Gallant}]{naselaris2011}
