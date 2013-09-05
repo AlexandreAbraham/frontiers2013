@@ -25,10 +25,12 @@ nifti_masker = io.NiftiMasker(memory='nilearn_cache', memory_level=1,
 fmri_masked = nifti_masker.fit_transform(dataset.func[0])
 mask = nifti_masker.mask_img_.get_data().astype(np.bool)
     
-n_clusters = 42
+n_clusters = 3000
+z = 42
+
 
 def plot_labels(labels, seed):
-    cut = labels[:, :, 45].astype(int)
+    cut = labels[:, :, z].astype(int)
     np.random.seed(seed)
     colors = np.random.random(size=(n_clusters + 1, 3))
     
@@ -61,6 +63,7 @@ labels = nifti_masker.inverse_transform(labels).get_data()
 # 0 is the background, putting it to -1
 labels = labels - 1
 
+
 # Display the labels
 plot_labels(labels, 8)
 pl.savefig('ward.eps')
@@ -69,10 +72,11 @@ pl.savefig('ward.pdf')
 pl.figure(figsize=(4, 4.5))
 first_epi = nifti_masker.inverse_transform(fmri_masked[0]).get_data()
 # Outside the mask: a uniform value, smaller than inside the mask
-vmax = np.max(np.abs(first_epi[..., 45]))
+vmax = np.max(first_epi[..., z])
+vmin = np.min(first_epi[..., z])
 first_epi[np.logical_not(mask)] = -vmax - 1
-pl.imshow(np.rot90(first_epi[..., 45]),
-          interpolation='nearest', cmap=pl.cm.spectral, vmin=-vmax, vmax=vmax)
+pl.imshow(np.rot90(first_epi[..., z]),
+          interpolation='nearest', cmap=pl.cm.spectral, vmin=vmin, vmax=vmax)
 pl.axis('off')
 pl.tight_layout()
 pl.savefig('original.eps')
@@ -87,8 +91,8 @@ compressed = nifti_masker.inverse_transform(
     fmri_compressed[0]).get_data()
 compressed[np.logical_not(mask)] = -vmax - 1
 pl.figure(figsize=(4, 4.5))
-pl.imshow(np.rot90(compressed[:, :, 45]),
-          interpolation='nearest', cmap=pl.cm.spectral, vmin=-vmax, vmax=vmax)
+pl.imshow(np.rot90(compressed[:, :, z]),
+          interpolation='nearest', cmap=pl.cm.spectral, vmin=vmin, vmax=vmax)
 pl.axis('off')
 pl.tight_layout()
 pl.savefig('ward_compressed.eps')

@@ -16,9 +16,11 @@
 
 % Absolute numerotation for figures
 \usepackage{caption}
+\usepackage{subcaption}
+\usepackage{overpic}
 \captionsetup{figurewithin=none}  
 \captionsetup{tablewithin=none}
-\usepackage[tight]{subfigure}
+%\usepackage[tight]{subfigure}
 \def\subfigbottomskip{0pt}
 
 \makeatletter
@@ -81,7 +83,7 @@
 
 \usepackage{tikz}
 \usetikzlibrary{calc, spy}
-
+\usepackage{adjustbox}
 % Three counters
 \newcounter{x}
 \newcounter{y}
@@ -201,17 +203,22 @@ scikit-learn, Python
 \section{Introduction}
 
 Statistical machine learning is gaining an increasing interest in
-neuroimaging data analysis. These new problems are studied by
-neuroscientists, who use machine learning methods as black boxes, and computer scientists,
+neuroimaging data analysis. It is used by neuroscientists,
+who use machine learning methods as black boxes, and computer scientists,
 who acquire neuroscientific knowledge by experience. From these cooperations are
-born tools, like SPM, which are now considered as standards. However,
-these tools have pros but also cons. For example, SPM is built upon Matlab, a
-proprietary language which cost may be prohibitive.
+born tools, like SPM, which are now considered as standards. However, these
+tools are often used without having a real knowledge of the underlying
+mechanisms. Our goal in this paper is to fill the gap between machine learning
+and neuroimaging by providing a toolbox that can be used by computer scientists
+to produce scripts that are fully understood by neuroscientists.
 
+SPM is built upon Matlab, the reference programming language in the scientific
+community. Despite its great performance, Matlab comes with a cost that may be
+prohibitive.
 With its mature scientific stack, Python is an alterative to consider when
 analysing neuroimaging data. It has already been used in several studies
 \citep{millman2007analysis} and some frameworks specialized in neuroimaging
-already exists \citep{hanke2009pymvpa}. % Nipy ?
+already exists \citep{hanke2009pymvpa}. 
 
 In this paper, we show how scikit-learn, a Python machine learning library can
 be used on neuroimaging data. Through three use cases, we describe how to
@@ -419,7 +426,7 @@ includes:
 Neuroimaging data are represented in 4 dimensions: 3 dimensions for the scans,
 which are positioned in a coordinate space, and one dimension for the time.
 Scikit-learn algorithms, on the other hand, only accept 2-dimensional data (see
-\ref{scikit-learn}).
+\ref{scikitlearn}).
 Depending on the purpose and on the used estimator, voxels and time series can be
 considered as features
 or samples. For example, to reduce dimensionality of input data,
@@ -453,13 +460,13 @@ conventions.
 \begin{lstlisting}
 # Apply a mask
 # Ensure that the mask is boolean
-mask_data = mask_data.astype(np.bool)
+mask = mask.astype(np.bool)
 # Apply the mask, X = timeseries * voxels
-X = func_data[mask_data].T
+X = func_data[mask].T
 
 # Unmask data
-unmasked_data = np.zeros(mask_data.shape, dtype=X.dtype)
-unmasked_data[mask_data] = X
+unmasked_data = np.zeros(mask.shape, dtype=X.dtype)
+unmasked_data[mask] = X
 \end{lstlisting}
 
 
@@ -510,17 +517,16 @@ In the context of machine learning in neuroimaging, \textit{decoding} refers to 
 which predicts behavioral or phenotypic data given BOLD signal. It is presented
 in the following use case. The inverse procedure is
 called \textit{encoding} \citep{naselaris2011} and is introduced in the next use case
-(section \ref{kamitani}).
+(section \ref{kamitani}).\\
 
 This use case explores the relation between brain activity and visual
 stimuli. More precisely, we want to know if there is a significant difference
 in brain activity when presenting to the subject images of different categories.
-
-In this experiment, presented in \cite{haxby2001},
+It is based on the experiment presented in \cite{haxby2001}:
 grayscale images representing different image categories
 are presented to 6 subjects during 12 sessions. The goal is to predict,
 from fMRI data, which image category is presented
-to the subject and see where the discriminating brain voxels for this task are
+to the subject and determine where the discriminating brain voxels for this task are
 located. Full protocol information is available in the reference paper.
 For the sake of simplicity, this example focuses on one subject for the
 particular task of discriminating face against house images.\\
@@ -532,20 +538,18 @@ reference basic algorithm which has the advantage to
 give reliable results even when the number of dimensions is greater than the
 number of samples.
 
-\subsection{SVM}
-
-\subsubsection{Feature selection: ANOVA F-Test}
+\subsection{Feature selection: ANOVA F-Test}
 
 The common preprocessing pipeline is applied on Haxby dataset. After masking, 40
 000 features are left for only 1 400 samples. This is not an optimal setting
-for machine learning algorithm which efficiency strongly depends on the ratio
-between feature and samples.
+for machine learning algorithm which efficiency grows with the ratio
+between samples and features.\\
 
 Reducing the number of features (ie voxels) can be done by selecting the most
 relevant ones to our task. A neuroscientific approach could be to restrain the
 mask to occipital area which contains the visual cortex. The statistical
-approach consists in using a simple and costless test to reduce roughly the
-number of features, before applying a more sophisticated algorithm.
+approach consists in using a simple and costless test to roughly reduce the
+number of features, before applying a more sophisticated algorithm.\\
 
 Scikit-learn offers a panel of strategies to select features. In supervised
 learning, the most popular feature selection method is the
@@ -555,7 +559,7 @@ ANOVA compares several groups to determine if they are similar or not (the null
 hypothesis being that they are randomly drawn from the same population).
 It is used to compare feature distributions across classes: a feature which
 distribution is similar for all classes is not likely to contain much
-information.
+information.\\
 
 After ranking the features, \verb!sklearn.feature_selection! proposes a panel
 of feature selection strategies. One can choose to take a percentile of the features
@@ -565,7 +569,7 @@ for example. All these objects are implemented as transformers (see
 In this use case, \verb!f_classif! function (ANOVA F-Test) along with selection
 of a fixed number of features will be used.
 
-\subsubsection{Classification}
+\subsection{Classification: SVM}
 
 A Support Vector Classifier (SVC) is a simple classifier that finds a linear
 hyperplane separating samples that belong to different classes. 
@@ -614,7 +618,6 @@ contained in the voxel itself but in its neighbourhood. Hence the Searchlight
 runs the classification on a ball centered on the voxel instead of a single voxel.
 It can be seen as a sophisticated version of the dimension reduction used in our
 first setting.
-
 An efficient implementation of this algorithm is way beyond the scope of this
 paper also it is not detailed here. However, the code, along with this example,
 are available in nilearn Python package\footnote{http://nilearn.github.io}.
@@ -625,8 +628,10 @@ The results of this experience are shown in figure~\ref{fig:haxby}.
 On all figures, green, resp.\ blue,
 lines surround features corresponding to face, resp.\ house, recognition
 exhibited in the reference paper.
-The F-score (\textit{a}) is the basic
-classifier used in ANOVA to select the features.
+The F-score (left) is the basic
+classifier used in ANOVA to select the features. The middle pictures shows the
+first support vector obtained with SVC after feature selection. The picture on
+the right shows the amount of information computed by Searchlight.
 
 First, we see that voxels selected by all methods matches the results obtained
 in the original work. The F-scores are very salient, almost binary, compared to
@@ -712,22 +717,21 @@ support = feature_selection.inverse_transform(support)
 \section{Encoding brain activity and decoding images}
 \label{kamitani}
 
-The previous experiment shows that it is possible to determine the category of a
-visual stimulus by mining brain functional data in the visual cortex.
-The reverse operation, called \textit{encoding}, consists in predicting the
-brain activity evoked by a complex visual stimuli.
-This is the task proposed in the Kamitani dataset.
+In the previous experiment, the category of a visual stimulus was deduced from
+brain activity measured in the visual cortex.
+This use case goes further by inferring a direct link between the image
+seen by the subject and the brain activity.
 
-In the experiment proposed by \citep{miyawaki2008}, several series of $10\times10$ binary images are presented
-to two subjects while activity on the visual cortew is recorded.
-
+In the experiment proposed by \citep{miyawaki2008}, several series of $10\times10$
+binary images are presented to two subjects while activity on the visual cortex
+is recorded.
 The training set is composed of random images (where black and white pixels
 are balanced) and the testing set is composed of structured images containing
 geometric shapes (square, cross...) and letters. For the sake of simplicity, in
 this use case, we consider only the training set and use cross-validation to
-obtain scores on unseen data.
+obtain scores on unseen data.\\
 
-Here, we will illustrate two problems: reconstructing visual stimulus from BOLD activation,
+We will illustrate two problems: reconstructing visual stimulus from BOLD activation,
 which is a decoding task, and reconstructing brain activation from visual
 stimulus, which is an encoding task.
 
@@ -739,10 +743,10 @@ standardization).
 Prior knowledge on the data can help for model selection. In this experiment, we
 want to find the relation between voxel activation and some pixel color. It is
 therefore reasonable to suppose that not all voxels in the brain will be related to one
-pixel color. we will consequently use sparsity inducing models who tends to
+pixel. We will consequently use sparsity inducing models who tends to
 reduce the number of features on which their decision is made.
 
-The original work uses a sparse multinomial
+The original work by \cite{miyawaki2008} uses a sparse multinomial
 logistic regression and a sophisticated multiscale strategy to reconstruct the image.
 This example uses the simpler version of this approach, a $\ell_1$ logistic
 regression, and compare it to the Orthogonal
@@ -750,10 +754,8 @@ Matching Pursuit (\cite{mallat1993}). The OMP is a linear model that uses
 feature time series as a dictionary and an l1 constraint on the loadings. Its
 particularity is to add one atom at each step and update all coefficients
 based on the orthogonal projection on previously selected atoms.
-
-To measure the performance of each approach, we will use a log of the
-reconstruction error, which is close to a log likelihood. Thanks to
-scikit-learn, applying a cross validation to get the score is a oneliner.
+Reconstruction performance is measured by the accuracy score, the default
+function proposed in the scikit-learn.
 
 \begin{lstlisting}
 from sklearn.linear_model import OrthogonalMatchingPursuit as OMP
@@ -762,15 +764,17 @@ from sklearn.cross_validation import cross_val_score
 pipeline_OMP = Pipeline([('selection', SelectKBest(f_classif, 500)),
                          ('clf', OMP(n_nonzero_coefs=20)])
 
-# Note the use of list comprehension to iterate on one line
-scores_omp = [cross_val_score(pipeline_OMP, X_train, voxel,
-                              score_func=log_score, cv=5)
-              for pixel in y_train.T]
+scores_omp = []
+# y_train = n_samples x n_voxels
+# To iterate on voxels, we transpose it.
+for pixel in y_train.T:
+    score = cross_val_score(pipeline_OMP, X_train, pixel, cv=5)
+    scores_omp.append(score)
 \end{lstlisting}
 
 \subsubsection{Results}
 
-As Miyawaki et al., in figure \ref{fig:omp} we observe that reconstruction
+As Miyawaki et al., in figure \ref{fig:decoding} we observe that reconstruction
 is more accurate in the fovea. This
 may be caused by the fact that there are more neurons dedicated to foveal
 representation in the primary visual area than for the borders.
@@ -779,38 +783,57 @@ This particular voxel will be studied in the encoding task in the next section.
 
 \begin{figure}[hbtp]
   \begin{center}
-  \subfigure[Logistic regression scores]{
-    \includegraphics[width=.22\linewidth]{img/kamitani/scores_log}}
-  \subfigure[Voxel coefficients for logistic regression]{
-      \begin{tikzpicture}
+    \begin{subfigure}[c]{.07\linewidth}
+    \includegraphics[width=\linewidth]{img/kamitani/score_colorbar}
+    \end{subfigure}
+    \begin{subfigure}[c]{.2\linewidth}
+    %\includegraphics[width=\linewidth]{img/kamitani/scores_log}
+        \begin{overpic}[width=\linewidth]{img/kamitani/scores_log}
+            \put(2, 2){a}
+        \end{overpic}
+    %\subcaption{Logistic regression scores}
+    \end{subfigure}
+    \begin{subfigure}[c]{.2\linewidth}%
+        \begin{tikzpicture}
           \begin{scope}[spy using outlines={blue, circle, line width=3pt,
-                magnification=7.5, size=60, connect spies}]
-            \node[rotate=90]{\includegraphics[width=.22\linewidth]{img/kamitani/pixel_logistic}};
-            \spy [width=2.5cm, height=2.5cm, line width=3pt, spy connection path={\draw[line
+                magnification=6, size=60, connect spies}]
+            \node[inner sep=0pt, rotate=90](img){
+                \includegraphics[width=\linewidth]{img/kamitani/pixel_logistic}};
+            \node[inner sep=0pt] at (-1.6, -1.6) {\textcolor{white}{b}};
+            \spy [width=2cm, height=2cm, line width=3pt, spy connection path={\draw[line
             width=2pt, blue] (tikzspyonnode) -- (tikzspyinnode);}]
-            on (-0.035, -1.33) in node (a) [line width=4pt] (a) at (1, .8) (a) {};
+            on (-0.03, -1.2) in node (a) [line width=4pt] (a) at (.6, .6) (a) {};
         \end{scope}
     \end{tikzpicture}
-    }
-    %\includegraphics[width=.22\linewidth, angle=90, origin=c]{img/kamitani/pixel_logistic}}
-  \subfigure[OMP scores]{
-    \includegraphics[width=.22\linewidth]{img/kamitani/scores_omp}}
-  \subfigure[Voxel coefficients for OMP]{
+    %\caption{Voxel weights for logistic regression}
+    \end{subfigure}
+    \begin{subfigure}[c]{.2\linewidth}
+    %\includegraphics[width=\linewidth]{img/kamitani/scores_omp}
+        \begin{overpic}[width=\linewidth]{img/kamitani/scores_omp}
+            \put(2, 2){c}
+        \end{overpic}
+    %\caption{OMP scores}
+    \end{subfigure}
+    \begin{subfigure}[c]{.2\linewidth}
       \begin{tikzpicture}
           \begin{scope}[spy using outlines={blue, circle, line width=3pt,
-                magnification=7.5, size=60, connect spies}]
-            \node[rotate=90]{\includegraphics[width=.22\linewidth]{img/kamitani/pixel_omp}};
-            \spy [width=2.5cm, height=2.5cm, line width=3pt, spy connection path={\draw[line
+                magnification=6, size=60, connect spies}]
+            \node[inner sep=0pt, rotate=90]{\includegraphics[width=\linewidth]{img/kamitani/pixel_omp}};
+            \node[inner sep=0pt] at (-1.6, -1.6) {\textcolor{white}{d}};
+            \spy [width=2cm, height=2cm, line width=3pt, spy connection path={\draw[line
             width=2pt, blue] (tikzspyonnode) -- (tikzspyinnode);}]
-            on (-0.035, -1.33) in node (a) [line width=4pt] (a) at (1, .8) (a) {};
+            on (-0.03, -1.2) in node (a) [line width=4pt] (a) at (.6, .6) (a) {};
         \end{scope}
     \end{tikzpicture}
-    %\includegraphics[width=.22\linewidth, angle=90, origin=c]{img/kamitani/pixel_omp}
-    }
+    %\caption{Voxel weights for OMP}
+    \end{subfigure}
   \end{center}
-  \caption{Reconstruction accuracy depending on the methods. The brain voxels
-  corresponds to coefficients used to predict the blue bordered pixel.}
-\label{fig:omp}
+  \caption{Reconstruction accuracy per pixel depending on the method (\textit{a.} Logistic
+      regression, \textit{c.} OMP). The brain voxels
+  corresponds to coefficients used to predict the blue bordered pixel(\textit{b.} Logistic
+      regression, \textit{d.} OMP). This
+  figure should be put in relation with figure~\ref{fig:encoding}.}
+\label{fig:decoding}
 \end{figure}
 
 \subsection{Encoding}
@@ -973,9 +996,18 @@ validate ICA results.
 
 \begin{figure}[hbtp]
   \begin{center}
-      \subfigure[ICA]{\includegraphics[width=.3\linewidth]{img/ica/ica}}
-      \subfigure[CanICA]{\includegraphics[width=.3\linewidth]{img/ica/canica}}
-      \subfigure[Melodic]{\includegraphics[width=.3\linewidth]{img/ica/melodic}}
+      \begin{subfigure}[b]{.3\linewidth}
+        \includegraphics[width=\linewidth]{img/ica/ica}
+        \caption{ICA}
+      \end{subfigure}
+      \begin{subfigure}[b]{.3\linewidth}
+        \includegraphics[width=\linewidth]{img/ica/canica}
+        \caption{CanICA}
+      \end{subfigure}
+      \begin{subfigure}[b]{.3\linewidth}
+        \includegraphics[width=\linewidth]{img/ica/melodic}
+        \caption{melodic}
+      \end{subfigure}
   \end{center}
   \caption{Extraction of default mode network using different approches}
   \label{fig:ica}
@@ -1054,14 +1086,22 @@ method more sophisticated than the simple downsampling.
 
 \begin{figure}[hbtp]
   \begin{center}
-  \subfigure[KMeans clustering]{
-    \includegraphics[width=.23\linewidth]{img/clustering/kmeans}}
-  \subfigure[Ward's clustering]{
-    \includegraphics[width=.23\linewidth]{img/clustering/ward}}
-  \subfigure[Ward's compression]{
-    \includegraphics[width=.23\linewidth]{img/clustering/ward_compressed}}
-  \subfigure[Original signal]{
-    \includegraphics[width=.23\linewidth]{img/clustering/original}}
+      \begin{subfigure}[b]{.23\linewidth}
+          \includegraphics[width=\linewidth]{img/clustering/kmeans}
+        \caption{K-Means}
+      \end{subfigure}
+      \begin{subfigure}[b]{.23\linewidth}
+        \includegraphics[width=\linewidth]{img/clustering/ward}
+        \caption{Ward's clustering}
+      \end{subfigure}
+      \begin{subfigure}[b]{.23\linewidth}
+        \includegraphics[width=\linewidth]{img/clustering/ward_compressed}
+        \caption{Ward's compression}
+      \end{subfigure}
+      \begin{subfigure}[b]{.23\linewidth}
+        \includegraphics[width=\linewidth]{img/clustering/original}
+        \caption{Original signal}
+      \end{subfigure}
   \end{center}
   \caption{Brain decomposition using Ward's clustering and Kmeans. (c) shows how the original
   signal (d) is compressed using the Ward's clustering decomposition (b).}
