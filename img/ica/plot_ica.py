@@ -15,7 +15,6 @@ n_components = 20
 ### Preprocess ################################################################
 import nibabel
 import os
-from nipy.labs.viz import plot_map
 import pylab as pl
 import numpy as np
 import time
@@ -43,9 +42,9 @@ if not os.path.exists('canica.pdf'):
 
     c = cc.get_data()[:, :, :, 16]
     vmax = np.max(np.abs(c[:, :, 37]))
-    plot_map(c, cc.get_affine(), cut_coords=[37],
-            threshold=0.002, slicer='z', vmin=-vmax, vmax=vmax)
-
+    c = np.ma.masked_equal(c, 0.)
+    pl.imshow(np.rot90(c[:, :, 37]),
+            interpolation='nearest', vmax=vmax, vmin=-vmax, cmap='jet')
     pl.savefig('canica.pdf')
     pl.savefig('canica.eps')
 
@@ -68,8 +67,9 @@ if not os.path.exists('melodic.pdf'):
     melodic_components = nibabel.load('melodic.nii.gz')
     c = melodic_components.get_data()[:, :, :, 8]
     vmax = np.max(np.abs(c[:, :, 37]))
-    plot_map(c, melodic_components.get_affine(), cut_coords=[37],
-            threshold=1.5, slicer='z', vmin=-vmax, vmax=vmax)
+    c = np.ma.masked_equal(c, 0.)
+    pl.imshow(np.rot90(c[:, :, 37]), 
+            interpolation='nearest', vmax=vmax, vmin=-vmax, cmap='jet')
     pl.savefig('melodic.pdf')
     pl.savefig('melodic.eps')
 
@@ -90,8 +90,8 @@ if not os.path.exists('ica.pdf'):
     ica_components = nibabel.load('ica.nii.gz')
     c = ica_components.get_data()[:, :, :, 2]
     vmax = np.max(np.abs(c[:, :, 37]))
-    plot_map(c, affine, cut_coords=[37], threshold=1e-7, slicer='z',
-            vmin=-vmax, vmax=vmax)
-
+    c = np.ma.masked_equal(c, 0.)
+    pl.imshow(np.rot90(c[:, :, 37]),
+            interpolation='nearest', vmax=vmax, vmin=-vmax, cmap='jet')
     pl.savefig('ica.pdf')
     pl.savefig('ica.eps')

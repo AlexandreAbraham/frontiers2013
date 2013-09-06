@@ -774,11 +774,19 @@ for pixel in y_train.T:
 
 \subsubsection{Results}
 
-As Miyawaki et al., in figure \ref{fig:decoding} we observe that reconstruction
-is more accurate in the fovea. This
-may be caused by the fact that there are more neurons dedicated to foveal
+Results are presented in figure~\ref{fig:decoding}.
+Looking at both methods (figures \textit{a} and \textit{c}), we observe that reconstruction
+is more accurate in the fovea, as observed in the original work \citep{miyawaki2008}.
+This may be caused by the fact that there are more neurons dedicated to foveal
 representation in the primary visual area than for the borders.
-Plus, both methods have selected the same voxel to base their decision upon.
+
+Comparing the two methods, we see that Logistic Regression gives better results
+than Orthognal Matching Pursuit. However, LR bases its decision upon 200 voxels
+while the OMP has been forced to base it on 40.
+
+The pixel weights (\textit{b} and \textit{c}) agree on the fact that important
+domains are located in the blue shape.
+Both methods have selected the same voxel to base their decision upon.
 This particular voxel will be studied in the encoding task in the next section.
 
 \begin{figure}[hbtp]
