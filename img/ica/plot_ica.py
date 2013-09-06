@@ -21,19 +21,25 @@ import time
 
 # CanICA
 from nilearn.decomposition.canica import CanICA
+from nilearn.input_data import MultiNiftiMasker
 
-t0 = time.time()
-canica = CanICA(n_components=n_components,
-                smoothing_fwhm=6.,
-                memory="nilearn_cache", memory_level=1,
-                threshold=None,
-                random_state=1)
-canica.fit(dataset.func)
-print('Canica: %f' % (time.time() - t0))
-masker = canica.masker_
+# Masker:
+
+masker = MultiNiftiMasker(smoothing_fwhm=6.,
+                          memory="nilearn_cache",
+                          memory_level=1)
+masker.fit(dataset.func)
 affine = masker.mask_img_.get_affine()
 
 if not os.path.exists('canica.nii.gz'):
+    t0 = time.time()
+    canica = CanICA(n_components=n_components, mask=masker,
+                    smoothing_fwhm=6.,
+                    memory="nilearn_cache", memory_level=1,
+                    threshold=None,
+                    random_state=1)
+    canica.fit(dataset.func)
+    print('Canica: %f' % (time.time() - t0))
     canica_components = masker.inverse_transform(canica.components_)
     nibabel.save(canica_components, 'canica.nii.gz')
 
@@ -42,7 +48,8 @@ if not os.path.exists('canica.pdf'):
 
     c = cc.get_data()[:, :, :, 16]
     vmax = np.max(np.abs(c[:, :, 37]))
-    c = np.ma.masked_equal(c, 0.)
+    c = np.ma.masked_array(c,
+            np.logical_not(masker.mask_img_.get_data().astype(bool)))
     pl.imshow(np.rot90(c[:, :, 37]),
             interpolation='nearest', vmax=vmax, vmin=-vmax, cmap='jet')
     pl.savefig('canica.pdf')
@@ -67,8 +74,9 @@ if not os.path.exists('melodic.pdf'):
     melodic_components = nibabel.load('melodic.nii.gz')
     c = melodic_components.get_data()[:, :, :, 8]
     vmax = np.max(np.abs(c[:, :, 37]))
-    c = np.ma.masked_equal(c, 0.)
-    pl.imshow(np.rot90(c[:, :, 37]), 
+    c = np.ma.masked_array(c,
+            np.logical_not(masker.mask_img_.get_data().astype(bool)))
+    pl.imshow(np.rot90(c[:, :, 37]),
             interpolation='nearest', vmax=vmax, vmin=-vmax, cmap='jet')
     pl.savefig('melodic.pdf')
     pl.savefig('melodic.eps')
@@ -90,7 +98,8 @@ if not os.path.exists('ica.pdf'):
     ica_components = nibabel.load('ica.nii.gz')
     c = ica_components.get_data()[:, :, :, 2]
     vmax = np.max(np.abs(c[:, :, 37]))
-    c = np.ma.masked_equal(c, 0.)
+    c = np.ma.masked_array(c,
+            np.logical_not(masker.mask_img_.get_data().astype(bool)))
     pl.imshow(np.rot90(c[:, :, 37]),
             interpolation='nearest', vmax=vmax, vmin=-vmax, cmap='jet')
     pl.savefig('ica.pdf')
