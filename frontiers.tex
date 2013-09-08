@@ -512,21 +512,15 @@ y = y[:-2]
 \section{Decoding object representation in the brain}
 
 In the context of machine learning in neuroimaging, \textit{decoding} refers to learning a model
-which predicts behavioral or phenotypic data given BOLD signal. It is presented
-in the following use case. The inverse procedure is
+which predicts behavioral or phenotypic data given BOLD signal. The inverse procedure is
 called \textit{encoding} \citep{naselaris2011} and is introduced in the next use case
 (section \ref{kamitani}).\\
 
-This use case explores the relation between brain activity and visual
-stimuli. More precisely, we want to know if there is a significant difference
-in brain activity when presenting to the subject images of different categories.
-It is based on the experiment presented in \cite{haxby2001}:
-grayscale images representing different image categories
-are presented to 6 subjects during 12 sessions. The goal is to predict,
-from fMRI data, which image category is presented
-to the subject and determine where the discriminating brain voxels for this task are
-located. Full protocol information is available in the reference paper.
-For the sake of simplicity, this example focuses on one subject for the
+This use case is based on a simpler version of the experiment presented in
+\cite{haxby2001}. In the original work, grayscale images from 8 different categories
+are presented to 6 subjects during 12 sessions. The goal is to build a predictor
+capable of predicting the category of the image presented to subject given his
+brain activity. This example is restricted to one subject for the
 particular task of discriminating face against house images.\\
 
 As the desired output value (face or house) is known, this problem is a
@@ -574,7 +568,7 @@ hyperplane separating samples that belong to different classes.
 Classifying a new sample boils down to
 seeing on which side of the hyperplane it is.
 The decision is taken based upon a subset of training data called
-support vectors (this is not a black box). From them, one can deduce which
+support vectors. From them, one can deduce which
 features are the most important, and yield a neuroscientific interpretation out
 of these results.
 
