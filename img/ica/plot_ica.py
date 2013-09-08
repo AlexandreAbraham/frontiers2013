@@ -7,32 +7,44 @@ An example applying ICA to resting-state data.
 
 ### Load nyu_rest dataset #####################################################
 from nilearn import datasets
-# Here we use only 3 subjects to get faster-running code. For better
-# results, simply increase this number
 dataset = datasets.fetch_adhd(n_subjects=10)
 n_components = 20
 
-### Preprocess ################################################################
+# Index of the generated axial slice of the brain
+z = 52
+
+### Initialization ############################################################
 import nibabel
 import os
 import pylab as pl
 import numpy as np
 import time
-
-# CanICA
-from nilearn.decomposition.canica import CanICA
 from nilearn.input_data import MultiNiftiMasker
 
 # Masker:
-
 masker = MultiNiftiMasker(smoothing_fwhm=6.,
                           memory="nilearn_cache",
                           memory_level=1)
 masker.fit(dataset.func)
 affine = masker.mask_img_.get_affine()
 
+
+def plot_ica_map(map_3d):
+    # Mask the background
+    map_3d = np.ma.masked_array(map_3d,
+            np.logical_not(masker.mask_img_.get_data().astype(bool)))
+    section = map_3d[:, :, z]
+    vmax = np.max(np.abs(section))
+
+    pl.imshow(np.rot90(section), interpolation='nearest',
+              vmax=vmax, vmin=-vmax, cmap='jet')
+
+
+### CanICA ####################################################################
+
 if not os.path.exists('canica.nii.gz'):
     t0 = time.time()
+    from nilearn.decomposition.canica import CanICA
     canica = CanICA(n_components=n_components, mask=masker,
                     smoothing_fwhm=6.,
                     memory="nilearn_cache", memory_level=1,
@@ -44,14 +56,7 @@ if not os.path.exists('canica.nii.gz'):
     nibabel.save(canica_components, 'canica.nii.gz')
 
 if not os.path.exists('canica.pdf'):
-    cc = nibabel.load('canica.nii.gz')
-
-    c = cc.get_data()[:, :, :, 16]
-    vmax = np.max(np.abs(c[:, :, 37]))
-    c = np.ma.masked_array(c,
-            np.logical_not(masker.mask_img_.get_data().astype(bool)))
-    pl.imshow(np.rot90(c[:, :, 37]),
-            interpolation='nearest', vmax=vmax, vmin=-vmax, cmap='jet')
+    plot_ica_map(nibabel.load('canica.nii.gz').get_data()[..., 16])
     pl.savefig('canica.pdf')
     pl.savefig('canica.eps')
 
@@ -71,13 +76,7 @@ if not os.path.exists('melodic.nii.gz'):
     nibabel.save(melodic_components, 'melodic.nii.gz')
 
 if not os.path.exists('melodic.pdf'):
-    melodic_components = nibabel.load('melodic.nii.gz')
-    c = melodic_components.get_data()[:, :, :, 8]
-    vmax = np.max(np.abs(c[:, :, 37]))
-    c = np.ma.masked_array(c,
-            np.logical_not(masker.mask_img_.get_data().astype(bool)))
-    pl.imshow(np.rot90(c[:, :, 37]),
-            interpolation='nearest', vmax=vmax, vmin=-vmax, cmap='jet')
+    plot_ica_map(nibabel.load('melodic.nii.gz').get_data()[..., 8])
     pl.savefig('melodic.pdf')
     pl.savefig('melodic.eps')
 
@@ -95,12 +94,6 @@ if not os.path.exists('ica.nii.gz'):
     nibabel.save(ica_components, 'ica.nii.gz')
 
 if not os.path.exists('ica.pdf'):
-    ica_components = nibabel.load('ica.nii.gz')
-    c = ica_components.get_data()[:, :, :, 2]
-    vmax = np.max(np.abs(c[:, :, 37]))
-    c = np.ma.masked_array(c,
-            np.logical_not(masker.mask_img_.get_data().astype(bool)))
-    pl.imshow(np.rot90(c[:, :, 37]),
-            interpolation='nearest', vmax=vmax, vmin=-vmax, cmap='jet')
+    plot_ica_map(nibabel.load('ica.nii.gz').get_data()[..., 2])
     pl.savefig('ica.pdf')
     pl.savefig('ica.eps')
