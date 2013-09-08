@@ -13,12 +13,26 @@ Millman, K.~J. and Brett, M. (2007) Analysis of functional magnetic resonance
   imaging in python.
 \newblock {\em Computing in Science \& Engineering\/} 9 52--55.
 
+\bibitem[{Gorgolewski et~al.(2011)Gorgolewski, Burns, Madison, Clark,
+  Halchenko, Waskom et~al.}]{gorgolewski2011}
+Gorgolewski, K., Burns, C.~D., Madison, C., Clark, D., Halchenko, Y.~O.,
+  Waskom, M.~L., et~al. (2011) Nipype: a flexible, lightweight and extensible
+  neuroimaging data processing framework in python.
+\newblock {\em Front Neuroinform\/} 5.
+\newblock \doi{10.3389/fninf.2011.00013}.
+
 \bibitem[{Hanke et~al.(2009)Hanke, Halchenko, Sederberg, Hanson, Haxby, and
   Pollmann}]{hanke2009pymvpa}
 Hanke, M., Halchenko, Y.~O., Sederberg, P.~B., Hanson, S.~J., Haxby, J.~V., and
   Pollmann, S. (2009) Pymvpa: A python toolbox for multivariate pattern
   analysis of fmri data.
 \newblock {\em Neuroinformatics\/} 7 37--53.
+
+\bibitem[{Pedregosa et~al.(2011)Pedregosa, Varoquaux, Gramfort, Michel,
+  Thirion, Grisel et~al.}]{pedregosa2011}
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel,
+  O., et~al. (2011) Scikit-learn: Machine learning in {Python}.
+\newblock {\em Journal of Machine Learning Research\/} 12 2825.
 
 \bibitem[{Van Der~Walt et~al.(2011)Van Der~Walt, Colbert, and
   Varoquaux}]{vanderwalt2011}
@@ -30,12 +44,6 @@ Van Der~Walt, S., Colbert, S.~C., and Varoquaux, G. (2011) The numpy array: a
 Hunter, J.~D. (2007) Matplotlib: A 2d graphics environment.
 \newblock {\em Computing In Science \& Engineering\/} 9 90--95.
 
-\bibitem[{Pedregosa et~al.(2011)Pedregosa, Varoquaux, Gramfort, Michel,
-  Thirion, Grisel et~al.}]{pedregosa2011}
-Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel,
-  O., et~al. (2011) Scikit-learn: Machine learning in {Python}.
-\newblock {\em Journal of Machine Learning Research\/} 12 2825.
-
 \bibitem[{Friston(2007)}]{friston2007}
 Friston, K., {\em Statistical parametric mapping: the analysis of functional
   brain images\/} (Academic Press, 2007).
@@ -46,14 +54,6 @@ Smith, S.~M., Jenkinson, M., Woolrich, M.~W., Beckmann, C.~F., Behrens, T.~E.,
   Johansen-Berg, H., et~al. (2004) Advances in functional and structural mr
   image analysis and implementation as fsl.
 \newblock {\em Neuroimage\/} 23 S208--S219.
-
-\bibitem[{Gorgolewski et~al.(2011)Gorgolewski, Burns, Madison, Clark,
-  Halchenko, Waskom et~al.}]{gorgolewski2011}
-Gorgolewski, K., Burns, C.~D., Madison, C., Clark, D., Halchenko, Y.~O.,
-  Waskom, M.~L., et~al. (2011) Nipype: a flexible, lightweight and extensible
-  neuroimaging data processing framework in python.
-\newblock {\em Front Neuroinform\/} 5.
-\newblock \doi{10.3389/fninf.2011.00013}.
 
 \bibitem[{Naselaris et~al.(2011)Naselaris, Kay, Nishimoto, and
   Gallant}]{naselaris2011}
