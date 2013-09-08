@@ -177,7 +177,8 @@ Statistical machine learning methods are increasingly used for
 neuroimaging data analysis. Their main virtue for this type of application
 is their ability to model high-dimensional datasets, e.g.\ multivariate
 analysis of activation images, or capturing inter-subject variability.
-Supervised learning is typically used in \emph{decoding} setting to relate
+Supervised learning is typically used in \emph{decoding} or
+\emph{encoding} settings to relate
 brain images to behavioral or clinical observations, while
 unsupervised learning is typically used to uncover hidden structure in
 sets of images (e.g.\ resting state functional MRI) or to find
@@ -202,29 +203,27 @@ scikit-learn, Python
 
 \section{Introduction}
 
-Statistical machine learning is gaining an increasing interest in
+Statistical machine learning is gaining interest in
 neuroimaging data analysis. It is used by neuroscientists,
 who use machine learning methods as black boxes, and computer scientists,
-who acquire neuroscientific knowledge by experience. From these cooperations are
-born tools, like SPM, which are now considered as standards. However, these
-tools are often used without having a real knowledge of the underlying
-mechanisms. Our goal in this paper is to fill the gap between machine learning
-and neuroimaging by providing a toolbox that can be used by computer scientists
-to produce scripts that are fully understood by neuroscientists.
+who acquire neuroscientific knowledge on the job. This paper aims to fill 
+the gap between machine learning and neuroimaging by demonstrating how a 
+general-purpose machine-learning toolbox can be used to produce scripts 
+for neuroimaging analysis with state-of-the-art methods
+that are fully understood by both worlds.
 
-SPM is built upon Matlab, the reference programming language in the scientific
-community. Despite its great performance, Matlab comes with a cost that may be
-prohibitive.
-With its mature scientific stack, Python is an alterative to consider when
-analysing neuroimaging data. It has already been used in several studies
-\citep{millman2007analysis} and some frameworks specialized in neuroimaging
-already exists \citep{hanke2009pymvpa}. 
+With its mature scientific stack, Python is a growing contender in the
+landscape of neuroimaging data analysis with tools such as Nipy
+\citep{millman2007analysis} or Nipype \citep{gorgolewski2011} and some
+frameworks for multi-variate pattern analysis already exists
+\citep{hanke2009pymvpa}. 
 
-In this paper, we show how scikit-learn, a Python machine learning library can
+In this paper, we show how scikit-learn, a Python machine learning
+library \citep{pedregosa2011}, can
 be used on neuroimaging data. Through three use cases, we describe how to
 resolve common neuroimaging problems, which method should be use and why, and how to
-get the desired results. In fact, a neuroscientist is not only interest in the
-scores but in the interpretability of the results which leads us to avoid black
+get the desired results. We discuss not only prediction scores, but
+also the interpretability of the results, which leads us to open up the black
 box methods.
 
 \subsection{Scientific Python and neuroimaging ecosystem}
@@ -243,13 +242,13 @@ are:
         for numerical computing and they are the elementary bricks we use in all our
         algorithms.
 
-    \item{\bf Matplotlib} is a Python plotting library that is tightly integrated into the
-        rest of the scientific Python stack. It offers publication-quality figures in
-        a variety of formats and allows to display plots or images in a
+    \item{\bf Matplotlib} is a plotting library tightly integrated into the
+        the scientific Python stack \citep{hunter2007}. It offers publication-quality figures in
+        a variety of formats and can display plots or images in a
         graphical user interface. All figures in this paper have been generated using
-        Matplotlib \citep{hunter2007}.
+        it.
 
-    \item{\bf Nibabel} can load or save data in popular neuroimaging data format.
+    \item{\bf Nibabel} loads ors save data in popular neuroimaging file format.
         It is the starting point of all our scripts.
 \end{itemize}
 
@@ -264,13 +263,12 @@ and reusable in various scientific areas.
 
 \subsection{Concepts}
 
-In {\em scikit-learn}, data is represented in a generic 2-dimensional format
-accepted by all cited objects.
-
-All objects within scikit-learn share a uniform common basic API consisting of three
-complementary interfaces: an \textit{estimator} interface for building and
-fitting models, a \textit{predictor} interface for making predictions and a
-\textit{transformer} interface for converting data into a different representation.
+In {\em scikit-learn}, all objects and algorithms accept data represented
+in a generic domain-independent 2-dimensional array, samples $\times$
+features. Scikit-learn objects share a uniform set of methods that
+depends on their purpose: \textit{estimators} can build and fit models,
+\textit{predictors} can make predictions and \textit{transformers}
+converting data from one representation to another.
 
 \begin{itemize}
 \item {\bf Estimator}. The \textit{estimator} interface, the core of the
