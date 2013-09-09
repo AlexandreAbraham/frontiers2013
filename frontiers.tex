@@ -523,12 +523,12 @@ capable of predicting the category of the image presented to subject given his
 brain activity. This example is restricted to one subject for the
 particular task of discriminating face against house images.\\
 
-As the desired output value (face or house) is known, this problem is a
-supervised learning problem. Among all methods proposed in the scikit-learn, we
-chose the Support Vector Method (SVM) for this problem. In fact, it is a
-reference basic algorithm which has the advantage to
-give reliable results even when the number of dimensions is greater than the
-number of samples.
+As the desired output value (face or house) is known, this is a
+supervised learning problem.
+Among all methods proposed in the scikit-learn, we propose to use
+Support Vector Machine (SVM) for this problem as this method is fast, not
+computionally expensive and gives reliable results even when the number of
+dimensions is greater than the number of samples.
 
 \subsection{Feature selection: ANOVA F-Test}
 
@@ -563,14 +563,14 @@ of a fixed number of features will be used.
 
 \subsection{Classification: SVM}
 
-A Support Vector Classifier (SVC) is a simple classifier that finds a linear
-hyperplane separating samples that belong to different classes. 
-Classifying a new sample boils down to
-seeing on which side of the hyperplane it is.
-The decision is taken based upon a subset of training data called
-support vectors. From them, one can deduce which
-features are the most important, and yield a neuroscientific interpretation out
-of these results.
+A linear Support Vector Classifier (SVC) finds the linear
+hyperplane that separates samples belonging to different classes while
+maximizing the distance to the samples (called margin).
+Classifying a new sample boils down to 
+determining on which side of the hyperplane it lies.
+A SVC bases its decision upon a subset of training data called
+support vectors. An interpretation can be made by looking at the most important
+support vector (see figure~\ref{fig:haxby}).
 
 \begin{lstlisting}
 feature_selection = SelectKBest(f_classif, k=500)
