@@ -485,9 +485,9 @@ support vector (see figure~\ref{fig:haxby}).
 
 \begin{lstlisting}
 feature_selection = SelectKBest(f_classif, k=500)
-clf = SVC(kernel='linear', C=1.)
-X = feature_selection.fit_transform(X)
-clf.fit(X)
+clf = SVC(kernel='linear')
+X_red = feature_selection.fit_transform(X)
+clf.fit(X_red, y)
 \end{lstlisting}
 
 % \subsubsection{Pipeline}
