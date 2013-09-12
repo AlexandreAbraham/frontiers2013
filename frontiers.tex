@@ -319,8 +319,10 @@ template like MNI if necessary. Reference softwares for this task are
 SPM\footnote{http://www.fil.ion.ucl.ac.uk/spm}~\citep{friston2007} and
 FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\citep{smith2004}. A Python
 interface to these tools is available in nipype Python library
-\citep{gorgolewski2011}. Below, we discuss shaping preprocessed data into
-a format that can be fed to scikit-learn.
+\citep{gorgolewski2011}. Below we discuss shaping preprocessed data into
+a format that can be fed to scikit-learn. For the machine learning
+settings, we need a data matrix, that we will denote $X$, and optionally a
+target variable to predict, $y$.
 
 \subsection{Spatial resampling}
 \label{resampling}
@@ -332,25 +334,17 @@ from data indices to world coordinates. Such matrix can express data
 anisotropy, when the distance between two voxels is not the same
 depending on the direction. This information is used by algorithms
 relying on the spatial structure of the data, for instance the
-Searchlight. Going from data indices \verb!array[i, j, k]! to world
-coordinates $(x, y, z)$ is a simple matrix product.
-% Too much information here.
-
-% We can write a Python helper function to transpose coordinates of a mask into
-% its original space:
-
-SciPy provides routines taking affine into account in its ndimage module.
-When dealing with heterogeneous dataset (multiple subjects or sessions), it is
-necessary to resample data upon a reference affine. This can be done using
-\texttt{scipy.ndimage.affine\_transform}.
+Searchlight. SciPy provides routines taking affine into account in its
+ndimage module, for instance \texttt{scipy.ndimage.affine\_transform}.
+% XXX: here, maybe mention nilearn
 
 Resampling consists in changing the spatial resolution of the data. This is
 an interpolation and alters the data, that is why it should be used carefully.
 Oversampling (increasing data resolution) leads to higher memory consumption
 and computation resources with no gain in information.
 Downsampling is commonly used to reduce the size of data to process.
-Typical sizes are 2mm or 3mm resolutions, but the spread of high-field MR
-scanner tends to lower these values.
+Typical sizes are 2mm or 3mm resolutions, but scan spatial resolution is
+increasing with progress in MR physics.
 Data scaling factor for each direction can be modified in the affine matrix.
 
 \subsection{Signal cleaning}
@@ -365,39 +359,39 @@ includes:
         intensity itself has no meaning and we want to study its variation and
         correlation with other voxels. Detrending can be done thanks to SciPy
         (\texttt{scipy.signal.detrend}).
-    \item{\bf Normalization} consists in setting the timseries variance to 1.
+    \item{\bf Normalization} consists in setting the timeseries variance to 1.
         This harmonization is necessary as some machine learning algorithms are
         sensible to different value ranges.
     \item{\bf Confounds removal} consists in regressing out confounding factors.
         Typical neuroimaging confounds are head movements. These spurious
         variables induce spurious correlation between all brain voxels.
         Some datasets provide estimated confounds (usually in csv files) but
-        they can also be estimated (XXX: ref to compcorr).
-    \item{\bf Frequency filtering} consists in removing signal which frequency is
-        abnormally high or low. Low-frequency signals in fMRI data are caused by
-        physiological mechanism or scanner drifts.
+        they can also be estimated from the data \citep{behzadi2007}.
+    \item{\bf Frequency filtering} consists in removing high or low
+        frequency signals. Low-frequency signals in fMRI data are caused by
+        physiological mechanisms or scanner drifts.
 \end{itemize}
 
 \subsection{Masking}
 
-Neuroimaging data are represented in 4 dimensions: 3 dimensions for the scans,
-which are positioned in a coordinate space, and one dimension for the time.
-Scikit-learn algorithms, on the other hand, only accept 2-dimensional data (see
-\ref{scikitlearn}).
-Depending on the purpose and on the used estimator, voxels and time series can be
+Neuroimaging data are represented in 4 dimensions: 3 spatial dimensions, and 
+one dimension for the time.
+Scikit-learn algorithms, on the other hand, only accept 2-dimensional
+samples $\times$ features matrices (see \ref{scikitlearn}).
+Depending on the settings, voxels and time series can be
 considered as features
-or samples. For example, to reduce dimensionality of input data,
-time series can be passed as features to a Principal Component Analysis.
+or samples. For example, in spatial independent component analysis (ICA),
+voxels are samples.
 
-\subsubsection{From 4-dimensional image to 2-dimensional array}
+\subsubsection{From 4-dimensional images to 2-dimensional array}
 
-The natural way to reduce data dimension is to flatten it, losing its original
-structure. A better approach draws from the fact that not all voxels in fMRI data
-holds information: outer-brain voxels are of no
-use and, worse, they may bring spurious noise and scanner artefacts.
-A brain mask should be applied to avoid this problem. Such masks
+Reducing the data dimension from images to feature vectors implies losing its
+spatial structure. However, that not all voxels in fMRI data holds 
+relevant information: outer-brain voxels are of no
+use and, worse, they may bring spurious noise and scanner artifacts.
+Thus, we keep only voxels in a brain mask. Such masks
 are often given along with datasets or can be computed thanks to softwares like
-FSL or SPM.\\
+FSL or SPM.
 
 \begin{figure}[hbtp]
     \begin{center}
@@ -407,15 +401,11 @@ FSL or SPM.\\
     \label{fig:niimg}
 \end{figure}
 
-Implementing masking procedure is made easy by NumPy fancy
-indexing. Special attention must be paid to the type of the mask array: it must
-be boolean. Otherwise the indexing will be considered as broadcasting and the
-result will usually fill the whole memory.
-2-dimensional masked data will be refered as \texttt{X} to follow scikit-learn
-conventions.
-
+Applying the mask is made easy by NumPy fancy indexing (importantly, the
+type of the mask array must be boolean for the following to work).
+2-dimensional masked data will be refered as \texttt{X} to follow
+scikit-learn conventions:
 \begin{lstlisting}
-# Apply a mask
 # Ensure that the mask is boolean
 mask = mask.astype(np.bool)
 # Apply the mask, X = timeseries * voxels
@@ -443,12 +433,12 @@ unmasked_data[mask] = X
 % Multi subject computation is simply done by intersecting subjects maps
 % relatively to a chosen threshold.
 
-\subsubsection{Label shifting}
-
-Functional MRI acquisition is not immediate: BOLD response peak occurs between 3
-and 5 seconds after the stimulus. We take this time shift into account by
-shifting values of the label array by an offset of 2 time repetition (about 5
-seconds).
+%\subsubsection{Label shifting}
+%
+%Functional MRI acquisition is not immediate: BOLD response peak occurs between 3
+%and 5 seconds after the stimulus. We take this time shift into account by
+%shifting values of the label array by an offset of 2 time repetition (about 5
+%seconds).
 
 % Functional MRI measures brain activity by using the Blood-Oxygen-Level-Dependent
 % contrast (BOLD). In fact, like muscles, brain regions consume more oxygen and
@@ -463,45 +453,44 @@ seconds).
 % Usually, we remove the first two scans of the data and the two last values of the
 % labels (to keep an homogeneous length).
 
-\begin{lstlisting}
-X = X[2:]
-y = y[:-2]
-\end{lstlisting}
+%\begin{lstlisting}
+%X = X[2:]
+%y = y[:-2]
+%\end{lstlisting}
 
 \section{Decoding object representation in the brain}
 
 In the context of machine learning in neuroimaging, \textit{decoding} refers to learning a model
-which predicts behavioral or phenotypic data given BOLD signal. The inverse procedure is
-called \textit{encoding} \citep{naselaris2011} and is introduced in the next use case
-(section \ref{kamitani}).\\
+which predicts behavioral or phenotypic data given brain activity. 
+The reverse procedure is
+called \textit{encoding} \citep{naselaris2011} and is introduced in the next 
+section.
 
-This use case is based on a simpler version of the experiment presented in
-\cite{haxby2001}. In the original work, grayscale images from 8 different categories
-are presented to 6 subjects during 12 sessions. The goal is to build a predictor
-capable of predicting the category of the image presented to subject given his
-brain activity. This example is restricted to one subject for the
-particular task of discriminating face against house images.\\
+Here we illustrate decoding with a simpler version of the experiment presented in
+\cite{haxby2001}. In the original work, visual stimuli representing 8 different categories
+are presented to 6 subjects during 12 sessions. The goal is to 
+predict the category of the stimulus presented to subject given his
+brain activity. For the sake of simplicity, we will restrict our code 
+to one subject for the
+particular task of discriminating face against house images.
 
-As the desired output value (face or house) is known, this is a
-supervised learning problem.
-Among all methods proposed in the scikit-learn, we propose to use
-Support Vector Machine (SVM) for this problem as this method is fast, not
-computionally expensive and gives reliable results even when the number of
-dimensions is greater than the number of samples.
+As there is a \emph{target} variable to predict, $y$, this is a supervised
+learning problem. Among all methods proposed in the scikit-learn, we will
+combine the use of univariate feature selection and Support Vector
+Machines (SVM) for this problem. Indeed, this is a common and efficient
+setup used in NeuroImaging.
 
 \subsection{Feature selection: ANOVA F-Test}
 
-The common preprocessing pipeline is applied on Haxby dataset. After masking, 40
-000 features are left for only 1 400 samples. This is not an optimal setting
-for machine learning algorithm which efficiency grows with the ratio
-between samples and features.\\
+After applying a brain mask, the data consist of 40\,000 features for 
+only 1\,400 samples. Machine learning with much more features than samples
+is challenging, due to the so-called \emph{curse of dimensionality}.
 
-Reducing the number of features (ie voxels) can be done by selecting the most
-relevant ones to our task, based on prior knowledge.
-A neuroscientific approach could be to restrain the
-mask to occipital area where the visual cortex is located. A statistical
-approach consists in using a simple and costless test to roughly reduce the
-number of features, before applying a more sophisticated algorithm.\\
+A popular strategy is to reducing the number of features (ie voxels) by
+selecting the most relevant ones. Based on prior neuroscientific
+knowledge, we could restrain the mask to occipital area where the visual
+cortex is located. A simple statistical approach relies on screening
+features based on a univariate statistical test.
 
 Scikit-learn offers a panel of strategies to select features. In supervised
 learning, the most popular feature selection method is the
