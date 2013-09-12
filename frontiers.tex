@@ -475,7 +475,12 @@ to one subject for the
 particular task of discriminating face against house images.
 
 As there is a \emph{target} variable to predict, $y$, this is a supervised
-learning problem. Among all methods proposed in the scikit-learn, we will
+learning problem. $y$ represents a small number of object categories,
+\emph{classes} in machine-learning terms. In these settings, the learning
+task is known as a \emph{classification} problem, as opposed to a
+\emph{regression} problem, for a variable $y$ taking continuous values,
+such as age.
+Among all methods proposed in the scikit-learn, we will
 combine the use of univariate feature selection and Support Vector
 Machines (SVM) for this problem. Indeed, this is a common and efficient
 setup used in NeuroImaging.
@@ -485,7 +490,6 @@ setup used in NeuroImaging.
 After applying a brain mask, the data consist of 40\,000 features for 
 only 1\,400 samples. Machine learning with much more features than samples
 is challenging, due to the so-called \emph{curse of dimensionality}.
-
 A popular strategy is to reducing the number of features (ie voxels) by
 selecting the most relevant ones. Based on prior neuroscientific
 knowledge, we could restrain the mask to occipital area where the visual
@@ -494,13 +498,9 @@ features based on a univariate statistical test.
 
 Scikit-learn offers a panel of strategies to select features. In supervised
 learning, the most popular feature selection method is the
-ANalysis Of VAriance (ANOVA) F-Test. This is a generalization of the t-test to
-more than 2 features.
-ANOVA compares several groups to determine if they are similar or not (the null
-hypothesis being that they are randomly drawn from the same population).
-It is used to compare feature distributions across classes: a feature which
-distribution is similar for all classes is not likely to contain much
-information.\\
+ANalysis Of VAriance (ANOVA) F-Test. 
+The null hypothesis of this test is that the feature takes the same value
+for all classes of $y$ to predicted.
 
 After ranking the features, \verb!sklearn.feature_selection! proposes a panel
 of feature selection strategies. One can choose to take a percentile of the features
