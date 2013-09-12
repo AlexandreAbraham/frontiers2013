@@ -297,93 +297,55 @@ converting data from one representation to another.
 
 \end{itemize}
 
-\subsection{Model selection and cross validation}
+\subsection{Cross validation and model selection}
 
-The problem of model selection is to find the best
-combination of hyper-parameters with respect to some user-specified criterion,
-most often the prediction score on unseen data.
+% XXX: describe cross-validation
 
-In {\em scikit-learn}, model selection is supported in two distinct
-estimators, \texttt{GridSearchCV}. It takes
-as input an estimator, whose hyper-parameters must be
-optimized, and a set of hyperparameter settings to search through. This set is
-represented as a mapping of parameter names to a set of discrete choices in
-the case of grid search, which exhaustively enumerates the ``grid'' (cartesian
-product) of complete parameter combinations.
+The problem of model selection is to find the hyper-parameters or the
+model that works best on the data, according for a specific task, most
+often prediction on unseen data.
+%
+In {\em scikit-learn}, model selection can be done with the
+\texttt{GridSearchCV} estimator. It takes as input an estimator, whose
+hyper-parameters must be optimized, and a set of hyperparameter settings
+to search through. 
 
 \section{From MR volumes to a data matrix}
 
-From this point, it is supposed that common MRI preprocessings have been applied
-to the data (namely motion correction, slice timing, coregistration on a common template like
-MNI if necessary). Reference softwares for this task are
+Before applying statistical learning to neuroimaging data, standard
+preprocessing must be applied. For fMRI, these namely entail motion
+correction, slice timing, coregistration and normalization on a common
+template like MNI if necessary. Reference softwares for this task are
 SPM\footnote{http://www.fil.ion.ucl.ac.uk/spm}~\citep{friston2007} and
-FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\citep{smith2004}. A python interface to
-these tools is available in nipype Python library \citep{gorgolewski2011}.
-This section deals with transforming neuroimaging data into a format that can be
-fed to scikit-learn's functions.
+FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\citep{smith2004}. A Python
+interface to these tools is available in nipype Python library
+\citep{gorgolewski2011}. Below, we discuss shaping preprocessed data into
+a format that can be fed to scikit-learn.
 
+\subsection{Spatial resampling}
+\label{resampling}
 
-\subsection{Transformation matrix}
-
-Neuroimaging data are represented by 4-dimensional data (3D scans composed of
-voxels and their associated time series) along with a transformation matrix
-(called affine) used to compute voxel locations from voxel coordinates to
-world coordinates.
-Such matrix is needed because data may be anisotropic: the distance between
-two voxels is not the same depending on the direction.
-This information is used by algorithms relying on the geometric structure of the
-data (e.g. Searchlight).
+Neuroimaging data often come as Nifti files, 4-dimensional data (3D scans
+composed of voxels and their associated time series) along with a
+transformation matrix (called affine) used to compute voxel locations
+from voxel coordinates to world coordinates. Such matrix is needed
+because data may be anisotropic: the distance between two voxels is not
+the same depending on the direction. This information is used by
+algorithms relying on the geometric structure of the data (e.g.
+Searchlight).
 
 Going from
 numpy indexing \verb!array[i, j, k]! to real coordinates $(x, y, z) \in
-\mathbb{R}^3$ is a simple matrix product. For example, if your transformation
-matrix is diagonal (with an offset):
-
-\[
-    \begin{bmatrix}
-        r_x & 0   & 0   & o_x \\
-        0   & r_y & 0   & o_y \\
-        0   & 0   & r_z & o_z \\
-        0   & 0   & 0   & 1   \\
-    \end{bmatrix}
-    \begin{bmatrix}
-        i \\
-        j \\
-        k \\
-        1 \\
-    \end{bmatrix}
-    =
-    \begin{bmatrix}
-        x \\
-        y \\
-        z \\
-        1 \\
-    \end{bmatrix}
-\]
-
+\mathbb{R}^3$ is a simple matrix product.
 % Too much information here.
 
 % We can write a Python helper function to transpose coordinates of a mask into
 % its original space:
 
-% \begin{lstlisting}
-% def get_real_world_coordinates(mask, affine):
-%     # get coordinates of non zero voxels
-%     mask_coords = np.where(mask != 0)
-%     # add an extra dimension for the offset
-%     mask_coords = mask_coords + (np.ones(len(mask_coords[0])),)
-%     # apply the transformation
-%     mask_coords = np.dot(affine, np.asarray(mask_coords))[:3].T
-%     return mask_coords
-% \end{lstlisting}
-
 SciPy provides routines taking affine into account in its ndimage module.
 When dealing with heterogeneous dataset (multiple subjects or sessions), it is
 necessary to resample data upon a reference affine. This can be done using
 \texttt{scipy.ndimage.affine\_transform}.
-
-\subsection{Resampling}
-\label{resampling}
 
 Resampling consists in changing the spatial resolution of the data. This is
 an interpolation and alters the data, that is why it should be used carefully.
