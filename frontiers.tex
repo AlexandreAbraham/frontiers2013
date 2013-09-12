@@ -328,15 +328,12 @@ a format that can be fed to scikit-learn.
 Neuroimaging data often come as Nifti files, 4-dimensional data (3D scans
 composed of voxels and their associated time series) along with a
 transformation matrix (called affine) used to compute voxel locations
-from voxel coordinates to world coordinates. Such matrix is needed
-because data may be anisotropic: the distance between two voxels is not
-the same depending on the direction. This information is used by
-algorithms relying on the geometric structure of the data (e.g.
-Searchlight).
-
-Going from
-numpy indexing \verb!array[i, j, k]! to real coordinates $(x, y, z) \in
-\mathbb{R}^3$ is a simple matrix product.
+from data indices to world coordinates. Such matrix can express data
+anisotropy, when the distance between two voxels is not the same
+depending on the direction. This information is used by algorithms
+relying on the spatial structure of the data, for instance the
+Searchlight. Going from data indices \verb!array[i, j, k]! to world
+coordinates $(x, y, z)$ is a simple matrix product.
 % Too much information here.
 
 % We can write a Python helper function to transpose coordinates of a mask into
