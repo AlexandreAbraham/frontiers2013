@@ -474,14 +474,13 @@ of a fixed number of features will be used.
 
 \subsection{Classification: SVM}
 
-A linear Support Vector Classifier (SVC) finds the linear
-hyperplane that separates samples belonging to different classes while
-maximizing the distance to the samples (called margin).
-Classifying a new sample boils down to 
-determining on which side of the hyperplane it lies.
-A SVC bases its decision upon a subset of training data called
-support vectors. An interpretation can be made by looking at the most important
-support vector (see figure~\ref{fig:haxby}).
+A linear Support Vector Classifier (SVC) finds the linear hyperplane that
+separates samples belonging to different classes while maximizing the
+distance to the samples (called margin). Classifying a new sample boils
+down to determining on which side of the hyperplane it lies. A SVC bases
+its decision upon a subset of training data called support vectors. As
+the linear SVC is a linear classifier, it's decision is based on a set of
+weights that form a brain map (see figure~\ref{fig:haxby}).
 
 \begin{lstlisting}
 feature_selection = SelectKBest(f_classif, k=500)
