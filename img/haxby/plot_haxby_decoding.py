@@ -62,7 +62,7 @@ session = session[condition_mask]
 conditions = conditions[condition_mask]
 
 ### Masking step ##############################################################
-from nilearn.io import NiftiMasker
+from nilearn.input_data import NiftiMasker
 from nibabel import Nifti1Image
 nifti_masker = NiftiMasker(mask=mask, sessions=session, smoothing_fwhm=4,
                            memory="nilearn_cache", memory_level=1)
@@ -118,15 +118,15 @@ y_pred = anova_svc.predict(X)
 ### Visualisation #############################################################
 
 ### Look at the discriminating weights
-svc = clf.support_vectors_
+coef = clf.coef_
 # reverse feature selection
-svc = feature_selection.inverse_transform(svc)
+coef = feature_selection.inverse_transform(coef)
 # reverse masking
-svc = nifti_masker.inverse_transform(svc[0])
+coef = nifti_masker.inverse_transform(coef[0])
 
 # We use a masked array so that the voxels at '-1' are displayed
 # transparently
-act = np.ma.masked_array(svc.get_data(), svc.get_data() == 0)
+act = np.ma.masked_array(coef.get_data(), coef.get_data() == 0)
 
 plot_haxby(act, 'SVC')
 pl.savefig('haxby_svm.pdf')
