@@ -557,7 +557,7 @@ coef = feature_selection.inverse_transform(coef)
   \includegraphics[width=.3\linewidth]{img/haxby/haxby_searchlight}
   \end{center}
 \caption{Voxel importance in prediction decision for Haxby experiment.
-The masked derived from standard analysis in the original paper
+The masks derived from standard analysis in the original paper
 \citep{haxby2001} are displayed blue and in green.}
 \label{fig:haxby}
 \end{figure}
@@ -623,23 +623,22 @@ brain activity measured in the visual cortex.
 This use case goes further by inferring a direct link between the image
 seen by the subject and the brain activity.
 
-In the experiment proposed by \citep{miyawaki2008}, several series of $10\times10$
+In the experiment of \cite{miyawaki2008} several series of $10{\times}10$
 binary images are presented to two subjects while activity on the visual cortex
 is recorded.
-The training set is composed of random images (where black and white pixels
-are balanced) and the testing set is composed of structured images containing
-geometric shapes (square, cross...) and letters. For the sake of simplicity, in
-this use case, we consider only the training set and use cross-validation to
-obtain scores on unseen data.\\
+In the original paper, the training set is composed of random images (where black and white pixels
+are balanced) while the testing set is composed of structured images containing
+geometric shapes (square, cross...) and letters. Here, for the sake of simplicity, we consider only the training set and use cross-validation to
+obtain scores on unseen data.
 
 We will illustrate two problems: reconstructing visual stimulus from BOLD activation,
-which is a decoding task, and reconstructing brain activation from visual
+which is a decoding task, and predicting brain activation from visual
 stimulus, which is an encoding task.
 
 \subsection{Decoding}
 
-Common pre-processing have been applied to the data (detrending and
-standardization).
+As common pre-processing step, apply to the data detrending and variance
+normalization.
 
 Prior knowledge on the data can help for model selection. In this experiment, we
 want to find the relation between voxel activation and some pixel color. It is
@@ -649,7 +648,7 @@ reduce the number of features on which their decision is made.
 
 The original work by \cite{miyawaki2008} uses a sparse multinomial
 logistic regression and a sophisticated multiscale strategy to reconstruct the image.
-This example uses the simpler version of this approach, a $\ell_1$ logistic
+Here we use a simpler version of this approach, a $\ell_1$ logistic
 regression, and compare it to the Orthogonal
 Matching Pursuit (\cite{mallat1993}). The OMP is a linear model that uses
 feature time series as a dictionary and an l1 constraint on the loadings. Its
@@ -766,11 +765,13 @@ to the voxel.
   \label{fig:encoding}
 \end{figure}
 
-\section{Functional Connectivity}
+\section{Resting-state and functional Connectivity analysis}
 
-\cite{biswal1995} exhibits coherent patterns in
-brain activation during resting state. These correlated voxel activations are
-organized in functional networks consistent with neuroscientific knowledge.
+Even in the absence of external behavioral or clinical variable, studying
+the structure of brain signals can reveal interesting information.
+Indeed, \cite{biswal1995} have shown that brain activation exhibits
+coherent spatial patterns during rest. These correlated voxel activations
+form functional networks that are consistent with know task networks.
 
 % Resting-state fMRI is useful when dealing with subjects that cannot execute a
 % specific task. In fact, no task-driven protocol is capable of diagnosing precisely
@@ -783,29 +784,22 @@ Here we use a dataset containing control and ADHD
 resting state data (subjects are scanned without giving them any specific task
 to capture the cerebral background activity).
 
-As resting state fMRI are unlabeled data, unsupervised methods must be used to
-mine them. These methods group similar voxels together by comparing their time
-series.
-The most popular method to extract functional networks is ICA and
-is the subject of our first use case. We will then show results obtained with
-clustering methods as several efficient implementations are available in
-scikit-learn.
-
-The main problem with functional connectivity (and unsupervised methods in
-general) is the lack of labels or ground truth. It is therefore very difficult
-to score the computed models and cross validate them. A first approach is to
-validate results thanks to prior knowledge, obtained in task-driven experiments
-for example. Another way is to compare to functional atlases that have already
-been released \citep{craddock2011,yeo2011}, the problem being that these atlases
-do not agree on the number
-and position of many function brain areas.
+Resting state fMRI is unlabeled data in the sens that the brain activity
+at a given instant in time cannot be related to an output variable.
+In machine learning, this class of problems is known as unsupervised
+learning. 
+To extract functional network, we use methods that group together 
+similar voxels by comparing their time
+series. In neuroimaging, the most popular method is ICA and
+is the subject of our first example. We will then show results obtained with
+clustering methods.
 
 \subsection{Independent Component Analysis (ICA)}
 
 \subsubsection{Principle}
 
 ICA is a blind source separation method. Its principle is to separate a
-multivariate signal into several components by maximizing their non-gaussianity.
+multivariate signal into several components by maximizing their non-Gaussianity.
 A typical example is the \emph{cocktail party problem} where ICA is able to separate
 voices from several people using signal from microphones located across the room.
 
