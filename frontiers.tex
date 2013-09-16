@@ -513,8 +513,7 @@ Searchlight \citep{kriegeskorte2006} is a popular algorithm in the
 neuroimaging community. It runs a predictive model on a spatial
 neighbourhood of each voxel and tests the out-of-sample prediction
 performance as proxy measure of the link between the local brain activity
-and the target behavioral variable. brain voxels depending on the amount
-of information they hold. In practice, it entails performing
+and the target behavioral variable. In practice, it entails performing
 cross-validation of the model, most often an SVM, on voxels contained in
 balls centered on each voxel of interest. The procedure amounts to
 solving a large number of SVMs and can be computationally expensive.
@@ -529,9 +528,9 @@ On all figures, green, resp.\ blue,
 lines surround features corresponding to face, resp.\ house, recognition
 exhibited in the reference paper.
 The F-score (left) is the basic
-classifier used in ANOVA to select the features. The middle pictures shows the
+classifier used in ANOVA to select the features. The middle picture shows the
 first support vector obtained with SVC after feature selection. The picture on
-the right shows the amount of information computed by Searchlight.
+the right shows the Searchlight map.
 
 First, we observe that highlighted voxels located in the blue areas are
 highlighted by all methods. The Searchlight is more blurry than the other
@@ -546,9 +545,9 @@ the SVC can be used afterward to classify unseen brain scans.
 
 \begin{lstlisting}
 ### Look at the discriminating weights
-support = clf.support_vectors_
+coef = clf.coef_
 # reverse feature selection
-support = feature_selection.inverse_transform(support)
+coef = feature_selection.inverse_transform(coef)
 \end{lstlisting}
 
 \begin{figure}[hbtp]
@@ -557,7 +556,9 @@ support = feature_selection.inverse_transform(support)
   \includegraphics[width=.3\linewidth]{img/haxby/haxby_svm}
   \includegraphics[width=.3\linewidth]{img/haxby/haxby_searchlight}
   \end{center}
-\caption{Voxel importance in prediction decision for Haxby experiment}
+\caption{Voxel importance in prediction decision for Haxby experiment.
+The masked derived from standard analysis in the original paper
+\citep{haxby2001} are displayed blue and in green.}
 \label{fig:haxby}
 \end{figure}
 
