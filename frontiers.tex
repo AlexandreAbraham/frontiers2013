@@ -437,7 +437,7 @@ to one subject for the
 particular task of discriminating face against house images.
 
 As there is a \emph{target} variable to predict, $y$, this is a supervised
-learning problem. $y$ represents a small number of object categories,
+learning problem. Here $y$ represents a small number of object categories,
 \emph{classes} in machine-learning terms. In these settings, the learning
 task is known as a \emph{classification} problem, as opposed to a
 \emph{regression} problem, for a variable $y$ taking continuous values,
@@ -510,20 +510,18 @@ clf.fit(X_red, y)
 \subsection{Searchlight}
 \label{searchlight}
 
-Searchlight is a popular algorithm in the neuroscience community.
-Presented in \cite{kriegeskorte2006}, it aims to score
-brain voxels depending on the amount of information they hold. Concretely, a
-cross validated SVM-based classification is run on each voxel: the better the
-result is, the more information it holds.
-
-Considering the fact that the information of a voxel is not only
-contained in the voxel itself but in its neighbourhood, the Searchlight
-runs the classification on a ball centered on the voxel instead of a single voxel.
-It can be seen as a sophisticated version of the dimension reduction used in our
-first setting.
-An efficient implementation of this algorithm is way beyond the scope of this
-paper also it is not detailed here. However, the code, along with this example,
-are available in nilearn Python package\footnote{http://nilearn.github.io}.
+Searchlight \citep{kriegeskorte2006} is a popular algorithm in the
+neuroimaging community. It runs a predictive model on a spatial
+neighbourhood of each voxel and tests the out-of-sample prediction
+performance as proxy measure of the link between the local brain activity
+and the target behavioral variable. brain voxels depending on the amount
+of information they hold. In practice, it entails performing
+cross-validation of the model, most often an SVM, on voxels contained in
+balls centered on each voxel of interest. The procedure amounts to
+solving a large number of SVMs and can be computationally expensive.
+An efficient implementation of this algorithm is beyond the scope of this
+paper and it is not detailed here. However, the code, along with this example,
+are available in nilearn\footnote{http://nilearn.github.io}.
 
 \subsection{Results}
 
@@ -542,8 +540,10 @@ methods because it iterates over a ball around the voxels.
 
 These results are also neuroscientifically plausible as the activation occurs in the
 high level regions of the visual cortex which is known to contain semantic
-information about vision. If Searchlight only gives a score of the voxels, the
-SVC can be used afterward to classify unseen brain scans.
+information about vision. While Searchlight only gives a score to each voxel,
+the SVC can be used afterward to classify unseen brain scans.
+
+% XXX has 'SVC' been defined
 
 \begin{lstlisting}
 ### Look at the discriminating weights
