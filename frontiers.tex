@@ -9,10 +9,7 @@
 
 %\usepackage{lineno}
 \usepackage{todonotes}
-\usepackage{listings}
-\lstset{language=python,
-        basicstyle=\ttfamily,
-        frame=single,xleftmargin=\fboxsep,xrightmargin=-\fboxsep}
+
 
 % Absolute numerotation for figures
 \usepackage{caption}
@@ -22,14 +19,37 @@
 %\usepackage[tight]{subfigure}
 \def\subfigbottomskip{0pt}
 
-\makeatletter
+\usepackage{listings}
+\lstset{language=python,
+	basicstyle=\ttfamily,
+	extendedchars=true,
+	xleftmargin = 0pt,
+	rulecolor=\color{black!50},
+        aboveskip = 0.5ex,
+        belowskip = 0.6ex,
+	escapebegin={\color{green!50!black}},
+        %keywordstyle=\sffamily\bfseries\color{grey},
+	%identifierstyle=\sffamily,
+	commentstyle=\slshape\color{green!50!black},
+	stringstyle=\rmfamily\color{blue},
+	showstringspaces=false,
+	tabsize=2,
+	breaklines=true,
+	%classoffset=1,
+        morekeywords={{,},=,:},
+	%classoffset=0,
+        frame=single,xleftmargin=\fboxsep,xrightmargin=-\fboxsep
+    }
+	
+
+%\makeatletter
 % Space between floats
 %\setlength\floatsep    {4\p@}
 % Space between floats and text
 %\setlength\textfloatsep{4\p@}
 % Space above and below an inline figure
 %\setlength\intextsep   {4\p@}
-\makeatother
+%\makeatother
 
 
 \newcommand{\alex}[1]{\todo[inline, color=green!40]{#1}}
@@ -843,13 +863,14 @@ Resting state fMRI is unlabeled data in the sens that the brain activity
 at a given instant in time cannot be related to an output variable.
 In machine learning, this class of problems is known as unsupervised
 learning. 
-To extract functional network, we use methods that group together 
+To extract functional networks or regions, we use methods that group together 
 similar voxels by comparing their time
 series. In neuroimaging, the most popular method is ICA and
-is the subject of our first example. We will then show results obtained with
+is the subject of our first example. We will then show how to obtained 
+functionally-homogeneous regions with
 clustering methods.
 
-\subsection{Independent Component Analysis (ICA)}
+\subsection{Independent Component Analysis (ICA) to extract networks}
 
 \subsubsection{Principle}
 
@@ -874,25 +895,26 @@ resulting time series the FastICA algorithm with scikit-learn is
 straightforward thanks to the transformer concept. The data matrix must
 be transposed, as we are using \emph{spatial} ICA, in other words the
 direction considered as random is that of the voxels and not the time
-points.
+points. The maps obtained capture different components of the signal,
+including noise components as well as resting-state functional networks.
 
-% XXX: tell us was Xs are
 
 \begin{lstlisting}
-from sklearn.decomposition import FastICA
+# Here we start with Xs: a list of subject-level data matrices
+# First we concatenate them in the time-direction, thus implementing
+# a concat-ICA
 X = np.vstack(Xs)
+from sklearn.decomposition import FastICA
 ica = FastICA(n_components=20)
 components_masked = ica.fit_transform(data_masked.T).T
 \end{lstlisting}
 
-After computation, normalization and thresholding of the map is necessary to
-obtain brain networks.
-
 \subsubsection{Results}
 
-Classical spatial ICA is compared to other evoked methods (CanICA and MELODIC).
-We focus here on the default mode network because it is commonly used to
-validate ICA results.
+On fig. \ref{fig:ica} we compare a simple concat ICA as implemented by
+the code above to more sophisticated multi-subject methods, namely CanICA
+and MELODIC's concat ICA. We display here only the default mode network
+as it is a well-known resting-state network.
 
 \begin{figure}[hbtp]
   \begin{center}
@@ -909,30 +931,32 @@ validate ICA results.
         \caption{melodic}
       \end{subfigure}
   \end{center}
-  \caption{Extraction of default mode network using different approches}
+  \caption{Default mode network extracted using different approaches:
+\emph{left}: the simple Concat-ICA approach demoed in this article;
+\emph{middle}: CanICA, as implemented in nilearn; \emph{right}: Melodic's
+concac-ICA.}
   \label{fig:ica}
 \end{figure}
 
-\subsection{Clustering}
+\subsection{Learning  with clustering}
 \label{clustering}
 
-A clustering method aggregates samples into groups (called clusters)
-based on a similarity measure. Some clustering approaches can make use of
+From a machine learning perspective, a clustering method aggregates 
+samples into groups (called clusters) to maximize a measure of similarity in
+the clusters. If we consider voxels of a functional brain image, this 
+measure can capture functional similarity, thus the clusters of voxel
+form functionally-homogeneous regions \citep{thirion2006}.
+
+\subsubsection{Imposing spatial structure}
+
+Some clustering approaches can make use of
 spatial information and yield spatially-contiguous clusters, \emph{i.e.}
 parcels.
-
-\subsubsection{Preserving structural information}
-
-In scikit-learn, structural information is stored apart from the data matrix
-into a graph. \verb!sklearn.feature_extraction.image! provides two methods
-that build an adjacency matrix based upon your data while taking the mask
-into account:
-\begin{itemize}
-    \item \verb!grid_to_graph! creates a binary adjacency graph based upon the
-        data shape; it is used in Ward's clustering.
-    \item \verb!image_to_graph! creates a distance matrix using the gradient of
-        the image which is used in spectral clustering.
-\end{itemize}
+In scikit-learn, structural information is described via a connectivity
+graph given to the clustering estimator. 
+{\tt sklearn.feature\_extraction.image .grid\_to\_graph} is a function that
+can construct such a graph capturing the neighbor structure of an image
+grid, with optionally a brain mask.
 
 \subsubsection{Approaches}
 

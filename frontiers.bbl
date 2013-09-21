@@ -1,4 +1,4 @@
-\begin{thebibliography}{20}
+\begin{thebibliography}{19}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \expandafter\ifx\csname doi\endcsname\relax
@@ -99,18 +99,6 @@ Biswal, B., Zerrin~Yetkin, F., Haughton, V., and Hyde, J. (1995) {Functional
   MRI}.
 \newblock {\em Magn Reson Med\/} 34 53719.
 
-\bibitem[{Craddock et~al.(2011)Craddock, James, Holtzheimer~III, Hu, and
-  Mayberg}]{craddock2011}
-Craddock, R., James, G., Holtzheimer~III, P., Hu, X., and Mayberg, H. (2011) A
-  whole brain fmri atlas generated via spatially constrained spectral
-  clustering.
-\newblock {\em Hum Brain Mapp\/} .
-
-\bibitem[{Yeo et~al.(2011)Yeo, Krienen, Sepulcre, Sabuncu et~al.}]{yeo2011}
-Yeo, B., Krienen, F., Sepulcre, J., Sabuncu, M., et~al. (2011) The organization
-  of the human cerebral cortex estimated by intrinsic functional connectivity.
-\newblock {\em J Neurophysio\/} 106 1125--1165.
-
 \bibitem[{Kiviniemi et~al.(2003)Kiviniemi, Kantola, Jauhiainen, Hyv{\"a}rinen,
   and Tervonen}]{kiviniemi2003}
 Kiviniemi, V., Kantola, J., Jauhiainen, J., Hyv{\"a}rinen, A., and Tervonen, O.
@@ -131,5 +119,12 @@ Varoquaux, G., Sadaghiani, S., Pinel, P., Kleinschmidt, A., Poline, J.~B., and
   Thirion, B. (2010) {A group model for stable multi-subject {ICA} on {fMRI}
   datasets}.
 \newblock {\em NeuroImage\/} 51 288.
+
+\bibitem[{Thirion et~al.(2006)Thirion, Flandin, Pinel, Roche, Ciuciu, and
+  Poline}]{thirion2006}
+Thirion, B., Flandin, G., Pinel, P., Roche, A., Ciuciu, P., and Poline, J.
+  (2006) {Dealing with the shortcomings of spatial normalization: Multi-subject
+  parcellation of {fMRI} datasets}.
+\newblock {\em Hum brain map\/} 27 678.
 
 \end{thebibliography}
