@@ -830,18 +830,14 @@ Even in the absence of external behavioral or clinical variable, studying
 the structure of brain signals can reveal interesting information.
 Indeed, \cite{biswal1995} have shown that brain activation exhibits
 coherent spatial patterns during rest. These correlated voxel activations
-form functional networks that are consistent with know task networks.
+form functional networks that are consistent with known task-related networks.
 
-% Resting-state fMRI is useful when dealing with subjects that cannot execute a
-% specific task. In fact, no task-driven protocol is capable of diagnosing precisely
-% damaged brain areas e.g. in stroke patients, as no task can highlight these problems.
-% \cite{varoquaux2010b} found differences in correlation between functional
-% networks between control and post-stroke patients.
-
-Here we use a dataset containing control and ADHD
-(Attention Disorder Hyperactivity Disorder) patients
-resting state data (subjects are scanned without giving them any specific task
-to capture the cerebral background activity).
+Biomarkers found via predictive modeling on resting-state fMRI would be
+particularly useful, as they could be applied to diminished subjects that
+cannot execute a specific task. Here we use a dataset containing control
+and ADHD (Attention Disorder Hyperactivity Disorder) patients resting
+state data (subjects are scanned without giving them any specific task to
+capture the cerebral background activity).
 
 Resting state fMRI is unlabeled data in the sens that the brain activity
 at a given instant in time cannot be related to an output variable.
@@ -872,12 +868,15 @@ ICA approach which is not detailed here.
 
 \subsubsection{Application}
 
-We detrend the time series because
-FastICA does not look for linear trends, only constant one.
+As data preparation steps, we not only center, but also detrend the time
+series to avoid capturing linear trends with the ICA. Applying to the
+resulting time series the FastICA algorithm with scikit-learn is
+straightforward thanks to the transformer concept. The data matrix must
+be transposed, as we are using \emph{spatial} ICA, in other words the
+direction considered as random is that of the voxels and not the time
+points.
 
-Applying the scikit-learn ICA is straightforward thanks to the transformer
-concept. As for clustering methods, a transposition of our data is required to
-operate on the spatial dimension (and not on time series).
+% XXX: tell us was Xs are
 
 \begin{lstlisting}
 from sklearn.decomposition import FastICA
@@ -914,15 +913,13 @@ validate ICA results.
   \label{fig:ica}
 \end{figure}
 
-\alex{After taking a closer look, it is very difficult to measure computation
-time as canica and melodic are interlaced with data loading and preprocessing.}
-
 \subsection{Clustering}
 \label{clustering}
 
-A clustering method aggregates samples into groups (called clusters) based on a similarity
-measure. Unlike pure statistical methods, some clustering approaches make use of
-spatial information, which is relevant in our case as we are looking for blobs.
+A clustering method aggregates samples into groups (called clusters)
+based on a similarity measure. Some clustering approaches can make use of
+spatial information and yield spatially-contiguous clusters, \emph{i.e.}
+parcels.
 
 \subsubsection{Preserving structural information}
 
@@ -953,8 +950,7 @@ ability to segment well known anatomical features such as CerebroSpinal Fluid
 Chosen approached are:
 \begin{itemize}
     \item{\bf Ward's clustering} uses a bottom-up hierarchical approach. Features are
-        progressively aggregated into clusters until a whole tree is built. This
-        tree is then cut to get the requested number of clusters.
+        progressively aggregated into clusters.
     \item{\bf k-means} is a centroid based approach. Clusters are represented by
         a central vector: a feature belongs to the cluster of the nearest
         centroid. This algorithm gives better results when data is smoothed.
@@ -970,6 +966,8 @@ samples and that we want to group features: a transposition is needed to apply
 clustering in the wanted dimension. Scikit-learn provides a
 \texttt{WardAgglomeration} object that takes care of this step, this is not the
 case when using K-Means.
+
+% XXX: recall the necessary transpose
 
 \begin{lstlisting}
 connectivity = grid_to_graph(n_x=mask.shape[0], n_y=mask.shape[1],
