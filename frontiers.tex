@@ -165,13 +165,13 @@ brain images to behavioral or clinical observations, while
 unsupervised learning is typically used to uncover hidden structure in
 sets of images (e.g.\ resting state functional MRI) or to find
 sub-populations in large cohorts of subjects. By considering
-functional neuroimaging use cases, we illustrate how scikit-learn,
+different functional neuroimaging applications, we illustrate how scikit-learn,
 a Python machine learning library, can be used to perform some key
 analysis steps. Scikit-learn contains a large set of statistical
 learning algorithms, both supervised and unsupervised, that can be applied
-to neuroimaging data after a proper preprocessing. Combined with other
-Python libraries, neuroimaging data can be loaded, processed and the results
-can be visualised easily.
+to neuroimaging data. Other Python libraries provide the tools for
+loading and preparing neuroimaging data for scikit-learn, and visualizing
+the results.
 
 % XXX: here the tone of the article should be: scikit-learn for methods
 % development, ie we target the methods researchers for Neuroimaging. We
@@ -210,7 +210,8 @@ resolve common neuroimaging needs, which methods can be used, what they
 imply and how to achieve the desired results. We discuss not only
 prediction scores, but also the interpretability of the results, which
 leads us to open up the black box methods. The paper is organized as
-follows. First we show how the data must be prepared to apply
+follows. After introducing the \emph{scikit-learn} toolbox, we show 
+how the data must be prepared to apply
 \emph{scikit-learn}. Then we describe the application of \emph{supervised
 learning} techniques, to learn the links between brain images and
 stimuli. Finally we demonstrate how \emph{unsupervised learning}
@@ -241,8 +242,8 @@ are:
         graphical user interface. All figures in this paper have been generated using
         it.
 
-    \item{\bf Nibabel} loads ors save data in popular neuroimaging file format.
-        It is the starting point of all our scripts.
+    \item{\bf Nibabel} loads or saves data in neuroimaging file formats.
+	We use it at the beginning of all our scripts.
 \end{itemize}
 
 \section{Scikit-learn}
@@ -303,7 +304,7 @@ In {\em scikit-learn}, model selection can be done with the
 hyper-parameters must be optimized, and a set of hyperparameter settings
 to search through. 
 
-\section{From MR volumes to a data matrix}
+\section{Data preparation: from MR volumes to a data matrix}
 
 Before applying statistical learning to neuroimaging data, standard
 preprocessing must be applied. For fMRI, these namely entail motion
@@ -365,7 +366,7 @@ includes:
         physiological mechanisms or scanner drifts.
 \end{itemize}
 
-\subsection{Masking}
+\subsection{From 4-dimensional images to 2-dimensional array: masking}
 
 Neuroimaging data are represented in 4 dimensions: 3 spatial dimensions, and 
 one dimension for the time.
@@ -376,7 +377,6 @@ considered as features
 or samples. For example, in spatial independent component analysis (ICA),
 voxels are samples.
 
-\subsubsection{From 4-dimensional images to 2-dimensional array}
 
 Reducing the data dimension from images to feature vectors implies losing its
 spatial structure. However, that not all voxels in fMRI data holds 
