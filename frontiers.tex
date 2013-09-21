@@ -666,7 +666,9 @@ obtain scores on unseen data.
 
 We will illustrate two problems: reconstructing visual stimulus from BOLD activation,
 which is a decoding task, and predicting brain activation from visual
-stimulus, which is an encoding task.
+stimulus, which is an encoding task. The goal of these two approaches is to find
+a relation between brain voxels and observed pixels. As a conclusion, we will
+compare results obtained on the same voxels and pixels to see if they match.
 
 \subsection{Decoding}
 
@@ -677,29 +679,14 @@ will treat this problem as a classification problem. However, one has to keep in
 mind that this problem is intrisically a regression as the color spectrum is
 continuous.
 
-In order to chose the classifier adapted to our problem, we have to make some
-prior assumptions.
-
-Also, from neuroscientific knowledge,
-we expect that the value of a single pixel will be related
-to only few voxels.
-
-From these observations, we look for classifiers penalized sparsity inducing norm,
-such as $\ell_1$. We chose different models using different losses: logistic
-regression (used in original work) and Linear SVC.
-
-The original work by \cite{miyawaki2008} uses a sparse multinomial
-logistic regression and a sophisticated multiscale strategy to reconstruct the image.
-Using logistic regression makes sense considering that it can be extended to
-multiclass for multiscale classification.
-
-Here we use a simpler version of this approach, a $\ell_1$ logistic
-regression, and compare it to the previously seen SVC.
-Reconstruction performance is measured by the accuracy score, the default
-function proposed in the scikit-learn.
+Following our first example, we will use a Linear SVC to solve this problem.
+As we expect brain voxels to be strongly localized in the brain, we will use the
+$\ell_1$ norm as penalization to induce sparsity. We compare SVC to Logistic
+Regression, a simpler method than the one used in the original work, with an $\ell_1$ penalty.
+These two methods differs by their loss function: SVC uses a square hinge loss
+and Logistic Regression a logit function.
 
 In a first time, we look at how a pixel is \textit{mapped} in the brain.
-
 In a second time, we make a global score map of whole pixels to see which ones
 are easier to decode.
 
@@ -718,6 +705,23 @@ for pixel in y_train.T:
     scores_lr.append(score)
 \end{lstlisting}
 
+
+\begin{figure}[hbtp]
+  \begin{center}
+    \includegraphics[width=\linewidth]{img/miyawaki/figure}
+  \end{center}
+  \caption{
+      Miyawaki results in both decoding and encoding. Highlighted pixels and
+      voxels are the same across methods. Results are consistent as decoding
+      and encoding have found a relation between the same pixel and voxels.
+      \textbf{Decoding.} Reconstruction accuracy per pixel (\textit{a.} Logistic
+      regression, \textit{c.} SVC). Coefficients used to predict the chosen pixel(\textit{b.} Logistic
+      regression, \textit{d.} SVC). 
+      \textbf{Encoding.} Left: reconstruction accuracy depending on pixel
+           position in the stimulus. Right: receptive fields corresponding to
+       voxels with highest scores and neighbours.}
+\label{fig:miyawaki}
+\end{figure}
 
 
 
@@ -784,9 +788,22 @@ This particular voxel will be studied in the encoding task in the next section.
   \caption{Reconstruction accuracy per pixel depending on the method (\textit{a.} Logistic
       regression, \textit{c.} OMP). The brain voxels
   corresponds to coefficients used to predict the blue bordered pixel(\textit{b.} Logistic
-      regression, \textit{d.} OMP). This
-  figure should be put in relation with figure~\ref{fig:encoding}.}
+      regression, \textit{d.} OMP).}
 \label{fig:decoding}
+  \begin{center}
+    \includegraphics[width=\linewidth]{img/miyawaki/figure_encoding}
+  \end{center}
+  \caption{Left: reconstruction accuracy depending on pixel
+           position in the stimulus. Right: receptive fields corresponding to
+       voxels with highest scores and neighbours.}
+
+
+       \caption{Comparison between decoding and encoding on Miyawaki dataset.
+       Top row show results using 2 different methods: Reconstruction accuracy per pixel depending on the method (\textit{a.} Logistic
+      regression, \textit{c.} OMP). The brain voxels
+  corresponds to coefficients used to predict the blue bordered pixel(\textit{b.} Logistic
+      regression, \textit{d.} OMP).}
+  \label{fig:encoding}
 \end{figure}
 
 \subsection{Encoding}
