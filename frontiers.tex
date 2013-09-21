@@ -639,6 +639,61 @@ stimulus, which is an encoding task.
 
 \subsection{Decoding}
 
+In this experiment, we want to find a relation between brain voxels,
+and black and white pixels in order to reconstruct the stimulus seen by the
+subject from brain activity. Due to the nature of the stimuli (binary data), we
+will treat this problem as a classification problem. However, one has to keep in
+mind that this problem is intrisically a regression as the color spectrum is
+continuous.
+
+In order to chose the classifier adapted to our problem, we have to make some
+prior assumptions.
+
+Also, from neuroscientific knowledge,
+we expect that the value of a single pixel will be related
+to only few voxels.
+
+From these observations, we look for classifiers penalized sparsity inducing norm,
+such as $\ell_1$. We chose different models using different losses: logistic
+regression (used in original work) and Linear SVC.
+
+The original work by \cite{miyawaki2008} uses a sparse multinomial
+logistic regression and a sophisticated multiscale strategy to reconstruct the image.
+Using logistic regression makes sense considering that it can be extended to
+multiclass for multiscale classification.
+
+Here we use a simpler version of this approach, a $\ell_1$ logistic
+regression, and compare it to the previously seen SVC.
+Reconstruction performance is measured by the accuracy score, the default
+function proposed in the scikit-learn.
+
+In a first time, we look at how a pixel is \textit{mapped} in the brain.
+
+In a second time, we make a global score map of whole pixels to see which ones
+are easier to decode.
+
+\begin{lstlisting}
+from sklearn.linear_model import OrthogonalMatchingPursuit as OMP
+from sklearn.cross_validation import cross_val_score
+
+pipeline_LR = Pipeline([('selection', SelectKBest(f_classif, 500)),
+                        ('clf', LR(penalty='l1', C=0.01)])
+
+scores_lr = []
+# y_train = n_samples x n_voxels
+# To iterate on voxels, we transpose it.
+for pixel in y_train.T:
+    score = cross_val_score(pipeline_LR, X_train, pixel, cv=5)
+    scores_lr.append(score)
+\end{lstlisting}
+
+
+
+
+
+
+\subsection{Decoding}
+
 As common pre-processing step, apply to the data detrending and variance
 normalization.
 
@@ -693,7 +748,7 @@ This particular voxel will be studied in the encoding task in the next section.
 
 \begin{figure}[hbtp]
   \begin{center}
-    \includegraphics[width=\linewidth]{img/kamitani/figure_decoding}
+    \includegraphics[width=\linewidth]{img/miyawaki/figure_decoding}
   \end{center}
   \caption{Reconstruction accuracy per pixel depending on the method (\textit{a.} Logistic
       regression, \textit{c.} OMP). The brain voxels
@@ -707,7 +762,7 @@ This particular voxel will be studied in the encoding task in the next section.
 Given an appropriate model of the stimulus, e.g. one which can provide an approximately linear representation of BOLD activation, an encoding approach allows one to quantify for each voxel to what extent its variability is captured by the model. A popular evaluation method is the predictive \(r^2\) score, which uses a prediction on left out data to quantify the decrease in residual norm brought about by fitting a regression function as opposed to fitting a constant. %We have \[r^2 = \frac{\|y_{\textrm{true}} - y_{\textrm{pred}}\|^2}{\|y_{\textrm{true}} - \bar y_{\textrm{true}}\|^2}\]
 The remaining variance consists of potentially unmodelled, but reproducible signal and spurious noise.
 
-On the Kamitani dataset, we can observe that mere black and white pixel values can explain a large part of the BOLD variance in many visual voxels. Sticking to the notation that \(X\) represesents BOLD signal and \(y\) the stimulus, we can write an encoding model using the ridge regression estimator of the scikit-learn:
+On the Miyawaki dataset, we can observe that mere black and white pixel values can explain a large part of the BOLD variance in many visual voxels. Sticking to the notation that \(X\) represesents BOLD signal and \(y\) the stimulus, we can write an encoding model using the ridge regression estimator of the scikit-learn:
 
 \begin{lstlisting}
 from sklearn.linear_model import Ridge
@@ -759,7 +814,7 @@ to the voxel.
 
 \begin{figure}[hbtp]
   \begin{center}
-    \includegraphics[width=\linewidth]{img/kamitani/figure_encoding}
+    \includegraphics[width=\linewidth]{img/miyawaki/figure_encoding}
   \end{center}
   \caption{Left: reconstruction accuracy depending on pixel
            position in the stimulus. Right: receptive fields corresponding to
