@@ -210,7 +210,8 @@ resolve common neuroimaging needs, which methods can be used, what they
 imply and how to achieve the desired results. We discuss not only
 prediction scores, but also the interpretability of the results, which
 leads us to open up the black box methods. The paper is organized as
-follows. First we show how the data must be prepared to apply
+follows. After introducing the \emph{scikit-learn} toolbox, we show 
+how the data must be prepared to apply
 \emph{scikit-learn}. Then we describe the application of \emph{supervised
 learning} techniques, to learn the links between brain images and
 stimuli. Finally we demonstrate how \emph{unsupervised learning}
@@ -303,7 +304,7 @@ In {\em scikit-learn}, model selection can be done with the
 hyper-parameters must be optimized, and a set of hyperparameter settings
 to search through. 
 
-\section{From MR volumes to a data matrix}
+\section{Data preparation: from MR volumes to a data matrix}
 
 Before applying statistical learning to neuroimaging data, standard
 preprocessing must be applied. For fMRI, these namely entail motion
@@ -365,7 +366,7 @@ includes:
         physiological mechanisms or scanner drifts.
 \end{itemize}
 
-\subsection{Masking}
+\subsection{From 4-dimensional images to 2-dimensional array: masking}
 
 Neuroimaging data are represented in 4 dimensions: 3 spatial dimensions, and 
 one dimension for the time.
@@ -376,7 +377,6 @@ considered as features
 or samples. For example, in spatial independent component analysis (ICA),
 voxels are samples.
 
-\subsubsection{From 4-dimensional images to 2-dimensional array}
 
 Reducing the data dimension from images to feature vectors implies losing its
 spatial structure. However, that not all voxels in fMRI data holds 
