@@ -165,13 +165,13 @@ brain images to behavioral or clinical observations, while
 unsupervised learning is typically used to uncover hidden structure in
 sets of images (e.g.\ resting state functional MRI) or to find
 sub-populations in large cohorts of subjects. By considering
-functional neuroimaging use cases, we illustrate how scikit-learn,
+different functional neuroimaging applications, we illustrate how scikit-learn,
 a Python machine learning library, can be used to perform some key
 analysis steps. Scikit-learn contains a large set of statistical
 learning algorithms, both supervised and unsupervised, that can be applied
-to neuroimaging data after a proper preprocessing. Combined with other
-Python libraries, neuroimaging data can be loaded, processed and the results
-can be visualised easily.
+to neuroimaging data. Other Python libraries provide the tools for
+loading and preparing neuroimaging data for scikit-learn, and visualizing
+the results.
 
 % XXX: here the tone of the article should be: scikit-learn for methods
 % development, ie we target the methods researchers for Neuroimaging. We
@@ -241,8 +241,8 @@ are:
         graphical user interface. All figures in this paper have been generated using
         it.
 
-    \item{\bf Nibabel} loads ors save data in popular neuroimaging file format.
-        It is the starting point of all our scripts.
+    \item{\bf Nibabel} loads or saves data in neuroimaging file formats.
+	We use it at the beginning of all our scripts.
 \end{itemize}
 
 \section{Scikit-learn}
