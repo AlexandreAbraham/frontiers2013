@@ -203,12 +203,21 @@ frameworks for multi-variate pattern analysis already exists
 \citep{hanke2009pymvpa}. 
 
 In this paper, we show how scikit-learn, a Python machine learning
-library \citep{pedregosa2011}, can
-be used on neuroimaging data. Through three use cases, we describe how to
-resolve common neuroimaging problems, which method should be use and why, and how to
-get the desired results. We discuss not only prediction scores, but
-also the interpretability of the results, which leads us to open up the black
-box methods.
+library \citep{pedregosa2011}, can be used on neuroimaging data.
+Statistical learning can be a useful tool for scientific investigation in
+imaging neurosciences in many ways. We discuss a few applications to
+resolve common neuroimaging needs, which methods can be used, what they
+imply and how to achieve the desired results. We discuss not only
+prediction scores, but also the interpretability of the results, which
+leads us to open up the black box methods. The paper is organized as
+follows. First we show how the data must be prepared to apply
+\emph{scikit-learn}. Then we describe the application of \emph{supervised
+learning} techniques, to learn the links between brain images and
+stimuli. Finally we demonstrate how \emph{unsupervised learning}
+techniques can extract useful structure from the images.
+
+% Maybe we should stress that this paper is meant to be didactic, and
+% thus only presents simple examples
 
 \subsection{Scientific Python and neuroimaging ecosystem}
 
@@ -938,13 +947,13 @@ concac-ICA.}
   \label{fig:ica}
 \end{figure}
 
-\subsection{Learning  with clustering}
+\subsection{Learning functionally-homogeneous regions with clustering}
 \label{clustering}
 
 From a machine learning perspective, a clustering method aggregates 
 samples into groups (called clusters) to maximize a measure of similarity in
 the clusters. If we consider voxels of a functional brain image, this 
-measure can capture functional similarity, thus the clusters of voxel
+measure can capture functional similarity, thus the clusters of voxels
 form functionally-homogeneous regions \citep{thirion2006}.
 
 \subsubsection{Imposing spatial structure}
@@ -1034,12 +1043,15 @@ method more sophisticated than the simple downsampling.
 \section{Conclusion}
 
 These use cases show that neuroscientific problems can be easily handled thanks
-to scikit-learn python library. Diffculties lie in applying proper preprocessing of
+to scikit-learn python library. Difficulties lie in applying proper preprocessing of
 the data, chosing the right model depending on the problem and interpreting
 these results. An attempt to
-address the first problem has been made in the nilearn Pyhton library which
+address the first problem has been made in the nilearn Python library which
 provides convience tools to load neuroscientific data. However, the other
 problems require skill and experience.
+
+% XXX: note that the techniques described in this paper only scratch the
+% surface of the applications of statistical learning in neuroimaging. 
 
 \section*{Disclosure/Conflict-of-Interest Statement}
 %All relationships financial, commercial or otherwise that might be perceived
