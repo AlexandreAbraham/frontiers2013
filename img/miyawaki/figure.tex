@@ -1,0 +1,26 @@
+\documentclass{article}
+
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{tikz}
+\usetikzlibrary{calc, spy}
+\usepackage{adjustbox}
+\usepackage[tightpage, active, floats, graphics]{preview}
+\usepackage{overpic}
+
+\begin{document}
+\begin{preview}
+    \begin{turn}{90}
+        \sffamily
+        \hspace{14pt}
+        Decoding
+    \end{turn}
+    \includegraphics[width=.97\linewidth]{figure_decoding}\\
+    \begin{turn}{90}
+        \sffamily
+        \hspace{42pt}
+        Encoding
+    \end{turn}
+    \includegraphics[width=.975\linewidth]{figure_encoding}
+\end{preview}
+\end{document}
