@@ -294,6 +294,21 @@ converting data from one representation to another.
 \subsection{Cross validation and model selection}
 
 % XXX: describe cross-validation
+When testing an estimator or setting an hyperparameter, one needs a reliable
+performance score to evaluate its performance. Using the same
+sample set for training and testing is not recommended because it would lead to
+overfitting.
+Cross-validation is a technique that allows one to reliably score an
+estimator on a given dataset. It consists in iteratively training the
+estimator and testing it on unseen data.
+At each iteration, the sample set is partitionned into twoi disjoint subsets. The estimator
+is trained on the first one (training subset) and then applied on the second
+one (testing subset) to obtain a score.
+Several strategies exists to partition the sample set.
+For example, K-Fold cross validation consists in dividing randomly the samples in $k$
+subsets: each subset is then used once as testing set while the others $k - 1$
+subsets are used to train the estimator. This is one of the simplest and most
+widely used cross validation strategy.
 
 The problem of model selection is to find the hyper-parameters or the
 model that works best on the data, according for a specific task, most
@@ -572,8 +587,6 @@ high level regions of the visual cortex which is known to contain semantic
 information about vision. While Searchlight only gives a score to each voxel,
 the SVC can be used afterward to classify unseen brain scans.
 
-% XXX has 'SVC' been defined?
-
 \begin{lstlisting}
 ### Look at the discriminating weights
 coef = clf.coef_
@@ -686,20 +699,20 @@ Regression, a simpler method than the one used in the original work, with an $\e
 These two methods differs by their loss function: SVC uses a square hinge loss
 and Logistic Regression a logit function.
 
-In a first time, we look at how a pixel is \textit{mapped} in the brain.
-
-
-
-In a second time, we show the reconstruction accuracy per pixel (using a 5 fold
+In a first time, we show the reconstruction accuracy per pixel (using a 5 fold
 cross validation) in order to see if some pixel are easier to decode than
 others.
+In a second time, we chose a particular pixel and show the brain voxels used to
+predict its value by LR and SVC and their associated weights. An interpretation
+of these results is presented in section~\ref{sec:miyawaki_results}.
+
 
 \begin{lstlisting}
-from sklearn.linear_model import OrthogonalMatchingPursuit as OMP
+from sklearn.linear_model import LogisticRegression as LR
 from sklearn.cross_validation import cross_val_score
 
 pipeline_LR = Pipeline([('selection', SelectKBest(f_classif, 500)),
-                        ('clf', LR(penalty='l1', C=0.01)])
+                        ('clf', LR(penalty='l1', C=0.05)])
 
 scores_lr = []
 # y_train = n_samples x n_voxels
@@ -786,24 +799,19 @@ visual stimuli. Moreover, we note that our two approaches give matching results
 to the voxel.
 
 \subsection{Results}
-
+\label{sec:miyawaki_results}
 Results are presented in figure~\ref{fig:miyawaki}.
 In decoding setting, figures \textit{a} and \textit{c} show reconstruction
 accuracy score using Logistic Regression and Support Vector Classification.
-We observe that reconstruction is more accurate in the fovea, as highlighted
+Both methods give similar results but we observe that reconstruction is more
+accurate in the fovea, as highlighted
 in the original work \citep{miyawaki2008}.
 This may be caused by the fact that there are more neurons dedicated to foveal
 representation in the primary visual area than for periphery.
 
-Comparing the two methods, we see that Logistic Regression gives better results
-than Orthognal Matching Pursuit. However, LR bases its decision upon 200 voxels
-while the OMP has been forced to base it on 40.
-
-The pixel weights (\textit{b} and \textit{c}) agree on the fact that important
-domains are located in the blue shape.
-Both methods have selected the same voxel to base their decision upon.
-This particular voxel will be studied in the encoding task in the next section.
-
+Figures \textit{b} and \textit{d} shows the weights of the brain voxels for both
+methods. They both give roughly the same results and we can spot an interesting
+set of voxels.
 
 \begin{figure}[hbtp]
   \begin{center}
