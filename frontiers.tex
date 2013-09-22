@@ -687,8 +687,12 @@ These two methods differs by their loss function: SVC uses a square hinge loss
 and Logistic Regression a logit function.
 
 In a first time, we look at how a pixel is \textit{mapped} in the brain.
-In a second time, we make a global score map of whole pixels to see which ones
-are easier to decode.
+
+
+
+In a second time, we show the reconstruction accuracy per pixel (using a 5 fold
+cross validation) in order to see if some pixel are easier to decode than
+others.
 
 \begin{lstlisting}
 from sklearn.linear_model import OrthogonalMatchingPursuit as OMP
@@ -706,111 +710,23 @@ for pixel in y_train.T:
 \end{lstlisting}
 
 
-\begin{figure}[hbtp]
-  \begin{center}
-    \includegraphics[width=\linewidth]{img/miyawaki/figure}
-  \end{center}
-  \caption{
-      Miyawaki results in both decoding and encoding. Highlighted pixels and
-      voxels are the same across methods. Results are consistent as decoding
-      and encoding have found a relation between the same pixel and voxels.
-      \textbf{Decoding.} Reconstruction accuracy per pixel (\textit{a.} Logistic
-      regression, \textit{c.} SVC). Coefficients used to predict the chosen pixel(\textit{b.} Logistic
-      regression, \textit{d.} SVC). 
-      \textbf{Encoding.} Left: reconstruction accuracy depending on pixel
-           position in the stimulus. Right: receptive fields corresponding to
-       voxels with highest scores and neighbours.}
-\label{fig:miyawaki}
-\end{figure}
 
-
-
-
-
-\subsection{Decoding}
-
-As common pre-processing step, apply to the data detrending and variance
-normalization.
-
-Prior knowledge on the data can help for model selection. In this experiment, we
-want to find the relation between voxel activation and some pixel color. It is
-therefore reasonable to suppose that not all voxels in the brain will be related to one
-pixel. We will consequently use sparsity inducing models who tends to
-reduce the number of features on which their decision is made.
-
-The original work by \cite{miyawaki2008} uses a sparse multinomial
-logistic regression and a sophisticated multiscale strategy to reconstruct the image.
-Here we use a simpler version of this approach, a $\ell_1$ logistic
-regression, and compare it to the Orthogonal
-Matching Pursuit (\cite{mallat1993}). The OMP is a linear model that uses
-feature time series as a dictionary and an l1 constraint on the loadings. Its
-particularity is to add one atom at each step and update all coefficients
-based on the orthogonal projection on previously selected atoms.
-Reconstruction performance is measured by the accuracy score, the default
-function proposed in the scikit-learn.
-
-\begin{lstlisting}
-from sklearn.linear_model import OrthogonalMatchingPursuit as OMP
-from sklearn.cross_validation import cross_val_score
-
-pipeline_OMP = Pipeline([('selection', SelectKBest(f_classif, 500)),
-                         ('clf', OMP(n_nonzero_coefs=20)])
-
-scores_omp = []
-# y_train = n_samples x n_voxels
-# To iterate on voxels, we transpose it.
-for pixel in y_train.T:
-    score = cross_val_score(pipeline_OMP, X_train, pixel, cv=5)
-    scores_omp.append(score)
-\end{lstlisting}
-
-\subsubsection{Results}
-
-Results are presented in figure~\ref{fig:decoding}.
-Looking at both methods (figures \textit{a} and \textit{c}), we observe that reconstruction
-is more accurate in the fovea, as observed in the original work \citep{miyawaki2008}.
-This may be caused by the fact that there are more neurons dedicated to foveal
-representation in the primary visual area than for the borders.
-
-Comparing the two methods, we see that Logistic Regression gives better results
-than Orthognal Matching Pursuit. However, LR bases its decision upon 200 voxels
-while the OMP has been forced to base it on 40.
-
-The pixel weights (\textit{b} and \textit{c}) agree on the fact that important
-domains are located in the blue shape.
-Both methods have selected the same voxel to base their decision upon.
-This particular voxel will be studied in the encoding task in the next section.
-
-\begin{figure}[hbtp]
-  \begin{center}
-    \includegraphics[width=\linewidth]{img/miyawaki/figure_decoding}
-  \end{center}
-  \caption{Reconstruction accuracy per pixel depending on the method (\textit{a.} Logistic
-      regression, \textit{c.} OMP). The brain voxels
-  corresponds to coefficients used to predict the blue bordered pixel(\textit{b.} Logistic
-      regression, \textit{d.} OMP).}
-\label{fig:decoding}
-  \begin{center}
-    \includegraphics[width=\linewidth]{img/miyawaki/figure_encoding}
-  \end{center}
-  \caption{Left: reconstruction accuracy depending on pixel
-           position in the stimulus. Right: receptive fields corresponding to
-       voxels with highest scores and neighbours.}
-
-
-       \caption{Comparison between decoding and encoding on Miyawaki dataset.
-       Top row show results using 2 different methods: Reconstruction accuracy per pixel depending on the method (\textit{a.} Logistic
-      regression, \textit{c.} OMP). The brain voxels
-  corresponds to coefficients used to predict the blue bordered pixel(\textit{b.} Logistic
-      regression, \textit{d.} OMP).}
-  \label{fig:encoding}
-\end{figure}
 
 \subsection{Encoding}
-Given an appropriate model of the stimulus, e.g. one which can provide an approximately linear representation of BOLD activation, an encoding approach allows one to quantify for each voxel to what extent its variability is captured by the model. A popular evaluation method is the predictive \(r^2\) score, which uses a prediction on left out data to quantify the decrease in residual norm brought about by fitting a regression function as opposed to fitting a constant. %We have \[r^2 = \frac{\|y_{\textrm{true}} - y_{\textrm{pred}}\|^2}{\|y_{\textrm{true}} - \bar y_{\textrm{true}}\|^2}\]
-The remaining variance consists of potentially unmodelled, but reproducible signal and spurious noise.
+Given an appropriate model of the stimulus, e.g. one which can provide an
+approximately linear representation of BOLD activation, an encoding approach
+allows one to quantify for each voxel to what extent its variability is captured
+by the model. A popular evaluation method is the predictive \(r^2\) score, which
+uses a prediction on left out data to quantify the decrease in residual norm 
+brought about by fitting a regression function as opposed to fitting a constant. 
+%We have \[r^2 = \frac{\|y_{\textrm{true}} - y_{\textrm{pred}}\|^2}{\|y_{\textrm{true}} - \bar y_{\textrm{true}}\|^2}\]
+The remaining variance consists of potentially unmodelled, but reproducible signal
+and spurious noise.
 
-On the Miyawaki dataset, we can observe that mere black and white pixel values can explain a large part of the BOLD variance in many visual voxels. Sticking to the notation that \(X\) represesents BOLD signal and \(y\) the stimulus, we can write an encoding model using the ridge regression estimator of the scikit-learn:
+On the Miyawaki dataset, we can observe that mere black and white pixel values
+can explain a large part of the BOLD variance in many visual voxels. Sticking
+to the notation that \(X\) represesents BOLD signal and \(y\) the stimulus, we
+can write an encoding model using the ridge regression estimator of the scikit-learn:
 
 \begin{lstlisting}
 from sklearn.linear_model import Ridge
@@ -832,10 +748,19 @@ mean_scores = np.array(scores).mean(axis=0)
 \end{lstlisting}
 
 \subsubsection{Results}
-The variable \texttt{mean\_scores} contains a score for each voxel. Visualized in a brain volume we obtain figure \ref{fig:encoding}, in which we can observe that the BOLD signal especially in early visual areas, most notably V1, is very well explained as a linear function of the pixel intensities, with a predictive score of up to \(r^2 = 0.6\).
+The variable \texttt{mean\_scores} contains a score for each voxel.
+Visualized in a brain volume we obtain figure \ref{fig:encoding},
+in which we can observe that the BOLD signal especially in early visual
+areas, most notably V1, is very well explained as a linear function of
+the pixel intensities, with a predictive score of up to \(r^2 = 0.6\).
 
 \subsubsection{Receptive fields}
-Given the retinotopic structure of early visual areas, we are led to expect their voxels to have strongly localized so-called population receptive fields (\textit{prf}). This suggests that per voxel only very few stimulus pixels should suffice to explain its activity. This information can be exploited by using a sparse coding approach to find the receptive fields.
+Given the retinotopic structure of early visual areas, we are led to
+expect their voxels to have strongly localized so-called population
+receptive fields (\textit{prf}). This suggests that per voxel only very
+few stimulus pixels should suffice to explain its activity. This
+information can be exploited by using a sparse coding approach to find
+the receptive fields.
 
 \begin{lstlisting}
 from sklearn.linear_model import LassoLarsCV
@@ -860,15 +785,43 @@ is an expected result as we know that primary visual cortex direclty encodes
 visual stimuli. Moreover, we note that our two approaches give matching results 
 to the voxel.
 
+\subsection{Results}
+
+Results are presented in figure~\ref{fig:miyawaki}.
+In decoding setting, figures \textit{a} and \textit{c} show reconstruction
+accuracy score using Logistic Regression and Support Vector Classification.
+We observe that reconstruction is more accurate in the fovea, as highlighted
+in the original work \citep{miyawaki2008}.
+This may be caused by the fact that there are more neurons dedicated to foveal
+representation in the primary visual area than for periphery.
+
+Comparing the two methods, we see that Logistic Regression gives better results
+than Orthognal Matching Pursuit. However, LR bases its decision upon 200 voxels
+while the OMP has been forced to base it on 40.
+
+The pixel weights (\textit{b} and \textit{c}) agree on the fact that important
+domains are located in the blue shape.
+Both methods have selected the same voxel to base their decision upon.
+This particular voxel will be studied in the encoding task in the next section.
+
+
 \begin{figure}[hbtp]
   \begin{center}
-    \includegraphics[width=\linewidth]{img/miyawaki/figure_encoding}
+    \includegraphics[width=\linewidth]{img/miyawaki/figure}
   \end{center}
-  \caption{Left: reconstruction accuracy depending on pixel
+  \caption{
+      Miyawaki results in both decoding and encoding. Highlighted pixels and
+      voxels are the same across methods. Results are consistent as decoding
+      and encoding have found a relation between the same pixel and voxels.
+      \textbf{Decoding.} Reconstruction accuracy per pixel (\textit{a.} Logistic
+      regression, \textit{c.} SVC). Coefficients used to predict the chosen pixel(\textit{b.} Logistic
+      regression, \textit{d.} SVC). 
+      \textbf{Encoding.} Left: reconstruction accuracy depending on pixel
            position in the stimulus. Right: receptive fields corresponding to
        voxels with highest scores and neighbours.}
-  \label{fig:encoding}
+\label{fig:miyawaki}
 \end{figure}
+
 
 \section{Resting-state and functional Connectivity analysis}
 
