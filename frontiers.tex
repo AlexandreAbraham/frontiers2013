@@ -970,28 +970,19 @@ grid, with optionally a brain mask.
 \subsubsection{Approaches}
 
 Several clustering approaches exists, each one having its own pros and cons.
-The common parameter to all approaches is the number of clusters to extract.
-Setting this parameter is not easy as we have no information about the real
-number of clusters in our data (ie functional regions in the brain).
+Most require setting the number of clusters extracted. This choice
+depends on the application: a large number of cluster will give a more
+fine-grained description of the data, with a higher fidelity to the
+original signal, but also a higher model complexity. Here we will
+describe two clustering approaches that are simple and fast.
+\emph{Ward clustering} uses a bottom-up hierarchical approach:
+progressively agglomerating voxels together into clusters.
+\emph{K-means} seeks cluster centers that evenly explain the variation of
+the data. A voxel is then assigned to the cluster of the nearest
+center. 
 
-There are several ways to cross-validate this parameter (using signal variance
-explained by the model for example) but this is not the subject of this paper.
-In this use case, we present several clustering methods and focus on their
-ability to segment well known anatomical features such as CerebroSpinal Fluid
-(CSF), and amygdala.
-
-Chosen approached are:
-\begin{itemize}
-    \item{\bf Ward's clustering} uses a bottom-up hierarchical approach. Features are
-        progressively aggregated into clusters.
-    \item{\bf k-means} is a centroid based approach. Clusters are represented by
-        a central vector: a feature belongs to the cluster of the nearest
-        centroid. This algorithm gives better results when data is smoothed.
-% Too long to compute
-%    \item{\bf spectral clustering} is a graph based approach. It separates
-%        the feature graph into subgraphs by maximizing intra-group connectivity and
-%        minimizing inter-group connectivity.
-\end{itemize}
+% XXX: remark need to come later: K-means gives better results
+% when data is smoothed.
 
 Common preprocessing are applied, along with a PCA to reduce dimensionality and
 smoothing to enhance k-means result. Note that clustering algorithms group
