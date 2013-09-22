@@ -975,40 +975,44 @@ form functionally-homogeneous regions \citep{thirion2006}.
 
 \subsubsection{Imposing spatial structure}
 
-Some clustering approaches can make use of
-spatial information and yield spatially-contiguous clusters, \emph{i.e.}
-parcels.
-In scikit-learn, structural information is described via a connectivity
-graph given to the clustering estimator. 
-{\tt sklearn.feature\_extraction.image .grid\_to\_graph} is a function that
-can construct such a graph capturing the neighbor structure of an image
-grid, with optionally a brain mask.
-
 \subsubsection{Approaches}
 
-Several clustering approaches exists, each one having its own pros and cons.
-Most require setting the number of clusters extracted. This choice
+Several clustering approaches exists, each one having its own pros and
+cons. Most require setting the number of clusters extracted. This choice
 depends on the application: a large number of cluster will give a more
 fine-grained description of the data, with a higher fidelity to the
-original signal, but also a higher model complexity. Here we will
-describe two clustering approaches that are simple and fast.
-\emph{Ward clustering} uses a bottom-up hierarchical approach:
-progressively agglomerating voxels together into clusters.
-\emph{K-means} seeks cluster centers that evenly explain the variation of
-the data. A voxel is then assigned to the cluster of the nearest
-center. 
+original signal, but also a higher model complexity. Some clustering
+approaches can make use of spatial information and yield
+spatially-contiguous clusters, \emph{i.e.} parcels. Here we will describe
+two clustering approaches that are simple and fast.
 
-% XXX: remark need to come later: K-means gives better results
-% when data is smoothed.
+\paragraph{Ward clustering} uses a bottom-up hierarchical approach:
+progressively agglomerating voxels together into clusters. In
+scikit-learn, structural information can be specified via a connectivity
+graph given to the Ward clustering estimator. This graph is used to allow
+only merges between neighboring voxels, thus readily producing contigious
+parcels. We will rely on the {\tt
+sklearn.feature\_extraction.image.grid\_to\_graph} function to can
+construct such a graph using the neighbor structure of an image grid,
+with optionally a brain mask.
 
-Common preprocessing are applied, along with a PCA to reduce dimensionality and
-smoothing to enhance k-means result. Note that clustering algorithms group
-samples and that we want to group features: a transposition is needed to apply
-clustering in the wanted dimension. Scikit-learn provides a
-\texttt{WardAgglomeration} object that takes care of this step, this is not the
-case when using K-Means.
+\paragraph{K-means} is a more top-down approach, seeking cluster centers
+to evenly explain the variance of the data. Each voxels are then assigned
+to the nearest center, thus forming clusters. As imposing a spatial model
+in K-means is not easy, it is often advisable to spatially-smooth the
+data.
 
-% XXX: recall the necessary transpose
+To apply the clustering algorithms, we run the common data preparation
+steps and produce a data matrix. As both Ward clustering and K-means rely
+on second-order statistics, we can speed up the algorithms by reducing
+the dimensionality while preserving these second-order statistics with a
+PCA. Note that clustering algorithms group samples and that here we want
+to group voxels. So if the data matrix is, as previously a (time points
+$\times$ voxels) matrix, we need to transpose it before running the
+scikit-learn clustering estimators. Scikit-learn provides a
+\texttt{WardAgglomeration} object to do this \emph{feature agglomeration}
+with Ward clustering \cite{michel2012supervisedclustering}, but this is
+not the case when using K-Means.
 
 \begin{lstlisting}
 connectivity = grid_to_graph(n_x=mask.shape[0], n_y=mask.shape[1],
@@ -1023,6 +1027,7 @@ Clustering results are shown in figure~\ref{fig:clustering}. Cluster colors are
 random. These clustering does not contain neuroscientifc information. However,
 as clustering group similar voxels together, it can be used as a compression
 method more sophisticated than the simple downsampling.
+% Discuss the 'compression intuition'
 
 \begin{figure}[hbtp]
   \begin{center}

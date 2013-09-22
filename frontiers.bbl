@@ -1,4 +1,4 @@
-\begin{thebibliography}{19}
+\begin{thebibliography}{20}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \expandafter\ifx\csname doi\endcsname\relax
@@ -126,5 +126,12 @@ Thirion, B., Flandin, G., Pinel, P., Roche, A., Ciuciu, P., and Poline, J.
   (2006) {Dealing with the shortcomings of spatial normalization: Multi-subject
   parcellation of {fMRI} datasets}.
 \newblock {\em Hum brain map\/} 27 678.
+
+\bibitem[{Michel et~al.(2012)Michel, Gramfort, Varoquaux, Eger, Keribin, and
+  Thirion}]{michel2012supervisedclustering}
+Michel, V., Gramfort, A., Varoquaux, G., Eger, E., Keribin, C., and Thirion, B.
+  (2012) A supervised clustering approach for {fMRI}-based inference of brain
+  states.
+\newblock {\em Pattern Recognition\/} 45 2041.
 
 \end{thebibliography}
