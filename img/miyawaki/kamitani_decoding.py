@@ -25,7 +25,7 @@ print "Preprocessing data"
 
 # Load and mask fMRI data
 masker = MultiNiftiMasker(mask=dataset.mask, detrend=True,
-                          standardize=True)
+                          standardize=False)
 masker.fit()
 mask = masker.mask_img_.get_data().astype(bool)
 X_train = masker.transform(X_random)
@@ -123,6 +123,8 @@ fig.subplots_adjust(bottom=0., top=1., left=0., right=1.)
 pl.savefig('pixel_omp.pdf')
 pl.savefig('pixel_omp.eps')
 pl.close()
+
+exit(0)
 
 # Scores
 from sklearn.cross_validation import cross_val_score
