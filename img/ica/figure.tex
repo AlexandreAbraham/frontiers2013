@@ -1,0 +1,30 @@
+\documentclass{article} % for Science articles
+
+\usepackage{graphicx}
+\usepackage[tightpage, active, floats, graphics]{preview}
+\usepackage{subcaption}
+\captionsetup{figurewithin=none}  
+\captionsetup{tablewithin=none}
+
+\begin{document}
+\begin{figure}
+\begin{preview}
+      \begin{subfigure}[b]{.3\linewidth}
+        \includegraphics[width=\linewidth]{ica}%
+	\vspace*{-1.8em}
+        \caption{\sffamily ICA}
+      \end{subfigure}
+      \begin{subfigure}[b]{.3\linewidth}
+        \includegraphics[width=\linewidth]{canica}%
+	\vspace*{-1.8em}
+        \caption{\sffamily CanICA}
+      \end{subfigure}
+      \begin{subfigure}[b]{.3\linewidth}
+        \includegraphics[width=\linewidth]{melodic}%
+	\vspace*{-1.8em}
+        \caption{\sffamily melodic}
+      \end{subfigure}
+\end{preview}
+\end{figure}
+\end{document}
+
