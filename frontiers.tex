@@ -395,9 +395,9 @@ voxels are samples.
 
 
 Reducing the data dimension from images to feature vectors implies losing its
-spatial structure. However, that not all voxels in fMRI data holds 
+spatial structure. However, not all voxels in fMRI data hold
 relevant information: outer-brain voxels are of no
-use and, worse, they may bring spurious noise and scanner artifacts.
+use and they may bring spurious noise and scanner artifacts.
 Thus, we keep only voxels in a brain mask. Such masks
 are often given along with datasets or can be computed thanks to softwares like
 FSL or SPM.
@@ -415,13 +415,16 @@ type of the mask array must be boolean for the following to work).
 2-dimensional masked data will be refered as \texttt{X} to follow
 scikit-learn conventions:
 \begin{lstlisting}
+import nibabel
+mask = nibabel.load('mask.nii').get_data()
+func_data = nibabel.load('epi.nii').get_data()
 # Ensure that the mask is boolean
-mask = mask.astype(np.bool)
+mask = mask.astype(bool)
 # Apply the mask, X = timeseries * voxels
 X = func_data[mask].T
 
 # Unmask data
-unmasked_data = np.zeros(mask.shape, dtype=X.dtype)
+unmasked_data = numpy.zeros(mask.shape, dtype=X.dtype)
 unmasked_data[mask] = X
 \end{lstlisting}
 
@@ -456,9 +459,9 @@ nibabel.save(nibabel.Nifti1Image(act, bg_img.get_affine()), 'activation.nii.gz')
 Note that a background is needed to display partial maps. Overlaying two images
 can be done thanks to the \texttt{numpy.ma.masked\_array}.
 Several tricks and options exist to enhance the overall aspect of the plot.
-Some of them can be found in the example scripts
-\footnote{http://www.github.com/AlexandreAbraham/frontiers2013/} but it mainly
-comes with practice. Note that Nipy package provides a
+Some of them can be found in the full scripts accompanying this paper
+\footnote{http://www.github.com/AlexandreAbraham/frontiers2013/} but it 
+boils down to a good knowledge of Matplotlib. Note that Nipy package provides a
 \texttt{plot\_map} function that is tuned to display activation maps (a
 background is even provided if needed).
 
@@ -713,12 +716,11 @@ In the original paper, the training set is composed of random images (where blac
 are balanced) while the testing set is composed of structured images containing
 geometric shapes (square, cross...) and letters. Here, for the sake of simplicity, we consider only the training set and use cross-validation to
 obtain scores on unseen data.
-
-In the following example, inferring the relation between stimuli pixels and
-brain voxels is done two-ways: reconstructing visual stimulus from BOLD activation,
+%
+In the following example, we study the relation between stimuli pixels and
+brain voxels in both directions: reconstructing visual stimulus from BOLD activation,
 which is a decoding task, and predicting brain activation from visual
-stimulus, which is an encoding task. We conclude by stating if these approches
-reach a consensus.
+stimulus, which is an encoding task.
 
 \subsection{Decoding}
 
