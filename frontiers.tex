@@ -755,13 +755,6 @@ for train, test in cv:
 mean_scores = np.array(scores).mean(axis=0)
 \end{lstlisting}
 
-\subsubsection{Results}
-The variable \texttt{mean\_scores} contains a score for each voxel.
-Visualized in a brain volume we obtain figure \ref{fig:encoding},
-in which we can observe that the BOLD signal especially in early visual
-areas, most notably V1, is very well explained as a linear function of
-the pixel intensities, with a predictive score of up to \(r^2 = 0.6\).
-
 \subsubsection{Receptive fields}
 Given the retinotopic structure of early visual areas, we are led to
 expect their voxels to have strongly localized so-called population
@@ -793,18 +786,20 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 
 \label{sec:miyawaki_results}
 Results are presented in figure~\ref{fig:miyawaki}.
-In decoding setting, Figures \textit{a} and \textit{c} shows the classifiers weights as brain
+In decoding settings, Figures \textit{a} and \textit{c} shows the classifiers weights as brain
 maps for both methods. They both give roughly the same results and we can
 see that the weights are centered in the V1 area with a bit of higher
 visual areas.
 Figures \textit{b} and \textit{d} show reconstruction
-accuracy score using Logistic Regression and Support Vector Classification.
+accuracy score using Logistic Regression and Support Vector Classification
+(variable \texttt{mean\_scores} in the code above).
 Both methods give almost identical results. They also point out the fact that reconstruction is more
 accurate in the fovea, as highlighted
 in the original work \citep{miyawaki2008}.
 This may be caused by the fact that there are more neurons dedicated to foveal
 representation in the primary visual area than for periphery.
-In encoding setting, figure~\ref{fig:miyawaki}.e shows classifiers weights for encoding, that
+
+In encoding settings, figure~\ref{fig:miyawaki}.e shows classifiers weights for encoding, that
 we interpret as receptive fields. We can see that receptive fields of
 neighboring voxels are neighbouring pixels, which is an expected result
 as we know that primary visual cortex direclty encodes visual stimuli. 
