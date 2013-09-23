@@ -346,6 +346,7 @@ relying on the spatial structure of the data, for instance the
 Searchlight. SciPy provides routines taking affine into account in its
 ndimage module, for instance \texttt{scipy.ndimage.affine\_transform}.
 % XXX: here, maybe mention nilearn
+% For Searchlight or for the maskers ?
 
 Resampling consists in changing the spatial resolution of the data. This is
 an interpolation and alters the data, that is why it should be used carefully.
@@ -386,7 +387,7 @@ includes:
 Neuroimaging data are represented in 4 dimensions: 3 spatial dimensions, and 
 one dimension for the time.
 Scikit-learn algorithms, on the other hand, only accept 2-dimensional
-samples $\times$ features matrices (see \ref{scikitlearn}).
+samples $\times$ features matrices (see~\ref{scikitlearn}).
 Depending on the settings, voxels and time series can be
 considered as features
 or samples. For example, in spatial independent component analysis (ICA),
@@ -426,11 +427,11 @@ unmasked_data[mask] = X
 
 \subsection{Data visualisation}
 
-In the following examples, all figures are made inside python scripts using
-matplotlib to display an axial slice. Most of them are composed of two layers: a
-gray background and a colorful activation map. Overlaying them is done using a
-\texttt{numpy.ma.masked\_array}. Note that, to be displayed
-properly, data must be transposed and the origin of plot must be changed. 
+Across all our examples, voxels of interest are represented on an axial slice of
+the brain. Some transformations of the original matrix data are required to match
+matplotlib data format. The following snippet of code shows how to display an
+axial slice along with an overlaying activation map. It loads a generic map and
+display, as an overlaying map, the voxels with highest value.
 
 \begin{lstlisting}
 # Load image
@@ -452,17 +453,14 @@ plt.show()
 nibabel.save(nibabel.Nifti1Image(act, bg_img.get_affine()), 'activation.nii.gz')
 \end{lstlisting}
 
-Several tricks exist to enhance the overall aspect of the plot (like removing
-the default large white margins). One can look at image generation in our
-example scripts\footnote{http://www.github.com/AlexandreAbraham/frontiers2013/}
-to learn more about image generation using matplotlib. Nipy provides a
+Note that a background is needed to display partial maps. Overlaying two images
+can be done thanks to the \texttt{numpy.ma.masked\_array}.
+Several tricks and options exist to enhance the overall aspect of the plot.
+Some of them can be found in the example scripts
+\footnote{http://www.github.com/AlexandreAbraham/frontiers2013/} but it mainly
+comes with practice. Note that Nipy package provides a
 \texttt{plot\_map} function that is tuned to display activation maps (a
-background is even provided).
-
-The simplest way to visualize MRI data in an interactive way is to dump data in
-a file and use an external viewer like FSLview or MRIcron. % or use Pynax !
-3-dimensional display can be achieved in Python using Mayavi and from file using
-MRIcrogl.
+background is even provided if needed).
 
 % This part has been removed because automatic masking is overly complicated and
 % does not brinautomatic masking is overly complicated and does not bring much
@@ -537,7 +535,7 @@ setup used in NeuroImaging.
 After applying a brain mask, the data consist of 40\,000 features for 
 only 1\,400 samples. Machine learning with much more features than samples
 is challenging, due to the so-called \emph{curse of dimensionality}.
-A popular strategy is to reducing the number of features (ie voxels) by
+A popular strategy is to reduce the number of features (ie voxels) by
 selecting the most relevant ones. Based on prior neuroscientific
 knowledge, we could restrain the mask to occipital area where the visual
 cortex is located. A simple statistical approach relies on screening
@@ -547,7 +545,7 @@ Scikit-learn offers a panel of strategies to select features. In supervised
 learning, the most popular feature selection method is the
 ANalysis Of VAriance (ANOVA) F-Test. 
 The null hypothesis of this test is that the feature takes the same value
-for all classes of $y$ to predicted.
+for all classes of $y$ to predict.
 
 After ranking the features, \verb!sklearn.feature_selection! proposes a panel
 of feature selection strategies. One can choose to take a percentile of the features
@@ -716,32 +714,32 @@ are balanced) while the testing set is composed of structured images containing
 geometric shapes (square, cross...) and letters. Here, for the sake of simplicity, we consider only the training set and use cross-validation to
 obtain scores on unseen data.
 
-We will illustrate two problems: reconstructing visual stimulus from BOLD activation,
+In the following example, inferring the relation between stimuli pixels and
+brain voxels is done two-ways: reconstructing visual stimulus from BOLD activation,
 which is a decoding task, and predicting brain activation from visual
-stimulus, which is an encoding task. The goal of these two approaches is to find
-a relation between brain voxels and observed pixels. 
+stimulus, which is an encoding task. We conclude by stating if these approches
+reach a consensus.
 
 \subsection{Decoding}
 
-In this experiment, we want to find a relation between brain voxels,
-and black and white pixels in order to reconstruct the stimulus seen by the
-subject from brain activity. Due to the nature of the stimuli (binary data), we
-will treat this problem as a classification problem. However, one has to keep in
-mind that this problem is intrisically a regression as the color spectrum is
-continuous.
+In this setting, we want to infer the binary visual stimulus presented to
+subject from its brain activity.
+As the stimuli are binary, we will treat this problem as a classification
+problem. Note that the method presented here cannot be extended as-is to
+ecologic stimuli. 
 
 Following our first example, we will use a Linear SVC to solve this problem.
-As we expect brain voxels to be strongly localized in the brain, we will use the
-$\ell_1$ norm as penalization to induce sparsity. We compare SVC to Logistic
-Regression, a simpler method than the one used in the original work, with an $\ell_1$ penalty.
+As we expect brain voxels to be strongly localized in the brain, we use the
+$\ell_1$ norm as penalization to induce sparsity.
+In the original work, \cite{miyawaki2008} uses a multinomial Logistic Regression
+along with a sophisticated multi-scale strategy. As we limit ourselves to a
+binary problem, we use a simple $\ell_1$-penalized Logistic Regression.
 These two methods differs by their loss function: SVC uses a square hinge loss
 and Logistic Regression a logit function.
 
 We ran a 5-fold cross validation to set up the penalization parameter $C$
 (inverse of regularization amount) and obtains score presented in
-figure~\ref{fig:miyawaki}. This is particularly important for Logistic
-Regression which performance can dramatically decrease outside of the optimal
-value ($C=0.05$).
+figure~\ref{fig:miyawaki}.
 
 \begin{figure}[htbp]
     \begin{center}
@@ -749,25 +747,26 @@ value ($C=0.05$).
         $C$ value           & 0.0005 & 0.001  & 0.005  & 0.01   & 0.05    & 0.1    \\
     \hline\\[-.9em]
     \hline\\[-.7em]
-        Logistic Regression ($\ell_1$) & 0.5011 & 0.5010 & 0.5793 & 0.6392 &
-                              \textbf{0.7080} & 0.7030 \\[.1em]
-        $\ell_1$ SVC        & 0.5099 & 0.5583 & 0.6936 &
-                              \textbf{0.7103} & 0.6946 & 0.6843 \\[.1em]
-        $\ell_2$ SVC        & 0.6771 & \textbf{0.6793} &
-                              0.6722 & 0.6683 & 0.6584 & 0.6553
+        Logistic Regression ($\ell_1$) & 0.50 & 0.50 & 0.57 & 0.63 &
+                              \textbf{0.70} & 0.70 \\[.1em]
+        $\ell_1$ SVC        & 0.50 & 0.55 & 0.69 &
+                              \textbf{0.71} & 0.69 & 0.68 \\[.1em]
+        $\ell_2$ SVC        & 0.67 & \textbf{0.67} &
+                              0.67 & 0.66 & 0.65 & 0.65
     \end{tabular}
     \end{center}
     \caption{5-fold cross validation accuracy scores obtained for different
     values of parameter $C$.}
+    \label{fig:miyawaki_cv}
 \end{figure}
 
-In a first time, we show the reconstruction accuracy per pixel (using a 5 fold
-cross validation) in order to see if some pixel are easier to decode than
-others.
-In a second time, we chose a particular pixel and show the brain voxels used to
-predict its value by LR and SVC and their associated weights. An interpretation
-of these results is presented in section~\ref{sec:miyawaki_results}.
-
+Table~\ref{fig:miyawaki_cv} compares described approaches, along with an
+$\ell_2$ regularized SVC. We first observe that setting the parameter $C$ is
+critical as performance decrases outside of their optimal values.
+In accordance with our prior knowledge, $\ell_1$
+regularized method are does better than $\ell_2$ regularized method. SVC and
+Logistic Regression achieve the same score, which is normal as they are very
+close methods.
 
 \begin{lstlisting}
 from sklearn.linear_model import LogisticRegression as LR
@@ -860,20 +859,20 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 
 \label{sec:miyawaki_results}
 Results are presented in figure~\ref{fig:miyawaki}.
-In decoding setting, figures \textit{a} and \textit{c} show reconstruction
+In decoding setting, Figures \textit{a} and \textit{c} shows the classifiers weights as brain
+maps for both methods. They both give roughly the same results and we can
+see that the weights are centered in the V1 area with a bit of higher
+visual areas.
+Figures \textit{b} and \textit{d} show reconstruction
 accuracy score using Logistic Regression and Support Vector Classification.
-Both methods give similar results but we observe that reconstruction is more
+Both methods give almost identical results. They also point out the fact that reconstruction is more
 accurate in the fovea, as highlighted
 in the original work \citep{miyawaki2008}.
 This may be caused by the fact that there are more neurons dedicated to foveal
 representation in the primary visual area than for periphery.
 
-Figures \textit{b} and \textit{d} shows the classifiers weights as brain
-maps for both methods. They both give roughly the same results and we can
-see that the weights are centered in the V1 area with a bit of higher
-visual areas.
 
-Figure~\ref{fig:miyawaki}.f shows classifiers weights for encoding, that
+Figure~\ref{fig:miyawaki}.e shows classifiers weights for encoding, that
 we interpret as receptive fields. We can see that receptive fields of
 neighboring voxels are neighbouring pixels, which is an expected result
 as we know that primary visual cortex direclty encodes visual stimuli. 
@@ -885,14 +884,15 @@ as we know that primary visual cortex direclty encodes visual stimuli.
   \end{center}
   \caption{
       Miyawaki results in both decoding and encoding. 
-      \textbf{Top: Decoding.} Reconstruction accuracy per pixel 
-      (\textit{a.} Logistic
-      regression, \textit{c.} SVC). Classifier weights for the pixel
-      highlighted (\textit{b.} Logistic regression, \textit{d.} SVC). 
-      \textbf{Bottom: Encoding.} Left: reconstruction accuracy depending on 
-	pixel position in the stimulus. Right: receptive fields corresponding to
+      \textbf{Top: Decoding.} Classifier weights for the pixel
+      highlighted (\textit{a.} Logistic regression, \textit{c.} SVC).
+      Reconstruction accuracy per pixel 
+      (\textit{b.} Logistic
+      regression, \textit{c.} SVC). 
+      \textbf{Bottom: Encoding.} \textit{e}: receptive fields corresponding to
        voxels with highest scores and its neighbors.
-      --- Note that the pixels and voxels highlighted are the same in 
+       \textit{f}: reconstruction accuracy depending on 
+	  pixel position in the stimulus. --- Note that the pixels and voxels highlighted are the same in 
       both decoding and encoding figures and that encoding and decoding
       roughly match as both approach highlight a relationship between the
       same pixel and voxels.
