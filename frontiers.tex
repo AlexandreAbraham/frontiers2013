@@ -856,8 +856,10 @@ Given the retinotopic structure of early visual areas, we are led to
 expect their voxels to have strongly localized so-called population
 receptive fields (\textit{prf}). This suggests that per voxel only very
 few stimulus pixels should suffice to explain its activity. This
-information can be exploited by using a sparse coding approach to find
-the receptive fields.
+information can be exploited by using a sparse linear regression --the
+Lasso-- to find the receptive fields. Here we use the \emph{LassoLarsCV}
+estimator that relies on the Lars algorithm and cross-validation to set
+the Lasso parameter.
 
 \begin{lstlisting}
 from sklearn.linear_model import LassoLarsCV
@@ -905,12 +907,13 @@ set of voxels.
       Miyawaki results in both decoding and encoding. Highlighted pixels and
       voxels are the same across methods. Results are consistent as decoding
       and encoding have found a relation between the same pixel and voxels.
-      \textbf{Decoding.} Reconstruction accuracy per pixel (\textit{a.} Logistic
-      regression, \textit{c.} SVC). Coefficients used to predict the chosen pixel(\textit{b.} Logistic
+      \textbf{Top: Decoding.} Reconstruction accuracy per pixel 
+      (\textit{a.} Logistic
+      regression, \textit{c.} SVC). Coefficients used to predict the pixel chosen (\textit{b.} Logistic
       regression, \textit{d.} SVC). 
-      \textbf{Encoding.} Left: reconstruction accuracy depending on pixel
-           position in the stimulus. Right: receptive fields corresponding to
-       voxels with highest scores and neighbours.}
+      \textbf{Bottom: Encoding.} Left: reconstruction accuracy depending on 
+	pixel position in the stimulus. Right: receptive fields corresponding to
+       voxels with highest scores and its neighbors.}
 \label{fig:miyawaki}
 \end{figure}
 
@@ -1005,7 +1008,7 @@ as it is a well-known resting-state network.
   \caption{Default mode network extracted using different approaches:
 \emph{left}: the simple Concat-ICA approach demoed in this article;
 \emph{middle}: CanICA, as implemented in nilearn; \emph{right}: Melodic's
-concac-ICA.}
+concat-ICA.}
   \label{fig:ica}
 \end{figure}
 
@@ -1017,8 +1020,6 @@ samples into groups (called clusters) to maximize a measure of similarity in
 the clusters. If we consider voxels of a functional brain image, this 
 measure can capture functional similarity, thus the clusters of voxels
 form functionally-homogeneous regions \citep{thirion2006}.
-
-\subsubsection{Imposing spatial structure}
 
 \subsubsection{Approaches}
 
@@ -1056,7 +1057,7 @@ to group voxels. So if the data matrix is, as previously a (time points
 $\times$ voxels) matrix, we need to transpose it before running the
 scikit-learn clustering estimators. Scikit-learn provides a
 \texttt{WardAgglomeration} object to do this \emph{feature agglomeration}
-with Ward clustering \cite{michel2012supervisedclustering}, but this is
+with Ward clustering \citep{michel2012supervisedclustering}, but this is
 not the case when using K-Means.
 
 \begin{lstlisting}
@@ -1066,50 +1067,75 @@ ward = WardAgglomeration(n_clusters=1000, connectivity=connectivity)
 ward.fit(X)
 \end{lstlisting}
 
-\subsection{Results}
+\subsubsection{Results}
 
-Clustering results are shown in figure~\ref{fig:clustering}. Cluster colors are
-random. These clustering does not contain neuroscientifc information. However,
-as clustering group similar voxels together, it can be used as a compression
-method more sophisticated than the simple downsampling.
-% Discuss the 'compression intuition'
+Clustering results are shown in figure~\ref{fig:clustering}. While
+clustering extracts some known large scale structure, such as the
+calcarine sulcus on fig~\ref{fig:clustering}.a, it is not guaranteed to
+recover brain units. Rather, it can be considered as a compression, that
+is a useful method of summarizing information, as it groups together
+similar voxels. Note that, as Kmeans does not extract spatially-contiguous
+clusters, it gives a number of regions that can be much larger than the
+number of clusters specified, although some of these regions can be very
+small. On the opposite, Ward operates directly at the level of regions,
+and, as it is a bottom-up process, is often to be preferred when working
+with a large number of clusters. There exist many more clustering
+techniques expose in scikit-learn. Determining which is the best one to
+process fMRI time-series requires defining more precisely the target
+application.
 
 \begin{figure}[hbtp]
-  \begin{center}
       \begin{subfigure}[b]{.23\linewidth}
-          \includegraphics[width=\linewidth]{img/clustering/kmeans}
-        \caption{K-Means}
+          \includegraphics[width=\linewidth]{img/clustering/kmeans_100}
+        \caption{Kmeans, 100 clusters}
       \end{subfigure}
+      \hfill
       \begin{subfigure}[b]{.23\linewidth}
-        \includegraphics[width=\linewidth]{img/clustering/ward}
-        \caption{Ward's clustering}
+        \includegraphics[width=\linewidth]{img/clustering/ward_100}
+        \caption{Ward, 100 clusters}
       \end{subfigure}
+      \hfill
       \begin{subfigure}[b]{.23\linewidth}
-        \includegraphics[width=\linewidth]{img/clustering/ward_compressed}
-        \caption{Ward's compression}
+        \includegraphics[width=\linewidth]{img/clustering/kmeans_1000}
+        \caption{Kmeans, 1000 clusters}
       \end{subfigure}
+      \hfill
       \begin{subfigure}[b]{.23\linewidth}
-        \includegraphics[width=\linewidth]{img/clustering/original}
-        \caption{Original signal}
+        \includegraphics[width=\linewidth]{img/clustering/ward_1000}
+        \caption{Ward, 1000 clusters}
       \end{subfigure}
-  \end{center}
-  \caption{Brain decomposition using Ward's clustering and Kmeans. (c) shows how the original
-  signal (d) is compressed using the Ward's clustering decomposition (b).}
+  \caption{Brain parcellations extracted by clustering. Colors are
+random.}
   \label{fig:clustering}
 \end{figure}
 
 \section{Conclusion}
 
-These use cases show that neuroscientific problems can be easily handled thanks
-to scikit-learn python library. Difficulties lie in applying proper preprocessing of
-the data, chosing the right model depending on the problem and interpreting
-these results. An attempt to
-address the first problem has been made in the nilearn Python library which
-provides convience tools to load neuroscientific data. However, the other
-problems require skill and experience.
+In this paper we have shown some simple examples of applying machine
+learning using the scikit-learn Python toolkit on fMRI data to tackle
+neuroscientific problems. Encoding and decoding can rely on supervised
+learning to link brain images with stimuli. Unsupervised learning
+can extract structure from resting-state data, functional networks or
+brain regions. The accompanying Python code for the machine learning
+tasks is very straightforward. Difficulties lie in applying proper 
+preprocessing of the data, choosing the right model for the problem at
+hand and interpreting these results. Tackling these difficulties while
+providing the scientists with simple and readable code requires building
+a domain-specific library, dedicated to applying scikit-learn to
+neuroimaging data. This effort is underway in a nascent project, nilearn,
+that aims to facilitate the use of scikit-learn on neuroimaging data.
 
-% XXX: note that the techniques described in this paper only scratch the
-% surface of the applications of statistical learning in neuroimaging. 
+Note that the examples described in this paper only scratch the
+surface of the applications of statistical learning in neuroimaging. For
+instance, sparse inverse covariance can extract the functional 
+interaction structure from fMRI time-series \citep{varoquaux2013}, using
+the graph-lasso estimator also available in scikit-learn.
+High-dimensional statistics, as encountered in modern neuroimaging data
+processing with rich models to be fit on limited data quantities calls
+for statistical learning techniques. We hope that bridging a
+general-purpose machine learning tool, scikit-learn, to domain-specific
+data preparation code will open the door to new scientific advances.
+
 
 \section*{Disclosure/Conflict-of-Interest Statement}
 %All relationships financial, commercial or otherwise that might be perceived
