@@ -987,7 +987,12 @@ clustering extracts some known large scale structure, such as the
 calcarine sulcus on fig~\ref{fig:clustering}.a, it is not guaranteed to
 recover brain units. Rather, it can be considered as a compression, that
 is a useful method of summarizing information, as it groups together
-similar voxels.
+similar voxels. Note that, as Kmeans does not extract spatially-contiguous
+clusters, it gives a number of regions that can be much larger than the
+number of clusters specified, although some of these regions can be very
+small. On the opposite, Ward operates directly at the level of regions,
+and, as it is a bottom-up process, is often to be preferred when working
+with a large number of clusters.
 
 \begin{figure}[hbtp]
       \begin{subfigure}[b]{.23\linewidth}
