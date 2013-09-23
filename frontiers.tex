@@ -856,14 +856,8 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 \end{lstlisting}
 %y_train_centered = (y_train - y_train.mean(axis=0)) / y_train.std(axis=0)
 
-Figure~\ref{fig:miyawaki}. shows encoding . We can
-see that receptive fields of neighboring voxels are neighbouring pixels, which
-is an expected result as we know that primary visual cortex direclty encodes
-visual stimuli. Moreover, the two different estimators used in decoding
-give similar results in terms of prediction accuracy for the different
-pixels.
-
 \subsection{Results}
+
 \label{sec:miyawaki_results}
 Results are presented in figure~\ref{fig:miyawaki}.
 In decoding setting, figures \textit{a} and \textit{c} show reconstruction
@@ -874,9 +868,16 @@ in the original work \citep{miyawaki2008}.
 This may be caused by the fact that there are more neurons dedicated to foveal
 representation in the primary visual area than for periphery.
 
-Figures \textit{b} and \textit{d} shows the weights of the brain voxels for both
-methods. They both give roughly the same results and we can spot an interesting
-set of voxels.
+Figures \textit{b} and \textit{d} shows the classifiers weights as brain
+maps for both methods. They both give roughly the same results and we can
+see that the weights are centered in the V1 area with a bit of higher
+visual areas.
+
+Figure~\ref{fig:miyawaki}.f shows classifiers weights for encoding, that
+we interpret as receptive fields. We can see that receptive fields of
+neighboring voxels are neighbouring pixels, which is an expected result
+as we know that primary visual cortex direclty encodes visual stimuli. 
+
 
 \begin{figure}[hbtp]
   \begin{center}
