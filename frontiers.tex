@@ -559,7 +559,7 @@ of a fixed number of features will be used.
 
 \subsection{Classification: SVM}
 
-A linear Support Vector Classifier (SVC) finds the linear hyperplane that
+A linear Support Vector Classifier (SVC) finds the hyperplane that
 separates samples belonging to different classes while maximizing the
 distance to the samples (called margin). Classifying a new sample boils
 down to determining on which side of the hyperplane it lies. A SVC bases
@@ -719,8 +719,7 @@ obtain scores on unseen data.
 We will illustrate two problems: reconstructing visual stimulus from BOLD activation,
 which is a decoding task, and predicting brain activation from visual
 stimulus, which is an encoding task. The goal of these two approaches is to find
-a relation between brain voxels and observed pixels. As a conclusion, we will
-compare results obtained on the same voxels and pixels to see if they match.
+a relation between brain voxels and observed pixels. 
 
 \subsection{Decoding}
 
@@ -857,11 +856,12 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 \end{lstlisting}
 %y_train_centered = (y_train - y_train.mean(axis=0)) / y_train.std(axis=0)
 
-Receptive fields are show on the right part of figure~\ref{fig:encoding}. We can
+Figure~\ref{fig:miyawaki}. shows encoding . We can
 see that receptive fields of neighboring voxels are neighbouring pixels, which
 is an expected result as we know that primary visual cortex direclty encodes
-visual stimuli. Moreover, we note that our two approaches give matching results 
-to the voxel.
+visual stimuli. Moreover, the two different estimators used in decoding
+give similar results in terms of prediction accuracy for the different
+pixels.
 
 \subsection{Results}
 \label{sec:miyawaki_results}
@@ -953,7 +953,8 @@ be transposed, as we are using \emph{spatial} ICA, in other words the
 direction considered as random is that of the voxels and not the time
 points. The maps obtained capture different components of the signal,
 including noise components as well as resting-state functional networks.
-
+The produce the figures, we extract only 10 components, as we are
+interested here in exploring only the very large structures.
 
 \begin{lstlisting}
 # Here we start with Xs: a list of subject-level data matrices
@@ -961,7 +962,7 @@ including noise components as well as resting-state functional networks.
 # a concat-ICA
 X = np.vstack(Xs)
 from sklearn.decomposition import FastICA
-ica = FastICA(n_components=20)
+ica = FastICA(n_components=10)
 components_masked = ica.fit_transform(data_masked.T).T
 \end{lstlisting}
 
