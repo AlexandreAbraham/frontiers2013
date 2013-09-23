@@ -4,7 +4,8 @@ from matplotlib import pyplot as plt
 
 
 # Load image
-bg = nibabel.load('bg.nii.gz').get_data()
+bg_img = nibabel.load('bg.nii.gz')
+bg = bg_img.get_data()
 # Keep values over 4000 as activation map
 act = bg.copy()
 act[act < 6000] = 0.
