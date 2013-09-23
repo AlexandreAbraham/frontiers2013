@@ -95,12 +95,19 @@ sbrain = masker.inverse_transform(np.array(scores).mean(0))
 bg = nibabel.load(os.path.join('..', 'bg.nii.gz'))
 
 pl.figure(figsize=(8, 8))
-pl.imshow(bg.get_data()[:, :, 10], interpolation="nearest", cmap='gray')
-pl.imshow(np.ma.masked_less(sbrain.get_data()[:, :, 10], 1e-6),
-        interpolation="nearest", cmap='hot')
-plot_lines(contour[:, :, 10])
+ax1 = pl.axes([0., 0., 1., 1.])
+pl.imshow(bg.get_data()[:, :, 10].T, interpolation="nearest", cmap='gray',
+          origin='lower')
+pl.imshow(np.ma.masked_less(sbrain.get_data()[:, :, 10].T, 1e-6),
+          interpolation="nearest", cmap='hot', origin="lower")
+plot_lines(contour[:, :, 10].T)
 pl.axis('off')
-pl.subplots_adjust(left=0., right=1., bottom=0., top=1.)
+ax2 = pl.axes([.08, .5, .05, .47])
+cb = pl.colorbar(cax=ax2, ax=ax1)
+cb.ax.yaxis.set_ticks_position('left')
+cb.ax.yaxis.set_tick_params(labelcolor='white')
+cb.ax.yaxis.set_tick_params(labelsize=20)
+cb.set_ticks(np.arange(0., .8, .2))
 pl.savefig('encoding_scores.pdf')
 pl.savefig('encoding_scores.eps')
 pl.clf()
@@ -119,10 +126,26 @@ pixmask[p] = 1
 for index in [1780, 1951, 2131, 1935]:
     rf = lasso.fit(y_train, X_train[:, index]).coef_.reshape(10, 10)
     pl.figure(figsize=(8, 8))
-    pl.imshow(rf, vmin=0, interpolation="nearest", cmap='hot')
+    pl.imshow(rf, vmin=0, vmax=0.75, interpolation="nearest", cmap='gnuplot')
     plot_lines(pixmask, linewidth=6)
     pl.axis('off')
     pl.subplots_adjust(left=0., right=1., bottom=0., top=1.)
     pl.savefig('encoding_%d.pdf' % index)
     pl.savefig('encoding_%d.eps' % index)
     pl.clf()
+
+
+### Plot the colorbar #########################################################
+import matplotlib as mpl
+
+
+fig = pl.figure(figsize=(2.4, .4))
+cmap = mpl.cm.gnuplot
+norm = mpl.colors.Normalize(vmin=0., vmax=.75)
+cb = mpl.colorbar.ColorbarBase(pl.gca(), cmap=cmap, norm=norm,
+                               orientation='horizontal')
+#cb.ax.yaxis.set_ticks_position('left')
+cb.set_ticks([0., 0.38, 0.75])
+fig.subplots_adjust(bottom=0.5, top=1., left=0.08, right=.92)
+pl.savefig('rf_colorbar.pdf')
+pl.savefig('rf_colorbar.eps')
