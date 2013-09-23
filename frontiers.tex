@@ -745,39 +745,17 @@ Regression which performance can dramatically decrease outside of the optimal
 value ($C=0.05$).
 
 \begin{figure}[htbp]
-    % \begin{center}
-    % \begin{tabular}{|l|l|l|l|}
-    %     \hline
-    %     $C$ value & Logistic Regression & $\ell_1$ SVC      & $\ell_2$ SVC      \\
-    %     \hline
-    %     0.0005    & 0.5011045           & 0.509909          & 0.677136          \\
-    %     \hline
-    %     0.001     & 0.501045            & 0.55828           & \textbf{0.679273} \\
-    %     \hline
-    %     0.005     & 0.579341            & 0.693644          & 0.672227          \\
-    %     \hline
-    %     0.01      & 0.639182            & \textbf{0.710303} & 0.668386          \\
-    %     \hline
-    %     0.05      & \textbf{0.708015}   & 0.694568          & 0.658447          \\
-    %     \hline
-    %     0.1       & 0.702955            & 0.684341          & 0.655303          \\
-    %     \hline
-    % \end{tabular}
-    % \end{center}
     \begin{center}
-    \begin{tabular}{|l|l|l|l|l|l|l|}
-        \hline
+    \begin{tabular}{l|llllll}
         $C$ value           & 0.0005 & 0.001  & 0.005  & 0.01   & 0.05    & 0.1    \\
-        \hline
-        Logistic Regression & 0.5011 & 0.5010 & 0.5793 & 0.6392 &
-                              \textbf{0.7080} & 0.7030 \\
-        \hline
+    \hline\\[-.9em]
+    \hline\\[-.7em]
+        Logistic Regression ($\ell_1$) & 0.5011 & 0.5010 & 0.5793 & 0.6392 &
+                              \textbf{0.7080} & 0.7030 \\[.1em]
         $\ell_1$ SVC        & 0.5099 & 0.5583 & 0.6936 &
-                              \textbf{0.7103} & 0.6946 & 0.6843 \\
-        \hline
+                              \textbf{0.7103} & 0.6946 & 0.6843 \\[.1em]
         $\ell_2$ SVC        & 0.6771 & \textbf{0.6793} &
-                              0.6722 & 0.6683 & 0.6584 & 0.6553 \\
-        \hline
+                              0.6722 & 0.6683 & 0.6584 & 0.6553 \\[.1em]
     \end{tabular}
     \end{center}
     \caption{5-fold cross validation accuracy scores obtained for different
