@@ -982,11 +982,12 @@ ward.fit(X)
 
 \subsubsection{Results}
 
-Clustering results are shown in figure~\ref{fig:clustering}. Cluster colors are
-random. These clustering does not contain neuroscientifc information. However,
-as clustering group similar voxels together, it can be used as a compression
-method more sophisticated than the simple downsampling.
-% Discuss the 'compression intuition'
+Clustering results are shown in figure~\ref{fig:clustering}. While
+clustering extracts some known large scale structure, such as the
+calcarine sulcus on fig~\ref{fig:clustering}.a, it is not guaranteed to
+recover brain units. Rather, it can be considered as a compression, that
+is a useful method of summarizing information, as it groups together
+similar voxels.
 
 \begin{figure}[hbtp]
       \begin{subfigure}[b]{.23\linewidth}
