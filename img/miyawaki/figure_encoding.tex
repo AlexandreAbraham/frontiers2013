@@ -9,29 +9,29 @@
 \begin{document}
 \begin{preview}
     \begin{tikzpicture}
-        \begin{scope}[spy using outlines={blue, circle, line width=3pt,
-                magnification=6, size=60, connect spies}]
-                \node {\includegraphics[width=5cm]{encoding_scores}};
-            \spy [width=3cm, height=3cm, line width=3pt, spy connection path={\draw[line
-            width=2pt, blue] (tikzspyonnode) -- (tikzspyinnode);}]
-            on (-0.04, -1.7) in node (a) [line width=4pt] (a) at (1.2,1) (a) {};
-        \end{scope} 
+        \node (legend) at (0.4, -0.3) {\textsf{Receiptive fields}};
+        \node (colorbar) at (0.4, -0.9)
+        \node (legend2) at (0.4, -1) {\textsf{\footnotesize Classifier weights}};
         \node (e) at (-2.3, -2.3) {\color{white}\sffamily\bfseries e};
 
         \node (f) at (3.4, -2.3) {\sffamily\bfseries f};
-        \node (legend) at (4.4, -0.3) {\textsf{Receptive fields}};
-        \node (legend2) at (4.4, -1) {\textsf{\footnotesize Classifier weights}};
-        \node (colorbar) at (4.4, -1.35)
         {\includegraphics[width=2.4cm]{rf_colorbar}};
         
-        \node (i1780) at (4.4, 1.3)
+        \node (i1780) at (0.4, 1.3)
             {\includegraphics[width=2.4cm]{encoding_1780}};
-        \node (i1951) at (7, 1.3)
+        \node (i1951) at (3, 1.3)
             {\includegraphics[width=2.4cm]{encoding_1951}};
-        \node (i2131) at (9.6, 1.3)
+        \node (i2131) at (5.6, 1.3)
             {\includegraphics[width=2.4cm]{encoding_2131}};
-        \node (i1935) at (7, -1.3)
+        \node (i1935) at (3, -1.3)
             {\includegraphics[width=2.4cm]{encoding_1935}};
+        \begin{scope}[spy using outlines={blue, circle, line width=3pt,
+                magnification=6, size=60, connect spies}]
+                \node at(9.5, 0) {\includegraphics[width=5cm]{encoding_scores}};
+            \spy [width=3cm, height=3cm, line width=3pt, spy connection path={\draw[line
+            width=2pt, blue] (tikzspyonnode) -- (tikzspyinnode);}]
+            on (9.46, -1.7) in node (a) [line width=4pt] (a) at (10.7,1) (a) {};
+        \end{scope} 
 
     \end{tikzpicture}
 \end{preview}
