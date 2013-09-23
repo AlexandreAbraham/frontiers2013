@@ -921,7 +921,7 @@ as it is a well-known resting-state network.
   \caption{Default mode network extracted using different approaches:
 \emph{left}: the simple Concat-ICA approach demoed in this article;
 \emph{middle}: CanICA, as implemented in nilearn; \emph{right}: Melodic's
-concac-ICA.}
+concat-ICA.}
   \label{fig:ica}
 \end{figure}
 
@@ -933,8 +933,6 @@ samples into groups (called clusters) to maximize a measure of similarity in
 the clusters. If we consider voxels of a functional brain image, this 
 measure can capture functional similarity, thus the clusters of voxels
 form functionally-homogeneous regions \citep{thirion2006}.
-
-\subsubsection{Imposing spatial structure}
 
 \subsubsection{Approaches}
 
@@ -982,7 +980,7 @@ ward = WardAgglomeration(n_clusters=1000, connectivity=connectivity)
 ward.fit(X)
 \end{lstlisting}
 
-\subsection{Results}
+\subsubsection{Results}
 
 Clustering results are shown in figure~\ref{fig:clustering}. Cluster colors are
 random. These clustering does not contain neuroscientifc information. However,
@@ -993,24 +991,25 @@ method more sophisticated than the simple downsampling.
 \begin{figure}[hbtp]
   \begin{center}
       \begin{subfigure}[b]{.23\linewidth}
-          \includegraphics[width=\linewidth]{img/clustering/kmeans}
-        \caption{K-Means}
+          \includegraphics[width=\linewidth]{img/clustering/kmeans_100}
+        \caption{Kmeans, 100 clusters}
       \end{subfigure}
       \begin{subfigure}[b]{.23\linewidth}
-        \includegraphics[width=\linewidth]{img/clustering/ward}
-        \caption{Ward's clustering}
+        \includegraphics[width=\linewidth]{img/clustering/ward_100}
+        \caption{Ward, 100 clusters}
       \end{subfigure}
       \begin{subfigure}[b]{.23\linewidth}
-        \includegraphics[width=\linewidth]{img/clustering/ward_compressed}
-        \caption{Ward's compression}
+        \includegraphics[width=\linewidth]{img/clustering/kmeans_1000}
+        \caption{Kmeans, 1000 clusters}
       \end{subfigure}
       \begin{subfigure}[b]{.23\linewidth}
-        \includegraphics[width=\linewidth]{img/clustering/original}
-        \caption{Original signal}
+        \includegraphics[width=\linewidth]{img/clustering/ward_1000}
+        \caption{Ward, 1000 clusters}
       \end{subfigure}
   \end{center}
-  \caption{Brain decomposition using Ward's clustering and Kmeans. (c) shows how the original
-  signal (d) is compressed using the Ward's clustering decomposition (b).}
+  \caption{Brain parcellations using Kmeans (a) with 50 clusters and 
+  Ward clustering (b) with 250 clusters. (c) shows how the original
+  signal (d) is compressed using the Ward clustering (b).}
   \label{fig:clustering}
 \end{figure}
 
