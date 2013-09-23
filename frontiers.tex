@@ -995,7 +995,10 @@ clusters, it gives a number of regions that can be much larger than the
 number of clusters specified, although some of these regions can be very
 small. On the opposite, Ward operates directly at the level of regions,
 and, as it is a bottom-up process, is often to be preferred when working
-with a large number of clusters.
+with a large number of clusters. There exist many more clustering
+techniques expose in scikit-learn. Determining which is the best one to
+process fMRI time-series requires defining more precisely the target
+application.
 
 \begin{figure}[hbtp]
       \begin{subfigure}[b]{.23\linewidth}
@@ -1024,16 +1027,31 @@ random.}
 
 \section{Conclusion}
 
-These use cases show that neuroscientific problems can be easily handled thanks
-to scikit-learn python library. Difficulties lie in applying proper preprocessing of
-the data, chosing the right model depending on the problem and interpreting
-these results. An attempt to
-address the first problem has been made in the nilearn Python library which
-provides convience tools to load neuroscientific data. However, the other
-problems require skill and experience.
+In this paper we have shown some simple examples of applying machine
+learning using the scikit-learn Python toolkit on fMRI data to tackle
+neuroscientific problems. Encoding and decoding can rely on supervised
+learning to link brain images with stimuli. Unsupervised learning
+can extract structure from resting-state data, functional networks or
+brain regions. The accompanying Python code for the machine learning
+tasks is very straightforward. Difficulties lie in applying proper 
+preprocessing of the data, choosing the right model for the problem at
+hand and interpreting these results. Tackling these difficulties while
+providing the scientists with simple and readable code requires building
+a domain-specific library, dedicated to applying scikit-learn to
+neuroimaging data. This effort is underway in a nascent project, nilearn,
+that aims to facilitate the use of scikit-learn on neuroimaging data.
 
-% XXX: note that the techniques described in this paper only scratch the
-% surface of the applications of statistical learning in neuroimaging. 
+Note that the examples described in this paper only scratch the
+surface of the applications of statistical learning in neuroimaging. For
+instance, sparse inverse covariance can extract the functional 
+interaction structure from fMRI time-series \citep{varoquaux2013}, using
+the graph-lasso estimator also available in scikit-learn.
+High-dimensional statistics, as encountered in modern neuroimaging data
+processing with rich models to be fit on limited data quantities calls
+for statistical learning techniques. We hope that bridging a
+general-purpose machine learning tool, scikit-learn, to domain-specific
+data preparation code will open the door to new scientific advances.
+
 
 \section*{Disclosure/Conflict-of-Interest Statement}
 %All relationships financial, commercial or otherwise that might be perceived
