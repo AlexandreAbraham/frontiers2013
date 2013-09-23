@@ -772,8 +772,10 @@ Given the retinotopic structure of early visual areas, we are led to
 expect their voxels to have strongly localized so-called population
 receptive fields (\textit{prf}). This suggests that per voxel only very
 few stimulus pixels should suffice to explain its activity. This
-information can be exploited by using a sparse coding approach to find
-the receptive fields.
+information can be exploited by using a sparse linear regression --the
+Lasso-- to find the receptive fields. Here we use the \emph{LassoLarsCV}
+estimator that relies on the Lars algorithm and cross-validation to set
+the Lasso parameter.
 
 \begin{lstlisting}
 from sklearn.linear_model import LassoLarsCV
@@ -970,7 +972,7 @@ to group voxels. So if the data matrix is, as previously a (time points
 $\times$ voxels) matrix, we need to transpose it before running the
 scikit-learn clustering estimators. Scikit-learn provides a
 \texttt{WardAgglomeration} object to do this \emph{feature agglomeration}
-with Ward clustering \cite{michel2012supervisedclustering}, but this is
+with Ward clustering \citep{michel2012supervisedclustering}, but this is
 not the case when using K-Means.
 
 \begin{lstlisting}
