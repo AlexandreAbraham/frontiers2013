@@ -10,21 +10,21 @@ def plot_haxby(activation, title):
     fig.subplots_adjust(bottom=0., top=1., left=0., right=1.)
     pl.axis('off')
     # pl.title('SVM vectors')
-    pl.imshow(np.rot90(mean_img[:, 4:58, z]), cmap=pl.cm.gray,
-              interpolation='nearest')
-    pl.imshow(np.rot90(activation[:, 4:58, z]), cmap=pl.cm.hot,
-              interpolation='nearest')
+    pl.imshow(mean_img[:, 4:58, z].T, cmap=pl.cm.gray,
+              interpolation='nearest', origin='lower')
+    pl.imshow(activation[:, 4:58, z].T, cmap=pl.cm.hot,
+              interpolation='nearest', origin='lower')
 
     mask_house = nibabel.load(h.mask_house[0]).get_data()
     mask_face = nibabel.load(h.mask_face[0]).get_data()
 
-    pl.contour(np.rot90(mask_house[:, 4:58, z].astype(np.bool)), contours=1,
+    pl.contour(mask_house[:, 4:58, z].astype(np.bool).T, contours=1,
             antialiased=False, linewidths=4., levels=[0],
-            interpolation='nearest', colors=['blue'])
+            interpolation='nearest', colors=['blue'], origin='lower')
 
-    pl.contour(np.rot90(mask_face[:, 4:58, z].astype(np.bool)), contours=1,
+    pl.contour(mask_face[:, 4:58, z].astype(np.bool).T, contours=1,
             antialiased=False, linewidths=4., levels=[0],
-            interpolation='nearest', colors=['limegreen'])
+            interpolation='nearest', colors=['limegreen'], origin='lower')
 
     p_h = Rectangle((0, 0), 1, 1, fc="blue")
     p_f = Rectangle((0, 0), 1, 1, fc="limegreen")

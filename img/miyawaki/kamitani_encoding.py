@@ -1,6 +1,7 @@
 import numpy as np
 import pylab as pl
 import nibabel
+import os
 
 ### Load Kamitani dataset #####################################################
 from nilearn import datasets
@@ -91,7 +92,7 @@ def plot_lines(mask, linewidth=3):
 
 sbrain = masker.inverse_transform(np.array(scores).mean(0))
 
-bg = nibabel.load('bg_.nii.gz')
+bg = nibabel.load(os.path.join('..', 'bg.nii.gz'))
 
 pl.figure(figsize=(8, 8))
 pl.imshow(bg.get_data()[:, :, 10], interpolation="nearest", cmap='gray')

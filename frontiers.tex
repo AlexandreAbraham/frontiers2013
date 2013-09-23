@@ -424,6 +424,44 @@ unmasked_data = np.zeros(mask.shape, dtype=X.dtype)
 unmasked_data[mask] = X
 \end{lstlisting}
 
+\subsection{Data visualisation}
+
+In the following examples, all figures are made inside python scripts using
+matplotlib to display an axial slice. Most of them are composed of two layers: a
+gray background and a colorful activation map. OVerlaying them is done using a
+\texttt{numpy.ma.masked\_array}. Note that, to be displayed
+properly, data must be transposed and the origin of plot must be changed. 
+
+\begin{lstlisting}
+# Load image
+bg = nibabel.load('bg.nii.gz').get_data()
+# Keep values over 4000 as activation map
+act = bg.copy()
+act[act < 6000] = 0.
+
+# Display the background
+plt.imshow(bg[..., 10].T, origin='lower', interpolation='nearest', cmap='gray')
+# Mask background values of activation map
+masked_act = np.ma.masked_equal(act, 0.)
+plt.imshow(masked_act[..., 10].T, origin='lower', interpolation='nearest', cmap='hot')
+# Cosmetics: disable axis
+plt.axis('off')
+plt.show()
+# Save the activation map
+nibabel.save(nibabel.Nifti1Image(act, bg_img.get_affine()), 'activation.nii.gz')
+\end{lstlisting}
+
+Several tricks exist to enhance the overall aspect of the plot (like removing
+the default large white margins). One can look at image generation in our
+example scripts\footnote{http://www.github.com/AlexandreAbraham/frontiers2013/}
+to learn more about image generation using matplotlib. Nipy provides a
+\texttt{plot_map} function that is tuned to display activation maps (a
+background si even provided).
+
+The simplest way to visualize MRI data in an interactive way is to dump data in
+a file and use an external viewer like FSLview or MRIcron. % or use Pynax !
+3-dimensional display can be achieved in Python using Mayavi and from file using
+MRIcrogl.
 
 % This part has been removed because automatic masking is overly complicated and
 % does not brinautomatic masking is overly complicated and does not bring much
@@ -698,6 +736,52 @@ $\ell_1$ norm as penalization to induce sparsity. We compare SVC to Logistic
 Regression, a simpler method than the one used in the original work, with an $\ell_1$ penalty.
 These two methods differs by their loss function: SVC uses a square hinge loss
 and Logistic Regression a logit function.
+
+We ran a 5-fold cross validation to set up the penalization parameter $C$
+(inverse of regularization amount) and obtains score presented in
+figure~\ref{fig:miyawaki}. This is particularly important for Logistic
+Regression which performance can dramatically decrease outside of the optimal
+value ($C=0.05$).
+
+\begin{figure}[htbp]
+    % \begin{center}
+    % \begin{tabular}{|l|l|l|l|}
+    %     \hline
+    %     $C$ value & Logistic Regression & $\ell_1$ SVC      & $\ell_2$ SVC      \\
+    %     \hline
+    %     0.0005    & 0.5011045           & 0.509909          & 0.677136          \\
+    %     \hline
+    %     0.001     & 0.501045            & 0.55828           & \textbf{0.679273} \\
+    %     \hline
+    %     0.005     & 0.579341            & 0.693644          & 0.672227          \\
+    %     \hline
+    %     0.01      & 0.639182            & \textbf{0.710303} & 0.668386          \\
+    %     \hline
+    %     0.05      & \textbf{0.708015}   & 0.694568          & 0.658447          \\
+    %     \hline
+    %     0.1       & 0.702955            & 0.684341          & 0.655303          \\
+    %     \hline
+    % \end{tabular}
+    % \end{center}
+    \begin{center}
+    \begin{tabular}{|l|l|l|l|l|l|l|}
+        \hline
+        $C$ value           & 0.0005 & 0.001  & 0.005  & 0.01   & 0.05    & 0.1    \\
+        \hline
+        Logistic Regression & 0.5011 & 0.5010 & 0.5793 & 0.6392 &
+                              \textbf{0.7080} & 0.7030 \\
+        \hline
+        $\ell_1$ SVC        & 0.5099 & 0.5583 & 0.6936 &
+                              \textbf{0.7103} & 0.6946 & 0.6843 \\
+        \hline
+        $\ell_2$ SVC        & 0.6771 & \textbf{0.6793} &
+                              0.6722 & 0.6683 & 0.6584 & 0.6553 \\
+        \hline
+    \end{tabular}
+    \end{center}
+    \caption{5-fold cross validation accuracy scores obtained for different
+    values of parameter $C$.}
+\end{figure}
 
 In a first time, we show the reconstruction accuracy per pixel (using a 5 fold
 cross validation) in order to see if some pixel are easier to decode than
