@@ -428,7 +428,7 @@ unmasked_data[mask] = X
 
 In the following examples, all figures are made inside python scripts using
 matplotlib to display an axial slice. Most of them are composed of two layers: a
-gray background and a colorful activation map. OVerlaying them is done using a
+gray background and a colorful activation map. Overlaying them is done using a
 \texttt{numpy.ma.masked\_array}. Note that, to be displayed
 properly, data must be transposed and the origin of plot must be changed. 
 
@@ -457,7 +457,7 @@ the default large white margins). One can look at image generation in our
 example scripts\footnote{http://www.github.com/AlexandreAbraham/frontiers2013/}
 to learn more about image generation using matplotlib. Nipy provides a
 \texttt{plot\_map} function that is tuned to display activation maps (a
-background si even provided).
+background is even provided).
 
 The simplest way to visualize MRI data in an interactive way is to dump data in
 a file and use an external viewer like FSLview or MRIcron. % or use Pynax !
@@ -883,16 +883,19 @@ set of voxels.
     \includegraphics[width=\linewidth]{img/miyawaki/figure}
   \end{center}
   \caption{
-      Miyawaki results in both decoding and encoding. Highlighted pixels and
-      voxels are the same across methods. Results are consistent as decoding
-      and encoding have found a relation between the same pixel and voxels.
+      Miyawaki results in both decoding and encoding. 
       \textbf{Top: Decoding.} Reconstruction accuracy per pixel 
       (\textit{a.} Logistic
-      regression, \textit{c.} SVC). Coefficients used to predict the pixel chosen (\textit{b.} Logistic
-      regression, \textit{d.} SVC). 
+      regression, \textit{c.} SVC). Classifier weights for the pixel
+      highlighted (\textit{b.} Logistic regression, \textit{d.} SVC). 
       \textbf{Bottom: Encoding.} Left: reconstruction accuracy depending on 
 	pixel position in the stimulus. Right: receptive fields corresponding to
-       voxels with highest scores and its neighbors.}
+       voxels with highest scores and its neighbors.
+      --- Note that the pixels and voxels highlighted are the same in 
+      both decoding and encoding figures and that encoding and decoding
+      roughly match as both approach highlight a relationship between the
+      same pixel and voxels.
+}
 \label{fig:miyawaki}
 \end{figure}
 
