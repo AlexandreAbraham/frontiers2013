@@ -8,10 +8,10 @@ An example applying ICA to resting-state data.
 ### Load nyu_rest dataset #####################################################
 from nilearn import datasets
 dataset = datasets.fetch_adhd(n_subjects=10)
-n_components = 20
+n_components = 10
 
 # Index of the generated axial slice of the brain
-z = 52
+z = 35
 
 ### Initialization ############################################################
 import nibabel
@@ -21,13 +21,6 @@ import numpy as np
 import time
 from nilearn.input_data import MultiNiftiMasker
 
-# Masker:
-masker = MultiNiftiMasker(smoothing_fwhm=6.,
-                          memory="nilearn_cache",
-                          memory_level=1)
-masker.fit(dataset.func)
-affine = masker.mask_img_.get_affine()
-
 
 def plot_ica_map(map_3d):
     # Mask the background
@@ -36,8 +29,19 @@ def plot_ica_map(map_3d):
     section = map_3d[:, :, z]
     vmax = np.max(np.abs(section))
 
+    pl.figure(figsize=(3.8, 4.5))
+    pl.axes([0, 0, 1, 1])
     pl.imshow(np.rot90(section), interpolation='nearest',
               vmax=vmax, vmin=-vmax, cmap='jet')
+    pl.axis('off')
+
+
+# Masker:
+masker = MultiNiftiMasker(smoothing_fwhm=6.,
+                          target_affine=np.diag((3, 3, 3.)),
+                          memory="nilearn_cache",
+                          memory_level=1, n_jobs=-1)
+masker.fit(dataset.func)
 
 
 ### CanICA ####################################################################
@@ -46,19 +50,21 @@ if not os.path.exists('canica.nii.gz'):
     t0 = time.time()
     from nilearn.decomposition.canica import CanICA
     canica = CanICA(n_components=n_components, mask=masker,
+                    target_affine=np.diag((3, 3, 3.)),
                     smoothing_fwhm=6.,
                     memory="nilearn_cache", memory_level=1,
                     threshold=None,
-                    random_state=1)
+                    random_state=1, n_jobs=-1)
     canica.fit(dataset.func)
     print('Canica: %f' % (time.time() - t0))
     canica_components = masker.inverse_transform(canica.components_)
     nibabel.save(canica_components, 'canica.nii.gz')
 
 if not os.path.exists('canica.pdf'):
-    plot_ica_map(nibabel.load('canica.nii.gz').get_data()[..., 16])
+    plot_ica_map(nibabel.load('canica.nii.gz').get_data()[..., 4])
     pl.savefig('canica.pdf')
     pl.savefig('canica.eps')
+
 
 smooth_masked = masker.transform(dataset.func)
 
