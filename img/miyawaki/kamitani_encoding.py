@@ -80,14 +80,14 @@ for x, y in [(31, 9), (31, 10), (30, 10), (32, 10)]:
 from matplotlib.lines import Line2D
 
 
-def plot_lines(mask, linewidth=3):
+def plot_lines(mask, linewidth=3, color='b'):
     for i, j in np.ndindex(mask.shape):
         if i + 1 < mask.shape[0] and mask[i, j] != mask[i + 1, j]:
             pl.gca().add_line(Line2D([j - .5, j + .5], [i + .5, i + .5],
-                color='b', linewidth=linewidth))
+                color=color, linewidth=linewidth))
         if j + 1 < mask.shape[1] and mask[i, j] != mask[i, j + 1]:
             pl.gca().add_line(Line2D([j + .5, j + .5], [i - .5, i + .5],
-                color='b', linewidth=linewidth))
+                color=color, linewidth=linewidth))
 
 
 sbrain = masker.inverse_transform(np.array(scores).mean(0))
@@ -125,11 +125,12 @@ pixmask[p] = 1
 
 for index in [1780, 1951, 2131, 1935]:
     rf = lasso.fit(y_train, X_train[:, index]).coef_.reshape(10, 10)
-    pl.figure(figsize=(8, 8), facecolor='black')
-    pl.subplot(111, axisbg='black')
+    pl.figure(figsize=(8, 8))
+    # Black background
     pl.imshow(np.zeros_like(rf), vmin=0., vmax=1., cmap='gray')
-    pl.imshow(np.ma.masked_equal(rf, 0.), vmin=0., vmax=0.75, interpolation="nearest", cmap='rainbow')
-    plot_lines(pixmask, linewidth=6)
+    pl.imshow(np.ma.masked_equal(rf, 0.), vmin=0., vmax=0.75,
+            interpolation="nearest", cmap='cool')
+    plot_lines(pixmask, linewidth=6, color='r')
     pl.axis('off')
     pl.subplots_adjust(left=0., right=1., bottom=0., top=1.)
     pl.savefig('encoding_%d.pdf' % index)
@@ -142,7 +143,7 @@ import matplotlib as mpl
 
 
 fig = pl.figure(figsize=(2.4, .4))
-cmap = mpl.cm.rainbow
+cmap = mpl.cm.cool
 norm = mpl.colors.Normalize(vmin=0., vmax=.75)
 cb = mpl.colorbar.ColorbarBase(pl.gca(), cmap=cmap, norm=norm,
                                orientation='horizontal')
