@@ -384,6 +384,8 @@ includes:
 
 \subsection{From 4-dimensional images to 2-dimensional array: masking}
 
+\label{sec:unmasking}
+
 Neuroimaging data are represented in 4 dimensions: 3 spatial dimensions, and 
 one dimension for the time.
 Scikit-learn algorithms, on the other hand, only accept 2-dimensional
@@ -575,23 +577,6 @@ X_red = feature_selection.fit_transform(X)
 clf.fit(X_red, y)
 \end{lstlisting}
 
-% \subsubsection{Pipeline}
-
-% The workflow described above (feature selection + estimator) is a standard one.
-% In fact, in most cases, it will consist in atomic steps
-% \textit{linked} together (the output of a step is the input of the next one).
-% For this purpose, scikit-learn offers a pipeline object that allows such
-% linking. A pipeline is simply a list of scikit-learn objects through which the
-% input data will be conveyed. The function to call for each object (transform,
-% fit...) depends on its type.
-% This allow developpers to create new estimators based on existing ones.
-
-% \begin{lstlisting}
-% anova_svc = Pipeline([('anova', feature_selection), ('svc', clf)])
-% anova_svc.fit(X)
-% sv = anova_svc.inverse_tranform(clf.support_vectors_)
-% \end{lstlisting}
-
 \subsection{Searchlight}
 \label{searchlight}
 
@@ -609,31 +594,6 @@ are available in nilearn\footnote{http://nilearn.github.io}.
 
 \subsection{Results}
 
-The results of this experience are shown in figure~\ref{fig:haxby}.
-On all figures, green, resp.\ blue,
-lines surround features corresponding to face, resp.\ house, recognition
-exhibited in the reference paper.
-The F-score (left) is the basic
-classifier used in ANOVA to select the features. The middle picture shows the
-first support vector obtained with SVC after feature selection. The picture on
-the right shows the Searchlight map.
-
-First, we observe that highlighted voxels located in the blue areas are
-highlighted by all methods. The Searchlight is more blurry than the other
-methods because it iterates over a ball around the voxels.
-
-These results are also neuroscientifically plausible as the activation occurs in the
-high level regions of the visual cortex which is known to contain semantic
-information about vision. While Searchlight only gives a score to each voxel,
-the SVC can be used afterward to classify unseen brain scans.
-
-\begin{lstlisting}
-### Look at the discriminating weights
-coef = clf.coef_
-# reverse feature selection
-coef = feature_selection.inverse_transform(coef)
-\end{lstlisting}
-
 \begin{figure}[hbtp]
   \begin{center}
   \includegraphics[width=.3\linewidth]{img/haxby/haxby_fscore}
@@ -648,58 +608,30 @@ paper \citep{haxby2001} are displayed blue and in green.}
 \label{fig:haxby}
 \end{figure}
 
-% This is too technical
+To create full-brain maps from SVC weights, we must apply the
+unmasking step described in \ref{sec:unmasking}, but also invert the
+feature selection:
+\begin{lstlisting}
+### Look at the discriminating weights
+coef = clf.coef_
+# reverse feature selection
+coef = feature_selection.inverse_transform(coef)
+\end{lstlisting}
+
+Results are shown in figure~\ref{fig:haxby}: First
+F-score, that is standard analysis in brain mapping but also the
+statistic used to select features; second the SVC weights, after feature
+selection and last the Searchlight map.
 %
-% \subsubsection{Implementation}
-% 
-% Even if this algorithm seems complicated, it can be easily implemented thanks to
-% some basic bricks provided by the scikit-learn. They key elements here are
-% \textit{i)} the neighbourhood (\texttt{sklearn.neighbors.NearestNeighbors}),
-% \textit{ii)} the classifier (\texttt{sklearn.svm.LinearSVC}),
-% \textit{iii)} the cross-validation (\texttt{sklearn.svm.LinearSVC}).
-% 
-% Searchlight prohibitive computational cost makes it hardly runnable on a whole
-% brain. To avoid this problem, computation will be limited to voxels present in a
-% \texttt{process\_mask} (in this use case, a single axial slice). This is easily
-% doable thanks to scikit-learn: a connectivity graph is build upon the
-% \texttt{mask} and then restricted to voxels of interest contained in the 
-% \texttt{process\_mask}.
-% 
-% \begin{lstlisting}
-% # Compute world coordinates of all in-mask voxels.
-% mask_coords = get_real_world_coordinates(mask_data, mask_affine)
-% 
-% # Compute world coordinates of all in-processing region voxels
-% process_mask_coords = get_real_world_coordinates(process_mask_data,
-%                                                  process_mask_affine)
-% 
-% clf = neighbors.NearestNeighbors(radius=radius)
-% A = clf.fit(mask_coords).radius_neighbors_graph(process_mask_coords)
-% \end{lstlisting}
-% 
-% Then, for each row of our adjacency matrix, we do a cross validation using a
-% given estimator. This is the core of the algorithm and we see that it can be
-% written with a simple for-loop.
-% 
-% \begin{lstlisting}
-% scores = np.zeros(len(A.rows))
-% for i, row in enumerate(A.rows):
-%     scores[i] = np.mean(
-%             cross_val_score(estimator, X[:, row], y,
-%                             score_func=score_func,
-%                             cv=cv, n_jobs=1))
-% return scores
-% \end{lstlisting}
-% 
-% \subsubsection{Results}
-% 
-% Results are presented in figure \ref{fig:haxby}. Searchlight results
-% (\textit{b}) are compared to the previous use case and to the F-score measure
-% (\textit{c}), the simplest statistical test we can make on the data.
-% All methods mainly localizes information in the region of
-% interest corresponding to house detection. The smoothing effect present in the
-% Searchlight results is inherent to the fact that a ball is used to iterate on
-% the voxels.
+Note that, the voxels with most weights roughly match for all methods and
+are locate in the house-specific areas as defined by the original paper.
+The Searchlight is more expanded and blurry than the other methods
+as it iterates over a ball around the voxels.
+
+These results match neuroscientific knowledge as they highlight the
+high level regions of the visual cortex which is known to contain semantic
+information about vision. While Searchlight only gives a score to each voxel,
+the SVC can be used afterward to classify unseen brain scans.
 
 \section{Encoding brain activity and decoding images}
 \label{kamitani}
