@@ -125,8 +125,10 @@ pixmask[p] = 1
 
 for index in [1780, 1951, 2131, 1935]:
     rf = lasso.fit(y_train, X_train[:, index]).coef_.reshape(10, 10)
-    pl.figure(figsize=(8, 8))
-    pl.imshow(rf, vmin=0, vmax=0.75, interpolation="nearest", cmap='gnuplot')
+    pl.figure(figsize=(8, 8), facecolor='black')
+    pl.subplot(111, axisbg='black')
+    pl.imshow(np.zeros_like(rf), vmin=0., vmax=1., cmap='gray')
+    pl.imshow(np.ma.masked_equal(rf, 0.), vmin=0., vmax=0.75, interpolation="nearest", cmap='rainbow')
     plot_lines(pixmask, linewidth=6)
     pl.axis('off')
     pl.subplots_adjust(left=0., right=1., bottom=0., top=1.)
@@ -140,7 +142,7 @@ import matplotlib as mpl
 
 
 fig = pl.figure(figsize=(2.4, .4))
-cmap = mpl.cm.gnuplot
+cmap = mpl.cm.rainbow
 norm = mpl.colors.Normalize(vmin=0., vmax=.75)
 cb = mpl.colorbar.ColorbarBase(pl.gca(), cmap=cmap, norm=norm,
                                orientation='horizontal')
