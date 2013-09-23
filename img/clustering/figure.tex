@@ -1,0 +1,36 @@
+\documentclass{article} % for Science articles
+
+\usepackage{graphicx}
+\usepackage[tightpage, active, floats, graphics]{preview}
+\usepackage{subcaption}
+\captionsetup{figurewithin=none}  
+\captionsetup{tablewithin=none}
+
+\begin{document}
+\begin{figure}
+
+\begin{preview}
+      \begin{subfigure}[b]{.26\linewidth}
+        \includegraphics[width=\linewidth]{kmeans_100}%
+	\vspace*{-1.6em}
+        \caption{\footnotesize\sffamily\hspace*{-.9ex}Kmeans, 100 clusters}
+      \end{subfigure}%
+      \begin{subfigure}[b]{.26\linewidth}
+        \includegraphics[width=\linewidth]{ward_100}%
+	\vspace*{-1.6em}
+        \caption{\footnotesize\sffamily\hspace*{-.9ex}Ward, 100 clusters}
+      \end{subfigure}%
+      \begin{subfigure}[b]{.26\linewidth}
+        \includegraphics[width=\linewidth]{kmeans_1000}%
+	\vspace*{-1.6em}
+        \caption{\footnotesize\sffamily\hspace*{-.9ex}Kmeans, 1000 clusters}
+      \end{subfigure}%
+      \begin{subfigure}[b]{.26\linewidth}
+        \includegraphics[width=\linewidth]{ward_1000}%
+	\vspace*{-1.6em}
+        \caption{\footnotesize\sffamily\hspace*{-.9ex}Ward, 1000 clusters}
+      \end{subfigure}
+\end{preview}
+\end{figure}
+\end{document}
+

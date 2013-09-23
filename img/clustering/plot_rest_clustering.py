@@ -35,8 +35,8 @@ def plot_labels(labels, seed):
     np.random.seed(seed)
     colors = np.random.random(size=(n_colors + 1, 3))
 
-    # Cluster '-1' should be black (it's outside the brain)
-    colors[-1] = 0
+    # Cluster '-1' should be white (it's outside the brain)
+    colors[-1] = 1
     pl.figure(figsize=(3.8, 4.5))
     pl.axes([0, 0, 1, 1])
     pl.imshow(colors[np.rot90(cut)], interpolation='nearest')
