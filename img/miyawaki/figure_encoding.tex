@@ -10,12 +10,10 @@
 \begin{preview}
     \begin{tikzpicture}
         \node (legend) at (0.4, -0.3) {\textsf{Receiptive fields}};
-        \node (colorbar) at (0.4, -0.9)
-        \node (legend2) at (0.4, -1) {\textsf{\footnotesize Classifier weights}};
-        \node (e) at (-2.3, -2.3) {\color{white}\sffamily\bfseries e};
+        \node (colorbar) at (0.4, -1.3) {\includegraphics[width=2.4cm]{rf_colorbar}};
+        \node (legend2) at (0.4, -0.9) {\textsf{\footnotesize Classifier weights}};
 
-        \node (f) at (3.4, -2.3) {\sffamily\bfseries f};
-        {\includegraphics[width=2.4cm]{rf_colorbar}};
+        \node (f) at (-.7, -2.3) {\sffamily\bfseries f};
         
         \node (i1780) at (0.4, 1.3)
             {\includegraphics[width=2.4cm]{encoding_1780}};
@@ -32,6 +30,7 @@
             width=2pt, blue] (tikzspyonnode) -- (tikzspyinnode);}]
             on (9.46, -1.7) in node (a) [line width=4pt] (a) at (10.7,1) (a) {};
         \end{scope} 
+        \node (e) at (7.2, -2.3) {\color{white}\sffamily\bfseries e};
 
     \end{tikzpicture}
 \end{preview}
