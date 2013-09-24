@@ -682,7 +682,7 @@ We ran a 5-fold cross validation to set up the penalization parameter $C$
 (inverse of regularization amount) and obtains score presented in
 figure~\ref{fig:miyawaki}.
 
-\begin{figure}[htbp]
+\begin{table}[htbp]
     \begin{center}
     \begin{tabular}{l|llllll}
         $C$ value           & 0.0005 & 0.001  & 0.005  & 0.01   & 0.05    & 0.1    \\
@@ -711,7 +711,7 @@ figure~\ref{fig:miyawaki}.
     \caption{5-fold cross validation accuracy scores obtained for different
     values of parameter $C$ ($\pm$ standard deviation).}
     \label{fig:miyawaki_cv}
-\end{figure}
+\end{table}
 
 Table~\ref{fig:miyawaki_cv} compares described approaches, along with an
 $\ell_2$ regularized SVC. We first observe that setting the parameter $C$ is
