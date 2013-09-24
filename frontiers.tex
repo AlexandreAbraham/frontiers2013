@@ -688,16 +688,28 @@ figure~\ref{fig:miyawaki}.
         $C$ value           & 0.0005 & 0.001  & 0.005  & 0.01   & 0.05    & 0.1    \\
     \hline\\[-.9em]
     \hline\\[-.7em]
-        Logistic Regression ($\ell_1$) & 0.50 & 0.50 & 0.57 & 0.63 &
-                              \textbf{0.70} & 0.70 \\[.1em]
-        $\ell_1$ SVC        & 0.50 & 0.55 & 0.69 &
-                              \textbf{0.71} & 0.69 & 0.68 \\[.1em]
-        $\ell_2$ SVC        & 0.67 & \textbf{0.67} &
-                              0.67 & 0.66 & 0.65 & 0.65
+        Logistic Regression ($\ell_1$) & 0.50 $\pm$ 0.02
+                                       & 0.50 $\pm$ 0.02 
+                                       & 0.57 $\pm$ 0.13
+                                       & 0.63 $\pm$ 0.11
+                                       & \textbf{0.70} $\pm$ 0.12
+                                       & 0.70 $\pm$ 0.12 \\[.1em]
+        $\ell_1$ SVC        & 0.50 $\pm$ 0.06
+                            & 0.55 $\pm$ 0.12
+                            & 0.69 $\pm$ 0.11
+                            & \textbf{0.71} $\pm$ 0.12
+                            & 0.69 $\pm$ 0.12
+                            & 0.68 $\pm$ 0.12 \\[.1em]
+        $\ell_2$ SVC        & 0.67 $\pm$ 0.12
+                            & \textbf{0.67} $\pm$ 0.12
+                            & 0.67 $\pm$ 0.12
+                            & 0.66 $\pm$ 0.12
+                            & 0.65 $\pm$ 0.12
+                            & 0.65 $\pm$ 0.12
     \end{tabular}
     \end{center}
     \caption{5-fold cross validation accuracy scores obtained for different
-    values of parameter $C$.}
+    values of parameter $C$ ($\pm$ standard deviation).}
     \label{fig:miyawaki_cv}
 \end{figure}
 
