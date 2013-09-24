@@ -198,18 +198,28 @@ that are fully understood by both worlds.
 
 With its mature scientific stack, Python is a growing contender in the
 landscape of neuroimaging data analysis with tools such as Nipy
-\citep{millman2007analysis} or Nipype \citep{gorgolewski2011} and some
-frameworks for multi-variate pattern analysis already exists
-\citep{hanke2009pymvpa}. 
+\citep{millman2007analysis} or Nipype \citep{gorgolewski2011}.
+For multi-variate pattern analysis, PyMVPA \citep{hanke2009pymvpa}
+combines Python and external tools such as R or Shogun
+\citep{sonnenburg2010}. 
 
 In this paper, we show how scikit-learn, a Python machine learning
 library \citep{pedregosa2011}, can be used on neuroimaging data.
-Statistical learning can be a useful tool for scientific investigation in
-imaging neurosciences in many ways. We discuss a few applications to
+We discuss a few applications of statistical learning to
 resolve common neuroimaging needs, which methods can be used, what they
 imply and how to achieve the desired results. We discuss not only
 prediction scores, but also the interpretability of the results, which
-leads us to open up the black box methods. The paper is organized as
+leads us to open up the black box methods. The scope of this paper is not
+to discuss a library, but rather code patterns, and the github repository
+of the
+paper\footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}}
+provides complete scripts to generate figures. Naturally, there would be
+value in a software package building upon these patterns. Such a package
+is under development, in the form of nilearn
+--\url{http://nilearn.github.io}-- but is, to date, far from being ready
+for public consumption.
+
+The paper is organized as
 follows. After introducing the \emph{scikit-learn} toolbox, we show 
 how the data must be prepared to apply
 \emph{scikit-learn}. Then we describe the application of \emph{supervised
@@ -345,13 +355,10 @@ depending on the direction. This information is used by algorithms
 relying on the spatial structure of the data, for instance the
 Searchlight. SciPy provides routines taking affine into account in its
 ndimage module, for instance \texttt{scipy.ndimage.affine\_transform}.
-% XXX: here, maybe mention nilearn
-% For Searchlight or for the maskers ?
 
-Resampling consists in changing the spatial resolution of the data. This is
+Nilearn uses Scipy to implement easy-to-use image resampling: 
+changing the spatial resolution of the data. This is
 an interpolation and alters the data, that is why it should be used carefully.
-Oversampling (increasing data resolution) leads to higher memory consumption
-and computation resources with no gain in information.
 Downsampling is commonly used to reduce the size of data to process.
 Typical sizes are 2mm or 3mm resolutions, but scan spatial resolution is
 increasing with progress in MR physics.
@@ -462,7 +469,7 @@ Note that a background is needed to display partial maps. Overlaying two images
 can be done thanks to the \texttt{numpy.ma.masked\_array}.
 Several tricks and options exist to enhance the overall aspect of the plot.
 Some of them can be found in the full scripts accompanying this paper
-\footnote{http://www.github.com/AlexandreAbraham/frontiers2013/} but it 
+\footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}} but it 
 boils down to a good knowledge of Matplotlib. Note that Nipy package provides a
 \texttt{plot\_map} function that is tuned to display activation maps (a
 background is even provided if needed).
@@ -588,9 +595,9 @@ and the target behavioral variable. In practice, it entails performing
 cross-validation of the model, most often an SVM, on voxels contained in
 balls centered on each voxel of interest. The procedure amounts to
 solving a large number of SVMs and can be computationally expensive.
-An efficient implementation of this algorithm is beyond the scope of this
-paper and it is not detailed here. However, the code, along with this example,
-are available in nilearn\footnote{http://nilearn.github.io}.
+Detailing an efficient implementation of this algorithm is beyond the scope of this
+paper. However, the code, along with this example,
+are available in nilearn.
 
 \subsection{Results}
 
@@ -793,11 +800,11 @@ visual areas.
 Figures \textit{b} and \textit{d} show reconstruction
 accuracy score using Logistic Regression and Support Vector Classification
 (variable \texttt{mean\_scores} in the code above).
-Both methods give almost identical results. They also point out the fact that reconstruction is more
-accurate in the fovea, as highlighted
-in the original work \citep{miyawaki2008}.
-This may be caused by the fact that there are more neurons dedicated to foveal
-representation in the primary visual area than for periphery.
+Both methods give almost identical results. 
+As in the original work \citep{miyawaki2008}, reconstruction is more
+accurate in the fovea.
+This may be can be explained by the higher density of neurons dedicated to
+foveal representation in the primary visual area than for periphery.
 
 In encoding settings, figure~\ref{fig:miyawaki}.e shows classifiers weights for encoding, that
 we interpret as receptive fields. We can see that receptive fields of
@@ -873,7 +880,7 @@ fMRI \citep{kiviniemi2003}. Several strategies have been used to syndicate ICA
 results across several subjects. \cite{calhoun2001a} propose a dimension
 reduction (using PCA) followed by a concatenation of timeseries (used in this
 example). \cite{varoquaux2010} use dimension reduction and canonical correlation analysis
-to aggregate subject data. Melodic, ICA program from the FSL suite uses a Tensor
+to aggregate subject data. Melodic \cite{beckmann2004}, ICA program from the FSL suite uses a Tensor
 ICA approach which is not detailed here.
 
 \subsubsection{Application}
