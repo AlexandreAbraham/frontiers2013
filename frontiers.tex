@@ -334,7 +334,7 @@ to search through.
 
 Before applying statistical learning to neuroimaging data, standard
 preprocessing must be applied. For fMRI, these namely entail motion
-correction, slice timing, coregistration and normalization on a common
+correction, slice timing, coregistration and normalization to a common
 template like MNI if necessary. Reference softwares for this task are
 SPM\footnote{http://www.fil.ion.ucl.ac.uk/spm}~\citep{friston2007} and
 FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\citep{smith2004}. A Python
@@ -377,6 +377,7 @@ includes:
         intensity itself has no meaning and we want to study its variation and
         correlation with other voxels. Detrending can be done thanks to SciPy
         (\texttt{scipy.signal.detrend}).
+% bzw, linear detrending is utterly insufficient
     \item{\bf Normalization} consists in setting the timeseries variance to 1.
         This harmonization is necessary as some machine learning algorithms are
         sensible to different value ranges.
@@ -397,7 +398,7 @@ includes:
 Neuroimaging data are represented in 4 dimensions: 3 spatial dimensions, and 
 one dimension for the time.
 Scikit-learn algorithms, on the other hand, only accept 2-dimensional
-samples $\times$ features matrices (see~\ref{scikitlearn}).
+samples $\times$ features matrices (see Section~\ref{scikitlearn}).
 Depending on the settings, voxels and time series can be
 considered as features
 or samples. For example, in spatial independent component analysis (ICA),
@@ -516,16 +517,16 @@ background is even provided if needed).
 %y = y[:-2]
 %\end{lstlisting}
 
-\section{Decoding object representation in the brain}
+\section{Decoding the mental representation of objects in the brain}
 
 In the context of machine learning in neuroimaging, \textit{decoding} refers to learning a model
-which predicts behavioral or phenotypic data given brain activity. 
+that predicts behavioral or phenotypic data given brain activity. 
 The reverse procedure is
 called \textit{encoding} \citep{naselaris2011} and is introduced in the next 
 section.
 
 Here we illustrate decoding with a simpler version of the experiment presented in
-\cite{haxby2001}. In the original work, visual stimuli representing 8 different categories
+\cite{haxby2001}. In the original work, visual stimuli from 8 different categories
 are presented to 6 subjects during 12 sessions. The goal is to 
 predict the category of the stimulus presented to subject given his
 brain activity. For the sake of simplicity, we will restrict our code 
@@ -546,12 +547,12 @@ setup used in NeuroImaging.
 \subsection{Feature selection: ANOVA F-Test}
 
 After applying a brain mask, the data consist of 40\,000 features for 
-only 1\,400 samples. Machine learning with much more features than samples
+only 1\,400 samples. Machine learning with many more features than samples
 is challenging, due to the so-called \emph{curse of dimensionality}.
 A popular strategy is to reduce the number of features (ie voxels) by
 selecting the most relevant ones. Based on prior neuroscientific
-knowledge, we could restrain the mask to occipital area where the visual
-cortex is located. A simple statistical approach relies on screening
+knowledge, we could restrain the mask to occipital areas, where the visual
+cortex is actually located. A simple statistical approach relies on screening
 features based on a univariate statistical test.
 
 Scikit-learn offers a panel of strategies to select features. In supervised
@@ -573,9 +574,9 @@ of a fixed number of features will be used.
 A linear Support Vector Classifier (SVC) finds the hyperplane that
 separates samples belonging to different classes while maximizing the
 distance to the samples (called margin). Classifying a new sample boils
-down to determining on which side of the hyperplane it lies. A SVC bases
+down to determining on which side of the hyperplane it lies. An SVC bases
 its decision upon a subset of training data called support vectors. As
-the linear SVC is a linear classifier, it's decision is based on a set of
+the linear SVC is a linear classifier, its decision is based on a set of
 weights that form a brain map (see figure~\ref{fig:haxby}).
 
 \begin{lstlisting}
