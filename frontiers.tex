@@ -246,12 +246,14 @@ are:
         processing. Together, NumPy and SciPy provide a robust scientific environment
         for numerical computing and they are the elementary bricks we use in all our
         algorithms.
+        % XXX : elementary bricks -> foundations ? building blocks?
 
     \item{\bf Matplotlib} is a plotting library tightly integrated into the
-        the scientific Python stack \citep{hunter2007}. It offers publication-quality figures in
-        a variety of formats and can display plots or images in a
-        graphical user interface. All figures in this paper have been generated using
-        it.
+        scientific Python stack \citep{hunter2007}. It offers publication-quality figures in
+        a variety of formats.
+        %  and can display plots or images in a
+        % graphical user interface.
+        All figures in this paper have been generated with it.
 
     \item{\bf Nibabel} loads or saves data in neuroimaging file formats.
 	We use it at the beginning of all our scripts.
@@ -264,71 +266,75 @@ are:
 learning library for the Python programming language. The ambition of the
 project is to provide efficient and well-established machine learning tools within
 a programming environment that is accessible to non-machine learning experts
-and reusable in various scientific areas.
+and reusable across scientific disciplines.
 
 \subsection{Concepts}
 
-In {\em scikit-learn}, all objects and algorithms accept data represented
-in a generic domain-independent 2-dimensional array, samples $\times$
-features. Scikit-learn objects share a uniform set of methods that
-depends on their purpose: \textit{estimators} can build and fit models,
-\textit{predictors} can make predictions and \textit{transformers}
-converting data from one representation to another.
+In {\em scikit-learn}, all objects and algorithms accept as input data
+2-dimensional arrays of size samples $\times$ features.
+This convention makes it generic and domain-independent.
+Scikit-learn objects share a uniform set of methods that
+depends on their purpose: \textit{estimators} can fit models from data,
+\textit{predictors} can make predictions on new data and \textit{transformers}
+convert data from one representation to another.
 
 \begin{itemize}
 \item {\bf Estimator}. The \textit{estimator} interface, the core of the
-    library, exposes a \texttt{fit} method for learning a model from training data.
+    library, exposes a \texttt{fit} method for learning model parameters from training data.
     All supervised
     and unsupervised learning algorithms (e.g., for classification, regression or
-    clustering) are offered as objects implementing this interface. Machine
+    clustering) are available as objects implementing this interface. Machine
     learning tasks such as feature extraction, feature selection or dimensionality
     reduction are also provided as estimators.
 
 \item {\bf Predictor}. The \textit{predictor} interface extends the notion of an estimator
     by adding a \texttt{predict}
-    method that takes an array \texttt{X\_test} and produces
-    predictions for \texttt{X\_test}, based on the learned parameters of the
-    estimator (we call the input to \texttt{predict} ``\texttt{X\_test}'' in order
-    to emphasize that \texttt{predict} generalizes to new data). In the case of
+    method that takes an input array \texttt{X\_test} and makes
+    predictions for each sample in it.
+    We call the input parameter ``\texttt{X\_test}'' in order
+    to emphasize that \texttt{predict} generalizes to new data. In the case of
     supervised learning estimators, this method typically returns the predicted
-    labels or values computed by the model.
+    labels or values computed from the estimated model.
 
 \item {\bf Transformer}. As it is common to modify or filter data before feeding it to a learning
-    algorithm, some estimators in the library implement a \textit{transformer}
-    interface which defines a \texttt{transform} method. Preprocessing, feature selection and
+    algorithm, some estimators, named \textit{transformers}, implement a
+    \texttt{transform} method. Preprocessing, feature selection and
     dimensionality reduction
     algorithms are all provided as transformers within the library. If the transformation
-    can be inverted, a method called \verb!inverse_transform! also exists.
+    can be inverted, a method called \texttt{inverse\_transform} also exists.
 
 \end{itemize}
 
-\subsection{Cross validation and model selection}
+\subsection{Cross-validation and model selection}
 
 % XXX: describe cross-validation
-When testing an estimator or setting an hyperparameter, one needs a reliable
-performance score to evaluate its performance. Using the same
-sample set for training and testing is not recommended because it would lead to
-overfitting.
-Cross-validation is a technique that allows one to reliably score an
-estimator on a given dataset. It consists in iteratively training the
-estimator and testing it on unseen data.
-At each iteration, the sample set is partitionned into two disjoint subsets. The estimator
-is trained on the first one (training subset) and then applied on the second
-one (testing subset) to obtain a score.
-Several strategies exists to partition the sample set.
+When testing an estimator or setting hyperparameters, one needs a reliable
+metric to evaluate its performance. Using the same
+data for training and testing is not acceptable because it leads to
+overly confident model performance, a phenomena also known as \emph{overfitting}.
+Cross-validation is a technique that allows one to reliably evaluate an
+estimator on a given dataset. It consists in iteratively fit the
+estimator on a fraction of the data, called \emph{training set}, and test it
+on the left-out unseen data, called \emph{test set}.
+Several strategies exists to partition the data.
 For example, K-Fold cross validation consists in dividing randomly the samples in $k$
 subsets: each subset is then used once as testing set while the others $k - 1$
 subsets are used to train the estimator. This is one of the simplest and most
-widely used cross validation strategies.
+widely used cross validation strategies. The parameter $k$ is commonly set
+to 5 or 10. Other stragegies, sometimes called monte-carlo cross-validation,
+use many random partitions in the data.
 
-The problem of model selection is to find the hyper-parameters or the
-model that works best on the data, according to a specific task, most
-often prediction on unseen data.
+For a given model and some fixed value of hyperparameters, the scores
+on the various test sets can be averaged giving an quantitative score
+to assess how good the model is. Maximizing this cross-validation score offers
+a principled way to set hyperparameters, but also allows to choose between
+different models. This procedure is known as \emph{model selection}.
 %
-In {\em scikit-learn}, model selection can be done with the
-\texttt{GridSearchCV} estimator. It takes as input an estimator, whose
-hyper-parameters must be optimized, and a set of hyperparameter settings
-to search through. 
+In {\em scikit-learn}, hyperparameters tuning can be conviently done with the
+\texttt{GridSearchCV} estimator. It takes as input an estimator and
+a set of candidate hyperparameters. Cross-validation scores are then
+computed for all hyperparameters combinations, possibly in parallel,
+in order to find to find the best one.
 
 \section{Data preparation: from MR volumes to a data matrix}
 
