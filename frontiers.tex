@@ -311,7 +311,7 @@ convert data from one representation to another.
 When testing an estimator or setting hyperparameters, one needs a reliable
 metric to evaluate its performance. Using the same
 data for training and testing is not acceptable because it leads to
-overly confident model performance, a phenomena also known as \emph{overfitting}.
+overly confident model performance, a phenomenon also known as \emph{overfitting}.
 Cross-validation is a technique that allows one to reliably evaluate an
 estimator on a given dataset. It consists in iteratively fitting the
 estimator on a fraction of the data, called \emph{training set}, and
@@ -322,7 +322,7 @@ For example, K-Fold cross validation consists in dividing randomly the samples i
 subsets: each subset is then used once as testing set while the others $k - 1$
 subsets are used to train the estimator. This is one of the simplest and most
 widely used cross validation strategies. The parameter $k$ is commonly set
-to 5 or 10. Other stragegies, sometimes called monte-carlo cross-validation,
+to 5 or 10. Other strategies, sometimes called Monte-Carlo cross-validation,
 use many random partitions in the data.
 
 For a given model and some fixed value of hyperparameters, the scores
@@ -362,7 +362,7 @@ anisotropy, when the distance between two voxels is not the same
 depending on the direction. This information is used by algorithms
 relying on the spatial structure of the data, for instance the
 Searchlight. SciPy provides routines taking affine into account in its
-ndimage module, for instance \texttt{scipy.ndimage.affine\_transform}.
+\texttt{ndimage} module, for instance \texttt{scipy.ndimage.affine\_transform}.
 
 Nilearn uses Scipy to implement easy-to-use image resampling: 
 changing the spatial resolution of the data. This is
