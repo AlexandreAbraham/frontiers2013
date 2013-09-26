@@ -233,9 +233,8 @@ techniques can extract useful structure from the images.
 
 \subsection{Scientific Python and neuroimaging ecosystem}
 
-Thanks to its scientific libraries, Python is able to compete with languages
-originally made for scientific computation like Matlab or R. The main libraries
-are:
+Thanks to its scientific libraries, Python is able to compete with domain-specific
+languages such as Matlab or R. The main libraries in the scientific Python stack are:
 \begin{itemize}
     \item{\bf Scipy and Numpy} packages are the basis of scientific computing in Python.
         NumPy provides the \verb!ndarray! data type, an efficient $n$-dimensional data
@@ -354,7 +353,8 @@ target variable to predict, $y$.
 \subsection{Spatial resampling}
 \label{resampling}
 
-Neuroimaging data often come as Nifti files, 4-dimensional data (3D scans
+Neuroimaging data often come in the form of Nifti files, that is,
+a file that contains a 4-dimensional array (3D scans
 composed of voxels and their associated time series) along with a
 transformation matrix (called affine) used to compute voxel locations
 from data indices to world coordinates. Such matrix can express data
@@ -413,13 +413,14 @@ or samples. For example, in spatial independent component analysis (ICA),
 voxels are samples.
 
 
-Reducing the data dimension from images to feature vectors implies losing its
-spatial structure. However, not all voxels in fMRI data hold
-relevant information: outer-brain voxels are of no
+The reduction process from 4D-images to feature vectors comes with the loss
+of spatial structure. However, we have eliminated many uninformative
+features: since not all voxels in fMRI data hold
+relevant information, outer-brain voxels are of no
 use and they may bring spurious noise and scanner artifacts.
-Thus, we keep only voxels in a brain mask. Such masks
-are often given along with datasets or can be computed thanks to softwares like
-FSL or SPM.
+Thus, keeping only voxels in a brain mask improves the ratio of signtificant
+features. Such masks are often given along with the datasets or can be computed
+with software tools such as FSL or SPM.
 
 \begin{figure}[hbtp]
     \begin{center}
