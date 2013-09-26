@@ -190,8 +190,8 @@ scikit-learn, Python
 
 Statistical machine learning is gaining interest in
 neuroimaging data analysis. It is used by neuroscientists as a complicated yet powerful tool for statistical inference,
-and computer scientists,
-who acquire neuroscientific knowledge on the job \bertrand{What Do You Mean ???} This paper aims to fill 
+and computer scientists working in neuroscience,
+who often lack a deep understanding of the neuroscience questions. This paper aims to fill 
 the gap between machine learning and neuroimaging by demonstrating how a 
 general-purpose machine-learning toolbox can be used to produce scripts 
 for neuroimaging analysis with state-of-the-art methods
@@ -207,8 +207,8 @@ combines Python and external tools such as R or Shogun
 In this paper, we show how scikit-learn, a Python machine learning
 library \citep{pedregosa2011}, can be used on neuroimaging data.
 We discuss a few applications of statistical learning to
-resolve common neuroimaging needs, which methods can be used, what they
-imply \bertrand{please be a bit more specific} and how to achieve the desired results. We discuss not only
+resolve common neuroimaging needs, which methods can be used, what the underlying
+assumptions are, and how to achieve the desired results. We discuss not only
 prediction scores, but also the interpretability of the results, which
 leads us to explore the internal model of various methods. The scope of this paper is not
 to discuss a library, but rather code patterns, and the github repository
@@ -233,9 +233,8 @@ techniques can extract useful structure from the images.
 
 \subsection{Scientific Python and neuroimaging ecosystem}
 
-Thanks to its scientific libraries, Python is able to compete with languages
-originally made for scientific computation like Matlab or R. The main libraries
-are:
+Thanks to its scientific libraries, Python is able to compete with domain-specific
+languages such as Matlab or R. The main libraries in the scientific Python stack are:
 \begin{itemize}
     \item{\bf Scipy and Numpy} packages are the basis of scientific computing in Python.
         NumPy provides the \verb!ndarray! data type, an efficient $n$-dimensional data
@@ -311,7 +310,7 @@ convert data from one representation to another.
 When testing an estimator or setting hyperparameters, one needs a reliable
 metric to evaluate its performance. Using the same
 data for training and testing is not acceptable because it leads to
-overly confident model performance, a phenomena also known as \emph{overfitting}.
+overly confident model performance, a phenomenon also known as \emph{overfitting}.
 Cross-validation is a technique that allows one to reliably evaluate an
 estimator on a given dataset. It consists in iteratively fitting the
 estimator on a fraction of the data, called \emph{training set}, and testing it
@@ -355,13 +354,13 @@ target variable to predict, $y$.
 
 Neuroimaging data often come as Nifti files, 4-dimensional data (3D scans
 with time series at each location or voxel) along with a
-transformation matrix (called affine) used to translate the voxel location
+transformation matrix (called affine) used to compute voxel locations
 from array indices to world coordinates. Such matrix can express data
 anisotropy, when the distance between two voxels is not the same
 depending on the direction. This information is used by algorithms
 relying on the spatial structure of the data, for instance the
 Searchlight. SciPy provides routines taking affine into account in its
-ndimage module, for instance \texttt{scipy.ndimage.affine\_transform}.
+\texttt{ndimage} module, for instance \texttt{scipy.ndimage.affine\_transform}.
 
 Nilearn uses Scipy to implement easy-to-use image resampling: 
 changing the spatial resolution of the data. This is
@@ -385,6 +384,7 @@ includes:
         correlation with other voxels. Detrending can be done thanks to SciPy
         (\texttt{scipy.signal.detrend}).
 % bzw, linear detrending is utterly insufficient
+% That's why we do low pass
     \item{\bf Normalization} consists in setting the timeseries variance to 1.
         This harmonization is necessary as some machine learning algorithms are
         sensible to different value ranges.
@@ -412,13 +412,14 @@ or samples. For example, in spatial independent component analysis (ICA),
 voxels are samples.
 
 
-Reducing the data dimension from images to feature vectors implies losing its
-spatial structure. However, not all voxels in fMRI data hold
-relevant information: outer-brain voxels are of no
+The reduction process from 4D-images to feature vectors comes with the loss
+of spatial structure. However, we have eliminated many uninformative
+features: since not all voxels in fMRI data hold
+relevant information, outer-brain voxels are of no
 use and they may bring spurious noise and scanner artifacts.
-Thus, we keep only voxels in a brain mask. Such masks
-are often given along with datasets or can be computed thanks to softwares like
-FSL or SPM.
+Thus, keeping only voxels in a brain mask improves the ratio of signtificant
+features. Such masks are often given along with the datasets or can be computed
+with software tools such as FSL or SPM.
 
 \begin{figure}[hbtp]
     \begin{center}
@@ -573,7 +574,7 @@ After ranking the features, \verb!sklearn.feature_selection! proposes a panel
 of feature selection strategies. One can choose to take a percentile of the features
 (\verb!SelectPercentile!), or a fixed number of features (\verb!SelectKBest!).
 All these objects are implemented as transformers (see
-\ref{scikitlearn}) and are easily invertible (see code below).
+ section~\ref{scikitlearn}) and are easily invertible (see code below).
 In this use case, \verb!f_classif! function (ANOVA F-Test) along with selection
 of a fixed number of features will be used.
 
@@ -907,8 +908,10 @@ fMRI \citep{kiviniemi2003}. Several strategies have been used to syndicate ICA
 results across several subjects. \cite{calhoun2001a} propose a dimension
 reduction (using PCA) followed by a concatenation of timeseries (used in this
 example). \cite{varoquaux2010} use dimension reduction and canonical correlation analysis
-to aggregate subject data. Melodic \cite{beckmann2004}, ICA program from the FSL suite uses a Tensor
-ICA approach which is not detailed here.
+to aggregate subject data. Melodic \citep{beckmann2004}, the ICA tool in
+the FSL suite uses a concatenation approach not detailed here.
+% XXX: we are not using Melodic in TensorICA mode, I hope: the 'concat'
+% mode turns off TensorICA, which is not suitable for rest
 
 \subsubsection{Application}
 
@@ -920,7 +923,7 @@ be transposed, as we are using \emph{spatial} ICA, in other words the
 direction considered as random is that of the voxels and not the time
 points. The maps obtained capture different components of the signal,
 including noise components as well as resting-state functional networks.
-The produce the figures, we extract only 10 components, as we are
+To produce the figures, we extract only 10 components, as we are
 interested here in exploring only the very large structures.
 
 \begin{lstlisting}
@@ -1002,6 +1005,9 @@ connectivity = grid_to_graph(n_x=mask.shape[0], n_y=mask.shape[1],
                              n_z=mask.shape[2], mask=mask)
 ward = WardAgglomeration(n_clusters=1000, connectivity=connectivity)
 ward.fit(X)
+# The maps of cluster assignment can be retrieved and unmasked
+cluster_labels = numpy.zeros(mask.shape, dtype=int)
+cluster_labels[mask] = ward.labels_
 \end{lstlisting}
 
 \subsubsection{Results}
@@ -1049,9 +1055,10 @@ surface of the applications of statistical learning in neuroimaging. For
 instance, sparse inverse covariance can extract the functional 
 interaction structure from fMRI time-series \citep{varoquaux2013}, using
 the graph-lasso estimator also available in scikit-learn.
-High-dimensional statistics, as encountered in modern neuroimaging data
-processing with rich models to be fit on limited data quantities calls
-for statistical learning techniques. We hope that bridging a
+Modern neuroimaging data processing entails fitting rich models on
+limited data quantities. These are high-dimensional statistics problems
+which call
+for statistical-learning techniques. We hope that bridging a
 general-purpose machine learning tool, scikit-learn, to domain-specific
 data preparation code will open the door to new scientific advances.
 

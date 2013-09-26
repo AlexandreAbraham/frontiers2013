@@ -82,7 +82,7 @@ if not os.path.exists('melodic.nii.gz'):
     nibabel.save(melodic_components, 'melodic.nii.gz')
 
 if not os.path.exists('melodic.pdf'):
-    plot_ica_map(nibabel.load('melodic.nii.gz').get_data()[..., 8])
+    plot_ica_map(nibabel.load('melodic.nii.gz').get_data()[..., 3])
     pl.savefig('melodic.pdf')
     pl.savefig('melodic.eps')
 
