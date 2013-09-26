@@ -191,7 +191,7 @@ scikit-learn, Python
 Statistical machine learning is gaining interest in
 neuroimaging data analysis. It is used by neuroscientists as a complicated yet powerful tool for statistical inference,
 and computer scientists,
-who acquire neuroscientific knowledge on the job \bertrand{WDYM???} This paper aims to fill 
+who acquire neuroscientific knowledge on the job \bertrand{What Do You Mean ???} This paper aims to fill 
 the gap between machine learning and neuroimaging by demonstrating how a 
 general-purpose machine-learning toolbox can be used to produce scripts 
 for neuroimaging analysis with state-of-the-art methods
@@ -208,16 +208,16 @@ In this paper, we show how scikit-learn, a Python machine learning
 library \citep{pedregosa2011}, can be used on neuroimaging data.
 We discuss a few applications of statistical learning to
 resolve common neuroimaging needs, which methods can be used, what they
-imply \bertrand{?} and how to achieve the desired results. We discuss not only
+imply \bertrand{please be a bit more specific} and how to achieve the desired results. We discuss not only
 prediction scores, but also the interpretability of the results, which
-leads us to open up the black box methods. The scope of this paper is not
+leads us to explore the internal model of various methods. The scope of this paper is not
 to discuss a library, but rather code patterns, and the github repository
 of the
 paper\footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}}
 provides complete scripts to generate figures. Naturally, there would be
 value in a software package building upon these patterns. Such a package
 is under development, in the form of nilearn
---\url{http://nilearn.github.io}-- but is, to date, far from being ready
+--\url{http://nilearn.github.io}-- but is, to date, not ready
 for public consumption.
 
 The paper is organized as
@@ -266,7 +266,7 @@ are:
 learning library for the Python programming language. The ambition of the
 project is to provide efficient and well-established machine learning tools within
 a programming environment that is accessible to non-machine learning experts
-and reusable across scientific disciplines.
+and reusable across scientific disciplines and applicative fields.
 
 \subsection{Concepts}
 
@@ -313,19 +313,19 @@ metric to evaluate its performance. Using the same
 data for training and testing is not acceptable because it leads to
 overly confident model performance, a phenomena also known as \emph{overfitting}.
 Cross-validation is a technique that allows one to reliably evaluate an
-estimator on a given dataset. It consists in iteratively fit the
-estimator on a fraction of the data, called \emph{training set}, and test it
+estimator on a given dataset. It consists in iteratively fitting the
+estimator on a fraction of the data, called \emph{training set}, and testing it
 on the left-out unseen data, called \emph{test set}.
 Several strategies exists to partition the data.
 For example, K-Fold cross validation consists in dividing randomly the samples in $k$
 subsets: each subset is then used once as testing set while the others $k - 1$
 subsets are used to train the estimator. This is one of the simplest and most
 widely used cross validation strategies. The parameter $k$ is commonly set
-to 5 or 10. Other stragegies, sometimes called monte-carlo cross-validation,
+to 5 or 10. Other stragegies, sometimes called Monte-Carlo cross-validation,
 use many random partitions in the data.
 
 For a given model and some fixed value of hyperparameters, the scores
-on the various test sets can be averaged giving an quantitative score
+on the various test sets can be to give give a quantitative score
 to assess how good the model is. Maximizing this cross-validation score offers
 a principled way to set hyperparameters, but also allows to choose between
 different models. This procedure is known as \emph{model selection}.
@@ -339,9 +339,9 @@ in order to find to find the best one.
 \section{Data preparation: from MR volumes to a data matrix}
 
 Before applying statistical learning to neuroimaging data, standard
-preprocessing must be applied. For fMRI, these namely entail motion
-correction, slice timing, coregistration and normalization to a common
-template like MNI if necessary. Reference softwares for this task are
+preprocessing must be applied. For fMRI, this includes motion
+correction, slice timing correction, coregistration with an anatomical image and normalization to a common
+template like the MNI one if necessary. Reference softwares for these tasks are
 SPM\footnote{http://www.fil.ion.ucl.ac.uk/spm}~\citep{friston2007} and
 FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\citep{smith2004}. A Python
 interface to these tools is available in nipype Python library
@@ -354,9 +354,9 @@ target variable to predict, $y$.
 \label{resampling}
 
 Neuroimaging data often come as Nifti files, 4-dimensional data (3D scans
-composed of voxels and their associated time series) along with a
-transformation matrix (called affine) used to compute voxel locations
-from data indices to world coordinates. Such matrix can express data
+with time series at each location or voxel) along with a
+transformation matrix (called affine) used to translate the voxel location
+from array indices to world coordinates. Such matrix can express data
 anisotropy, when the distance between two voxels is not the same
 depending on the direction. This information is used by algorithms
 relying on the spatial structure of the data, for instance the
@@ -367,9 +367,10 @@ Nilearn uses Scipy to implement easy-to-use image resampling:
 changing the spatial resolution of the data. This is
 an interpolation and alters the data, that is why it should be used carefully.
 Downsampling is commonly used to reduce the size of data to process.
-Typical sizes are 2mm or 3mm resolutions, but scan spatial resolution is
+Typical sizes are 2mm or 3mm resolution, but scan spatial resolution is
 increasing with progress in MR physics.
 Data scaling factor for each direction can be modified in the affine matrix.
+\bertrand{I dont understand the last sentence.}
 
 \subsection{Signal cleaning}
 
@@ -451,7 +452,8 @@ Across all our examples, voxels of interest are represented on an axial slice of
 the brain. Some transformations of the original matrix data are required to match
 matplotlib data format. The following snippet of code shows how to display an
 axial slice along with an overlaying activation map. It loads a generic map and
-display, as an overlaying map, the voxels with highest value.
+displays, as an overlaying map, the voxels with highest value.
+\bertrand{With a value of 6000, this is probably not an activation map. What is it ?}
 
 \begin{lstlisting}
 # Load image
@@ -619,7 +621,7 @@ are available in nilearn.
 recognition in the Haxby experiment -- \emph{left}: standard analysis;
 SVM weights after screening voxels with an anova; \emph{right}:
 Searchlight map. The masks derived from standard analysis in the original
-paper \citep{haxby2001} are displayed blue and in green.}
+paper \citep{haxby2001} are displayed in blue and green.}
 \label{fig:haxby}
 \end{figure}
 
@@ -635,18 +637,20 @@ coef = feature_selection.inverse_transform(coef)
 
 Results are shown in figure~\ref{fig:haxby}: First
 F-score, that is standard analysis in brain mapping but also the
-statistic used to select features; second the SVC weights, after feature
+statistic used to select features; second the SVC weights after feature
 selection and last the Searchlight map.
 %
-Note that, the voxels with most weights roughly match for all methods and
-are locate in the house-specific areas as defined by the original paper.
+Note that the voxels with larger weights roughly match for all methods and
+are located in the house-responsive areas as defined by the original paper.
+%
 The Searchlight is more expanded and blurry than the other methods
 as it iterates over a ball around the voxels.
 
 These results match neuroscientific knowledge as they highlight the
-high level regions of the visual cortex which is known to contain semantic
-information about vision. While Searchlight only gives a score to each voxel,
-the SVC can be used afterward to classify unseen brain scans.
+high level regions of the ventral visual cortex which is known to
+contain category-specific visual areas. While Searchlight only gives a
+score to each voxel, the SVC can be used afterward to classify unseen
+brain scans.
 
 \section{Encoding brain activity and decoding images}
 \label{kamitani}
@@ -654,7 +658,7 @@ the SVC can be used afterward to classify unseen brain scans.
 In the previous experiment, the category of a visual stimulus was deduced from
 brain activity measured in the visual cortex.
 This use case goes further by inferring a direct link between the image
-seen by the subject and the brain activity.
+seen by the subject and the associated brain activation map.
 
 In the experiment of \cite{miyawaki2008} several series of $10{\times}10$
 binary images are presented to two subjects while activity on the visual cortex
@@ -678,7 +682,7 @@ problem. Note that the method presented here cannot be extended as-is to
 ecologic stimuli. 
 
 Following our first example, we will use a Linear SVC to solve this problem.
-As we expect brain voxels to be strongly localized in the brain, we use the
+As we expect brain voxels to be sparsely distributed in the brain, we use the
 $\ell_1$ norm as penalization to induce sparsity.
 In the original work, \cite{miyawaki2008} uses a multinomial Logistic Regression
 along with a sophisticated multi-scale strategy. As we limit ourselves to a
@@ -686,8 +690,8 @@ binary problem, we use a simple $\ell_1$-penalized Logistic Regression.
 These two methods differs by their loss function: SVC uses a square hinge loss
 and Logistic Regression a logit function.
 
-We ran a 5-fold cross validation to set up the penalization parameter $C$
-(inverse of regularization amount) and obtains score presented in
+We ran a 5-fold cross validation to estimate the penalization parameter $C$
+(inverse of the amount of regularization); this yields the scores presented in
 figure~\ref{fig:miyawaki}.
 
 \begin{table}[htbp]
@@ -721,13 +725,13 @@ figure~\ref{fig:miyawaki}.
     \label{fig:miyawaki_cv}
 \end{table}
 
-Table~\ref{fig:miyawaki_cv} compares described approaches, along with an
+Table~\ref{fig:miyawaki_cv} compares the described approaches, along with an
 $\ell_2$ regularized SVC. We first observe that setting the parameter $C$ is
 critical as performance decrases outside of their optimal values.
 In accordance with our prior knowledge, $\ell_1$
 regularized method are does better than $\ell_2$ regularized method. SVC and
 Logistic Regression achieve the same score, which is not surprising as they 
-are implement very close models.
+are implement similar models.
 
 \begin{lstlisting}
 from sklearn.linear_model import LogisticRegression as LR
@@ -785,12 +789,14 @@ mean_scores = np.array(scores).mean(axis=0)
 \subsubsection{Receptive fields}
 Given the retinotopic structure of early visual areas, we are led to
 expect their voxels to have strongly localized so-called population
-receptive fields (\textit{prf}). This suggests that per voxel only very
-few stimulus pixels should suffice to explain its activity. This
-information can be exploited by using a sparse linear regression --the
-Lasso-- to find the receptive fields. Here we use the \emph{LassoLarsCV}
-estimator that relies on the Lars algorithm and cross-validation to set
-the Lasso parameter.
+receptive fields (\textit{prf}). This suggests that only very few
+stimulus pixels should suffice to explain the activity in each brain
+voxel of the posterior visual cortex.
+%
+This information can be exploited by using a sparse linear
+regression --the Lasso-- to find the receptive fields. Here we use the
+\emph{LassoLarsCV} estimator that relies on the Lars algorithm and
+cross-validation to set the Lasso parameter.
 
 \begin{lstlisting}
 from sklearn.linear_model import LassoLarsCV
@@ -813,10 +819,9 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 
 \label{sec:miyawaki_results}
 Results are presented in figure~\ref{fig:miyawaki}.
-In decoding settings, Figures \textit{a} and \textit{c} shows the classifiers weights as brain
+In decoding settings, Figures \textit{a} and \textit{c} show the classifiers weights as brain
 maps for both methods. They both give roughly the same results and we can
-see that the weights are centered in the V1 area with a bit of higher
-visual areas.
+see that the weights are centered in the V1 and nearby retinotopic areas.
 Figures \textit{b} and \textit{d} show reconstruction
 accuracy score using Logistic Regression and Support Vector Classification
 (variable \texttt{mean\_scores} in the code above).
@@ -826,10 +831,12 @@ accurate in the fovea.
 This may be can be explained by the higher density of neurons dedicated to
 foveal representation in the primary visual area than for periphery.
 
-In encoding settings, figure~\ref{fig:miyawaki}.e shows classifiers weights for encoding, that
-we interpret as receptive fields. We can see that receptive fields of
-neighboring voxels are neighbouring pixels, which is an expected result
-as we know that primary visual cortex directly encodes visual stimuli. 
+In encoding settings, figure~\ref{fig:miyawaki}.e shows classifiers
+weights for encoding, that we interpret as receptive fields. We can
+see that receptive fields of neighboring voxels are neighbouring
+pixels, which is an expected result as we know that primary visual
+cortex directly encodes the geometric structure and contrast of visual
+stimuli.
 
 Both encoding and decoding analysis show a link between the selected
 pixel and brain voxels. In the absence of ground truth, seeing that
