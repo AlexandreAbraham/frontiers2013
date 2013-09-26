@@ -999,6 +999,9 @@ connectivity = grid_to_graph(n_x=mask.shape[0], n_y=mask.shape[1],
                              n_z=mask.shape[2], mask=mask)
 ward = WardAgglomeration(n_clusters=1000, connectivity=connectivity)
 ward.fit(X)
+# The maps of cluster assignment can be retrieved and unmasked
+cluster_labels = numpy.zeros(mask.shape, dtype=int)
+cluster_labels[mask] = ward.labels_
 \end{lstlisting}
 
 \subsubsection{Results}
