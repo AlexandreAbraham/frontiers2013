@@ -902,8 +902,10 @@ fMRI \citep{kiviniemi2003}. Several strategies have been used to syndicate ICA
 results across several subjects. \cite{calhoun2001a} propose a dimension
 reduction (using PCA) followed by a concatenation of timeseries (used in this
 example). \cite{varoquaux2010} use dimension reduction and canonical correlation analysis
-to aggregate subject data. Melodic \cite{beckmann2004}, ICA program from the FSL suite uses a Tensor
-ICA approach which is not detailed here.
+to aggregate subject data. Melodic \citep{beckmann2004}, the ICA tool in
+the FSL suite uses a concatenation approach not detailed here.
+% XXX: we are not using Melodic in TensorICA mode, I hope: the 'concat'
+% mode turns off TensorICA, which is not suitable for rest
 
 \subsubsection{Application}
 
@@ -915,7 +917,7 @@ be transposed, as we are using \emph{spatial} ICA, in other words the
 direction considered as random is that of the voxels and not the time
 points. The maps obtained capture different components of the signal,
 including noise components as well as resting-state functional networks.
-The produce the figures, we extract only 10 components, as we are
+To produce the figures, we extract only 10 components, as we are
 interested here in exploring only the very large structures.
 
 \begin{lstlisting}
