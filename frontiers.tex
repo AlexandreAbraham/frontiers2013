@@ -313,7 +313,7 @@ metric to evaluate its performance. Using the same
 data for training and testing is not acceptable because it leads to
 overly confident model performance, a phenomena also known as \emph{overfitting}.
 Cross-validation is a technique that allows one to reliably evaluate an
-estimator on a given dataset. It consists in iteratively fit the
+estimator on a given dataset. It consists in iteratively fitting the
 estimator on a fraction of the data, called \emph{training set}, and test it
 on the left-out unseen data, called \emph{test set}.
 Several strategies exists to partition the data.
@@ -384,6 +384,7 @@ includes:
         correlation with other voxels. Detrending can be done thanks to SciPy
         (\texttt{scipy.signal.detrend}).
 % bzw, linear detrending is utterly insufficient
+% That's why we do low pass
     \item{\bf Normalization} consists in setting the timeseries variance to 1.
         This harmonization is necessary as some machine learning algorithms are
         sensible to different value ranges.
