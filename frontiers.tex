@@ -597,8 +597,8 @@ than the others (see figure~\ref{fig:haxby}).
 \begin{lstlisting}
 feature_selection = SelectKBest(f_classif, k=500)
 clf = SVC(kernel='linear')
-X_red = feature_selection.fit_transform(X)
-clf.fit(X_red, y)
+X_reduced = feature_selection.fit_transform(X)
+clf.fit(X_reduced, y)
 \end{lstlisting}
 
 \subsection{Searchlight}
@@ -642,7 +642,7 @@ coef = clf.coef_
 coef = feature_selection.inverse_transform(coef)
 \end{lstlisting}
 
-Results are shown in figure~\ref{fig:haxby}: First
+Results are shown in figure~\ref{fig:haxby}: first
 F-score, that is standard analysis in brain mapping but also the
 statistic used to select features; second the SVC weights after feature
 selection and last the Searchlight map.
