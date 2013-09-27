@@ -590,8 +590,8 @@ weights that form a brain map (see figure~\ref{fig:haxby}).
 \begin{lstlisting}
 feature_selection = SelectKBest(f_classif, k=500)
 clf = SVC(kernel='linear')
-X_red = feature_selection.fit_transform(X)
-clf.fit(X_red, y)
+X_reduced = feature_selection.fit_transform(X)
+clf.fit(X_reduced, y)
 \end{lstlisting}
 
 \subsection{Searchlight}
@@ -635,13 +635,13 @@ coef = clf.coef_
 coef = feature_selection.inverse_transform(coef)
 \end{lstlisting}
 
-Results are shown in figure~\ref{fig:haxby}: First
+Results are shown in figure~\ref{fig:haxby}: first
 F-score, that is standard analysis in brain mapping but also the
 statistic used to select features; second the SVC weights, after feature
 selection and last the Searchlight map.
 %
 Note that, the voxels with most weights roughly match for all methods and
-are locate in the house-specific areas as defined by the original paper.
+are locates in the house-specific areas as defined by the original paper.
 The Searchlight is more expanded and blurry than the other methods
 as it iterates over a ball around the voxels.
 
@@ -727,7 +727,7 @@ Table~\ref{fig:miyawaki_cv} compares described approaches, along with an
 $\ell_2$ regularized SVC. We first observe that setting the parameter $C$ is
 critical as performance decrases outside of their optimal values.
 In accordance with our prior knowledge, $\ell_1$
-regularized method are does better than $\ell_2$ regularized method. SVC and
+regularized method does better than $\ell_2$ regularized method. SVC and
 Logistic Regression achieve the same score, which is not surprising as they 
 are implement very close models.
 
