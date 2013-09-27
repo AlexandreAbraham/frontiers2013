@@ -662,10 +662,10 @@ brain scans.
 \section{Encoding brain activity and decoding images}
 \label{kamitani}
 
-In the previous experiment, the category of a visual stimulus was deduced from
+In the previous experiment, the category of a visual stimulus was inferred from
 brain activity measured in the visual cortex.
-This use case goes further by inferring a direct link between the image
-seen by the subject and the associated brain activation map.
+One can go further by inferring a direct link between the image
+seen by the subject and the associated fMRI data.
 
 In the experiment of \cite{miyawaki2008} several series of $10{\times}10$
 binary images are presented to two subjects while activity on the visual cortex
@@ -676,26 +676,25 @@ geometric shapes (square, cross...) and letters. Here, for the sake of simplicit
 obtain scores on unseen data.
 %
 In the following example, we study the relation between stimuli pixels and
-brain voxels in both directions: reconstructing visual stimulus from BOLD activation,
-which is a decoding task, and predicting brain activation from visual
-stimulus, which is an encoding task.
+brain voxels in both directions: the reconstruction of the visual stimuli
+from fMRI, which is a decoding task, and the prediction of fMRI data
+from descriptors of the visual stimuli, which is an encoding task.
 
 \subsection{Decoding}
 
 In this setting, we want to infer the binary visual stimulus presented to
-subject from its brain activity.
+the subject from the recorded fMRI data.
 As the stimuli are binary, we will treat this problem as a classification
 problem. Note that the method presented here cannot be extended as-is to
-ecologic stimuli. 
+natural stimuli. 
 
-Following our first example, we will use a Linear SVC to solve this problem.
-As we expect brain voxels to be sparsely distributed in the brain, we use the
-$\ell_1$ norm as penalization to induce sparsity.
-In the original work, \cite{miyawaki2008} uses a multinomial Logistic Regression
-along with a sophisticated multi-scale strategy. As we limit ourselves to a
-binary problem, we use a simple $\ell_1$-penalized Logistic Regression.
-These two methods differs by their loss function: SVC uses a square hinge loss
-and Logistic Regression a logit function.
+In the original work, \cite{miyawaki2008} uses a Bayesian logistic regression
+promoting sparsity along with a sophisticated multi-scale strategy.
+As one can indeed expect the number of predictive voxels to be limited, we use 
+a simple Logistic Regression (LR) penalized with the $\ell_1$ norm
+known to promote sparsity. The SVM classifier used above and the LR
+differ by their loss functions: SVM uses a hinge loss while the LR
+uses a logit function.
 
 We ran a 5-fold cross validation to estimate the penalization parameter $C$
 (inverse of the amount of regularization); this yields the scores presented in
