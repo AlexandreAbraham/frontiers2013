@@ -413,12 +413,11 @@ voxels are samples.
 
 
 The reduction process from 4D-images to feature vectors comes with the loss
-of spatial structure. However, we have eliminated many uninformative
-features: since not all voxels in fMRI data hold
-relevant information, outer-brain voxels are of no
-use and they may bring spurious noise and scanner artifacts.
-Thus, keeping only voxels in a brain mask improves the ratio of signtificant
-features. Such masks are often given along with the datasets or can be computed
+of spatial structure. It however allows to discard uninformative
+voxels, such as the ones outside of the brain. Such voxels that
+only carry noise and scanner artifacts would reduce SNR and affect the
+quality of the estimation. The selected voxels form a \emph{brain mask}.
+Such a mask is often given along with the datasets or can be computed
 with software tools such as FSL or SPM.
 
 \begin{figure}[hbtp]
@@ -429,9 +428,8 @@ with software tools such as FSL or SPM.
     \label{fig:niimg}
 \end{figure}
 
-Applying the mask is made easy by NumPy fancy indexing (importantly, the
-type of the mask array must be boolean for the following to work).
-2-dimensional masked data will be refered as \texttt{X} to follow
+Applying the mask is made easy by NumPy fancy indexing using boolean arrays.
+Two-dimensional masked data will be referred to as \texttt{X} to follow
 scikit-learn conventions:
 \begin{lstlisting}
 import nibabel
@@ -451,9 +449,9 @@ unmasked_data[mask] = X
 
 Across all our examples, voxels of interest are represented on an axial slice of
 the brain. Some transformations of the original matrix data are required to match
-matplotlib data format. The following snippet of code shows how to display an
-axial slice along with an overlaying activation map. It loads a generic map and
-displays, as an overlaying map, the voxels with highest value.
+matplotlib data format. The following snippet of code shows how to load and
+display an axial slice overlaid with an activation map. Only
+the voxels with highest values are displayed.
 \bertrand{With a value of 6000, this is probably not an activation map. What is it ?}
 
 \begin{lstlisting}
@@ -477,10 +475,10 @@ nibabel.save(nibabel.Nifti1Image(act, bg_img.get_affine()), 'activation.nii.gz')
 \end{lstlisting}
 
 Note that a background is needed to display partial maps. Overlaying two images
-can be done thanks to the \texttt{numpy.ma.masked\_array}.
-Several tricks and options exist to enhance the overall aspect of the plot.
-Some of them can be found in the full scripts accompanying this paper
-\footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}} but it 
+can be done thanks to the \texttt{numpy.ma.masked\_array} data structure.
+Several options exist to enhance the overall aspect of the plot.
+Some of them can be found in the full scripts provided with this paper
+\footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}}. It generally
 boils down to a good knowledge of Matplotlib. Note that Nipy package provides a
 \texttt{plot\_map} function that is tuned to display activation maps (a
 background is even provided if needed).
@@ -528,65 +526,73 @@ background is even provided if needed).
 
 \section{Decoding the mental representation of objects in the brain}
 
-In the context of machine learning in neuroimaging, \textit{decoding} refers to learning a model
-that predicts behavioral or phenotypic data given brain activity. 
-The reverse procedure is
-called \textit{encoding} \citep{naselaris2011} and is introduced in the next 
+In the context of neuroimaging, \textit{decoding} refers to learning a model
+that predicts behavioral or phenotypic variables from brain imaging data. 
+The alternative that consists in predicting the imaging data given external
+variables, such as stimuli descriptors, is 
+called \textit{encoding}~\citep{naselaris2011}. It is further discussed in the next 
 section.
 
-Here we illustrate decoding with a simpler version of the experiment presented in
+First, we illustrate decoding with a simplified version of the experiment presented in
 \cite{haxby2001}. In the original work, visual stimuli from 8 different categories
 are presented to 6 subjects during 12 sessions. The goal is to 
-predict the category of the stimulus presented to subject given his
-brain activity. For the sake of simplicity, we will restrict our code 
-to one subject for the
-particular task of discriminating face against house images.
+predict the category of the stimulus presented to the subject given the
+recorded fMRI volumes. For the sake of simplicity, we restrict the example
+to one subject and to two categories, faces and houses.
 
-As there is a \emph{target} variable to predict, $y$, this is a supervised
-learning problem. Here $y$ represents a small number of object categories,
-\emph{classes} in machine-learning terms. In these settings, the learning
-task is known as a \emph{classification} problem, as opposed to a
-\emph{regression} problem, for a variable $y$ taking continuous values,
+As there is a \emph{target} variable $y$ to predict, this is a supervised
+learning problem. Here $y$ represents the two object categories, a.k.a.
+\emph{classes} in machine-learning terms. In such settings, where $y$
+takes discrete values the learning
+problem is known as \emph{classification}, as opposed to
+\emph{regression} when the variable $y$ can take continuous values,
 such as age.
-Among all methods proposed in the scikit-learn, we will
+
+Many classification methods are available in scikit-learn. In this
+example we chose to
 combine the use of univariate feature selection and Support Vector
-Machines (SVM) for this problem. Indeed, this is a common and efficient
-setup used in NeuroImaging.
+Machines (SVM). Such a classification strategy is simple,
+yet quite efficient when used on neuroimaging data.
 
 \subsection{Feature selection: ANOVA F-Test}
 
-After applying a brain mask, the data consist of 40\,000 features for 
-only 1\,400 samples. Machine learning with many more features than samples
+After applying a brain mask, the data consist of 40\,000 voxels, here
+the features, for only 1\,400 volumes, here the samples.
+Machine learning with many more features than samples
 is challenging, due to the so-called \emph{curse of dimensionality}.
-A popular strategy is to reduce the number of features (ie voxels) by
-selecting the most relevant ones. Based on prior neuroscientific
-knowledge, we could restrain the mask to occipital areas, where the visual
-cortex is actually located. A simple statistical approach relies on screening
-features based on a univariate statistical test.
+Two strategies exist to reduce the number of features.
+A first strategy is based on prior neuroscientific
+knowledge. Here one could restrict the mask to occipital areas, where the visual
+cortex is actually located. A second approach is a data-driven. Features
+are evaluated individually with a univariate statistical test. The variables
+having the most discriminative power are kept.
 
 Scikit-learn offers a panel of strategies to select features. In supervised
 learning, the most popular feature selection method is the
 ANalysis Of VAriance (ANOVA) F-Test. 
 The null hypothesis of this test is that the feature takes the same value
-for all classes of $y$ to predict.
+independently of the value of $y$ to predict.
 
 After ranking the features, \verb!sklearn.feature_selection! proposes a panel
 of feature selection strategies. One can choose to take a percentile of the features
 (\verb!SelectPercentile!), or a fixed number of features (\verb!SelectKBest!).
 All these objects are implemented as transformers (see
- section~\ref{scikitlearn}) and are easily invertible (see code below).
-In this use case, \verb!f_classif! function (ANOVA F-Test) along with selection
-of a fixed number of features will be used.
+ section~\ref{scikitlearn}).
+In the code below, the \verb!f_classif! function (ANOVA F-Test) along with
+the selection of a fixed number of features is used.
 
 \subsection{Classification: SVM}
 
-A linear Support Vector Classifier (SVC) finds the hyperplane that
-separates samples belonging to different classes while maximizing the
-distance to the samples (called margin). Classifying a new sample boils
-down to determining on which side of the hyperplane it lies. An SVC bases
-its decision upon a subset of training data called support vectors. As
-the linear SVC is a linear classifier, its decision is based on a set of
-weights that form a brain map (see figure~\ref{fig:haxby}).
+A linear SVM for classification, \verb!sklearn.svm.SVC!,
+finds the hyperplane that maximally
+separates the samples belonging to the different classes.
+It is said to maximize the \emph{margin}. Classifying a new sample boils
+down to determining on which side of the hyperplane it lies. When employing a
+linear kernel, the separating hyperplane is defined in the input
+data space and its coefficients can be related to the voxels.
+Such coefficients can therefore be visualized as an image
+where voxels with high values have more influence on the prediction
+than the others (see figure~\ref{fig:haxby}).
 
 \begin{lstlisting}
 feature_selection = SelectKBest(f_classif, k=500)
@@ -620,7 +626,7 @@ are available in nilearn.
   \end{center}
 \caption{Maps derived by different methods for face versus house
 recognition in the Haxby experiment -- \emph{left}: standard analysis;
-SVM weights after screening voxels with an anova; \emph{right}:
+SVM weights after screening voxels with an ANOVA; \emph{right}:
 Searchlight map. The masks derived from standard analysis in the original
 paper \citep{haxby2001} are displayed in blue and green.}
 \label{fig:haxby}
