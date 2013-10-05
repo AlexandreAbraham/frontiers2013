@@ -5,16 +5,7 @@ import os
 import sys
 import time
 
-### Load Kamitani dataset #####################################################
-from nilearn import datasets
-dataset = datasets.fetch_kamitani()
-X_random = dataset.func[12:]
-X_figure = dataset.func[:12]
-y_random = dataset.label[12:]
-y_figure = dataset.label[:12]
-y_shape = (10, 10)
 
-### Preprocess data ###########################################################
 offset = 2
 
 hand_made_affine = np.asarray(
@@ -24,8 +15,8 @@ hand_made_affine = np.asarray(
          [0, 0, 0, 1]])
 
 ### Load Kamitani dataset #####################################################
-from nilearn import datasets
-dataset = datasets.fetch_kamitani()
+from utils import datasets
+dataset = datasets.fetch_miyawaki2008()
 
 # Keep only random runs
 X_random = dataset.func[12:]
@@ -57,24 +48,8 @@ for y in y_random:
 X_train = np.vstack(X_train)
 y_train = np.vstack(y_train)
 
-
-# Remove rest period
-X_train = X_train[y_train[:, 0, 0] != -1]
-y_train = y_train[y_train[:, 0, 0] != -1]
-
-
-def flatten(list_of_2d_array):
-    flattened = []
-    for array in list_of_2d_array:
-        flattened.append(array.ravel())
-    return flattened
-
-
-# Simply flatten the array
-y_train = np.asarray(flatten(y_train))
-
 # Flatten the stimuli
-#y_train = np.reshape(y_train, (-1, y_shape[0] * y_shape[1]))
+y_train = np.reshape(y_train, (-1, y_shape[0] * y_shape[1]))
 
 sys.stderr.write(" Done (%.2fs)\n" % (time.time() - t0))
 n_pixels = y_train.shape[1]
@@ -120,13 +95,13 @@ def plot_lines(mask, linewidth=3, color='b'):
 
 sbrain = masking.unmask(np.array(scores).mean(0), dataset.mask)
 
-bg = nibabel.load(os.path.join('..', 'bg.nii.gz'))
+bg = nibabel.load('bg.nii.gz')
 
 pl.figure(figsize=(8, 8))
 ax1 = pl.axes([0., 0., 1., 1.])
 pl.imshow(bg.get_data()[:, :, 10].T, interpolation="nearest", cmap='gray',
           origin='lower')
-pl.imshow(np.ma.masked_less(sbrain.get_data()[:, :, 10].T, 1e-6),
+pl.imshow(np.ma.masked_less(sbrain[:, :, 10].T, 1e-6),
           interpolation="nearest", cmap='hot', origin="lower")
 plot_lines(contour[:, :, 10].T)
 pl.axis('off')
