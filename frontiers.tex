@@ -264,7 +264,7 @@ languages such as Matlab or R. The main libraries in the scientific Python stack
 {\em Scikit-learn} \citep{pedregosa2011} is an open source machine
 learning library for the Python programming language. The ambition of the
 project is to provide efficient and well-established machine learning tools within
-a programming environment that is accessible to non-machine learning experts
+a programming environment accessible to non-machine learning experts
 and reusable across scientific disciplines and applicative fields.
 
 \subsection{Concepts}
@@ -319,12 +319,12 @@ Several strategies exists to partition the data.
 For example, K-Fold cross validation consists in dividing randomly the samples in $k$
 subsets: each subset is then used once as testing set while the others $k - 1$
 subsets are used to train the estimator. This is one of the simplest and most
-widely used cross validation strategies. The parameter $k$ is commonly set
+widely used cross-validation strategies. The parameter $k$ is commonly set
 to 5 or 10. Other strategies, sometimes called Monte-Carlo cross-validation,
 use many random partitions in the data.
 
 For a given model and some fixed value of hyperparameters, the scores
-on the various test sets can be to give a quantitative score
+on the various test sets can be averaged to give a quantitative score
 to assess how good the model is. Maximizing this cross-validation score offers
 a principled way to set hyperparameters, but also allows to choose between
 different models. This procedure is known as \emph{model selection}.
@@ -333,14 +333,15 @@ In {\em scikit-learn}, hyperparameters tuning can be conviently done with the
 \texttt{GridSearchCV} estimator. It takes as input an estimator and
 a set of candidate hyperparameters. Cross-validation scores are then
 computed for all hyperparameters combinations, possibly in parallel,
-in order to find to find the best one.
+in order to find the best one.
 
 \section{Data preparation: from MR volumes to a data matrix}
 
 Before applying statistical learning to neuroimaging data, standard
 preprocessing must be applied. For fMRI, this includes motion
 correction, slice timing correction, coregistration with an anatomical image and normalization to a common
-template like the MNI one if necessary. Reference softwares for these tasks are
+template like the MNI (Montreal Neurologic Institute) one if necessary.
+Reference softwares for these tasks are
 SPM\footnote{http://www.fil.ion.ucl.ac.uk/spm}~\citep{friston2007} and
 FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\citep{smith2004}. A Python
 interface to these tools is available in nipype Python library
@@ -370,6 +371,9 @@ Typical sizes are 2mm or 3mm resolution, but scan spatial resolution is
 increasing with progress in MR physics.
 Data scaling factor for each direction can be modified in the affine matrix.
 \bertrand{I dont understand the last sentence.}
+\alex{I think it means that if you have a diagonal affine with 3 3 2, you can
+    change the scaling in third direction to get something isotropic for
+example. I think we can remove this sentence.}
 
 \subsection{Signal cleaning}
 
@@ -450,15 +454,14 @@ unmasked_data[mask] = X
 Across all our examples, voxels of interest are represented on an axial slice of
 the brain. Some transformations of the original matrix data are required to match
 matplotlib data format. The following snippet of code shows how to load and
-display an axial slice overlaid with an activation map. Only
-the voxels with highest values are displayed.
-\bertrand{With a value of 6000, this is probably not an activation map. What is it ?}
+display an axial slice overlaid with an activation map. The background is an
+anatomical scan and highest voxels are taken as phony activation map.
 
 \begin{lstlisting}
 # Load image
 bg_img = nibabel.load('bg.nii.gz')
 bg = bg_img.get_data()
-# Keep values over 4000 as activation map
+# Keep values over 4000 as phony activation map
 act = bg.copy()
 act[act < 6000] = 0.
 
@@ -560,8 +563,8 @@ After applying a brain mask, the data consist of 40\,000 voxels, here
 the features, for only 1\,400 volumes, here the samples.
 Machine learning with many more features than samples
 is challenging, due to the so-called \emph{curse of dimensionality}.
-Two strategies exist to reduce the number of features.
-A first strategy is based on prior neuroscientific
+Several strategies exist to reduce the number of features.
+A first one is based on prior neuroscientific
 knowledge. Here one could restrict the mask to occipital areas, where the visual
 cortex is actually located. A second approach is a data-driven. Features
 are evaluated individually with a univariate statistical test. The variables
@@ -606,7 +609,7 @@ clf.fit(X_reduced, y)
 
 Searchlight \citep{kriegeskorte2006} is a popular algorithm in the
 neuroimaging community. It runs a predictive model on a spatial
-neighbourhood of each voxel and tests the out-of-sample prediction
+neighborhood of each voxel and tests the out-of-sample prediction
 performance as proxy measure of the link between the local brain activity
 and the target behavioral variable. In practice, it entails performing
 cross-validation of the model, most often an SVM, on voxels contained in
@@ -626,7 +629,7 @@ are available in nilearn.
   \end{center}
 \caption{Maps derived by different methods for face versus house
 recognition in the Haxby experiment -- \emph{left}: standard analysis;
-SVM weights after screening voxels with an ANOVA; \emph{right}:
+\emph{center}: SVM weights after screening voxels with an ANOVA; \emph{right}:
 Searchlight map. The masks derived from standard analysis in the original
 paper \citep{haxby2001} are displayed in blue and green.}
 \label{fig:haxby}
@@ -845,7 +848,7 @@ foveal representation in the primary visual area.
 
 In encoding settings, figure~\ref{fig:miyawaki}.e shows classifiers
 weights for encoding, that we interpret as receptive fields. We can
-see that receptive fields of neighboring voxels are neighbouring
+see that receptive fields of neighboring voxels are neighboring
 pixels, which is an expected result as we know that primary visual
 cortex directly encodes the geometric structure and contrast of visual
 stimuli.
