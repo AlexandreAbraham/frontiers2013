@@ -55,7 +55,7 @@
 \newcommand{\alex}[1]{\todo[inline, color=green!40]{#1}}
 \newcommand{\fabian}[1]{\todo[inline, color=blue!40]{#1}}
 \newcommand{\bertrand}[1]{\todo[inline, color=red!40]{#1}}
-
+\newcommand{\michael}[1]{\todo[inline, color=yellow!40]{#1}}
 
 
 %\linenumbers
@@ -303,7 +303,7 @@ convert data from one representation to another.
     can be inverted, a method called \texttt{inverse\_transform} also exists.
 
 \end{itemize}
-
+\michael{Do we need to add that inversion is not always exact? E.g. by saying "If the transformation can be inverted in a certain sense''}
 \subsection{Cross-validation and model selection}
 
 % XXX: describe cross-validation
@@ -322,6 +322,7 @@ subsets are used to train the estimator. This is one of the simplest and most
 widely used cross-validation strategies. The parameter $k$ is commonly set
 to 5 or 10. Other strategies, sometimes called Monte-Carlo cross-validation,
 use many random partitions in the data.
+\michael{is K-Fold now always random?}
 
 For a given model and some fixed value of hyperparameters, the scores
 on the various test sets can be averaged to give a quantitative score
