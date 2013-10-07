@@ -13,7 +13,7 @@
 
 % Absolute numerotation for figures
 \usepackage{caption}
-\usepackage{subcaption}
+%\usepackage{subcaption}
 \captionsetup{figurewithin=none}  
 \captionsetup{tablewithin=none}
 %\usepackage[tight]{subfigure}
@@ -55,7 +55,7 @@
 \newcommand{\alex}[1]{\todo[inline, color=green!40]{#1}}
 \newcommand{\fabian}[1]{\todo[inline, color=blue!40]{#1}}
 \newcommand{\bertrand}[1]{\todo[inline, color=red!40]{#1}}
-
+\newcommand{\michael}[1]{\todo[inline, color=yellow!40]{#1}}
 
 
 %\linenumbers
@@ -190,7 +190,7 @@ scikit-learn, Python
 
 Statistical machine learning is gaining interest in
 neuroimaging data analysis. It is used by neuroscientists as a complicated yet powerful tool for statistical inference,
-and computer scientists working in neuroscience,
+and by computer scientists working in neuroscience,
 who often lack a deep understanding of the neuroscience questions. This paper aims to fill 
 the gap between machine learning and neuroimaging by demonstrating how a 
 general-purpose machine-learning toolbox can be used to produce scripts 
@@ -269,7 +269,7 @@ and reusable across scientific disciplines and applicative fields.
 
 \subsection{Concepts}
 
-In {\em scikit-learn}, all objects and algorithms accept as input data
+In {\em scikit-learn}, all objects and algorithms accept input data in the form of
 2-dimensional arrays of size samples $\times$ features.
 This convention makes it generic and domain-independent.
 Scikit-learn objects share a uniform set of methods that
@@ -303,7 +303,7 @@ convert data from one representation to another.
     can be inverted, a method called \texttt{inverse\_transform} also exists.
 
 \end{itemize}
-
+\michael{Do we need to add that inversion is not always exact? E.g. by saying "If the transformation can be inverted in a certain sense''}
 \subsection{Cross-validation and model selection}
 
 % XXX: describe cross-validation
@@ -322,6 +322,7 @@ subsets are used to train the estimator. This is one of the simplest and most
 widely used cross-validation strategies. The parameter $k$ is commonly set
 to 5 or 10. Other strategies, sometimes called Monte-Carlo cross-validation,
 use many random partitions in the data.
+\michael{is K-Fold now always random?}
 
 For a given model and some fixed value of hyperparameters, the scores
 on the various test sets can be averaged to give a quantitative score
@@ -381,6 +382,7 @@ Due to its acquisition process and poor resolution, neuroimaging data often has 
 signal-to-noise ratio. It contains trends and artifacts that must be removed
 to ensure maximum machine learning algorithms efficiency. Signal cleaning
 includes:
+\michael{Poor resolution? With respect to what?}
 \begin{itemize}
     \item{\bf Detrending} removes a linear trend over the time series of each
         voxel. This is a useful step when studying fMRI data, as the voxel
@@ -482,7 +484,7 @@ can be done thanks to the \texttt{numpy.ma.masked\_array} data structure.
 Several options exist to enhance the overall aspect of the plot.
 Some of them can be found in the full scripts provided with this paper
 \footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}}. It generally
-boils down to a good knowledge of Matplotlib. Note that Nipy package provides a
+boils down to a good knowledge of Matplotlib. Note that the Nipy package provides a
 \texttt{plot\_map} function that is tuned to display activation maps (a
 background is even provided if needed).
 
@@ -566,7 +568,7 @@ is challenging, due to the so-called \emph{curse of dimensionality}.
 Several strategies exist to reduce the number of features.
 A first one is based on prior neuroscientific
 knowledge. Here one could restrict the mask to occipital areas, where the visual
-cortex is actually located. A second approach is a data-driven. Features
+cortex is actually located.\michael{In what sense "actually"? Remove the word?} A second approach is a data-driven. Features
 are evaluated individually with a univariate statistical test. The variables
 having the most discriminative power are kept.
 
@@ -834,7 +836,7 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 
 \label{sec:miyawaki_results}
 Results are presented in figure~\ref{fig:miyawaki}.
-In decoding settings, Figures \textit{a} and \textit{c} show the classifiers weights as brain
+In decoding settings, Figures \textit{a} and \textit{c} show the classifier's weights as brain
 maps for both methods. They both give roughly the same results and we can
 see that the weights are centered in the V1 and nearby retinotopic areas.
 Figures \textit{b} and \textit{d} show reconstruction
@@ -879,6 +881,7 @@ different methods come to the same conclusion comes as face validity.
       both decoding and encoding figures and that encoding and decoding
       roughly match as both approach highlight a relationship between the
       same pixel and voxels.
+\michael{I understand there may be reasons for choosing the colormap employed. However, in the encoding case, having a pixel value that is really close to 0, i.e. really close to not being selected if the penalty were slightly different, scream at me in bright turquoise WILL distort my view on the receptive field: They look awfully spread out, while they are actually not, if you manage to focus on the purple and magenta pixels}
 }
 \label{fig:miyawaki}
 \end{figure}
@@ -968,7 +971,7 @@ concat-ICA.}
   \label{fig:ica}
 \end{figure}
 
-\subsection{Learning functionally-homogeneous regions with clustering}
+\subsection{Learning functionally homogeneous regions with clustering}
 \label{clustering}
 
 From a machine learning perspective, a clustering method aggregates 
@@ -976,7 +979,7 @@ samples into groups (called clusters) maximizing a measure of similarity
 between samples within each cluster. If we consider voxels of a functional brain image
 as samples, this 
 measure can be based on functional similarity, leading to clusters of voxels
-that form functionally-homogeneous regions \citep{thirion2006}.
+that form functionally homogeneous regions \citep{thirion2006}.
 
 \subsubsection{Approaches}
 
@@ -986,7 +989,7 @@ depends on the application: a large number of cluster will give a more
 fine-grained description of the data, with a higher fidelity to the
 original signal, but also a higher model complexity. Some clustering
 approaches can make use of spatial information and yield
-spatially-contiguous clusters, \emph{i.e.} parcels. Here we will describe
+spatially contiguous clusters, \emph{i.e.} parcels. Here we will describe
 two clustering approaches that are simple and fast.
 
 \paragraph{Ward clustering} uses a bottom-up hierarchical approach:
@@ -999,10 +1002,11 @@ sklearn.feature\_extraction.image.grid\_to\_graph} function to
 construct such a graph using the neighbor structure of an image grid,
 with optionally a brain mask.
 
+\michael{K-means or K-Means? Both are used in this paragraph}
 \paragraph{K-means} is a more top-down approach, seeking cluster centers
 to evenly explain the variance of the data. Each voxels are then assigned
 to the nearest center, thus forming clusters. As imposing a spatial model
-in K-means is not easy, it is often advisable to spatially-smooth the
+in K-means is not easy, it is often advisable to spatially smooth the
 data.
 
 To apply the clustering algorithms, we run the common data preparation
@@ -1034,7 +1038,7 @@ clustering extracts some known large scale structure, such as the
 calcarine sulcus on fig~\ref{fig:clustering}.a, it is not guaranteed to
 delineate functionally specific brain regions. Rather, it can be considered as a compression, that
 is a useful method of summarizing information, as it groups together
-similar voxels. Note that, as Kmeans does not extract spatially-contiguous
+similar voxels. Note that, as K-means does not extract spatially-contiguous
 clusters, it gives a number of regions that can be much larger than the
 number of clusters specified, although some of these regions can be very
 small. On the opposite, Ward operates directly at the level of regions.
