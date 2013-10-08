@@ -16,9 +16,12 @@ Pattern Recognition 2011.
 
 ### Load nyu_rest dataset #####################################################
 
+from os.path import join
 import numpy as np
 import pylab as pl
 from nilearn import datasets, input_data
+
+
 dataset = datasets.fetch_adhd(n_subjects=1)
 nifti_masker = input_data.NiftiMasker(memory='nilearn_cache',
                         memory_level=1, standardize=True)
@@ -63,8 +66,8 @@ for n_clusters in 100, 1000:
 
     # Display the labels
     plot_labels(labels, 8)
-    pl.savefig('ward_%i.eps' % n_clusters)
-    pl.savefig('ward_%i.pdf' % n_clusters)
+    pl.savefig(join('clustering', 'ward_%i.eps' % n_clusters))
+    pl.savefig(join('clustering', 'ward_%i.pdf' % n_clusters))
 
     # Compute Kmeans clustering
     from sklearn.cluster import MiniBatchKMeans
@@ -83,6 +86,5 @@ for n_clusters in 100, 1000:
     labels = labels - 1
 
     plot_labels(labels, 2)
-    pl.savefig('kmeans_%i.eps' % n_clusters)
-    pl.savefig('kmeans_%i.pdf' % n_clusters)
-
+    pl.savefig(join('clustering', 'kmeans_%i.eps' % n_clusters))
+    pl.savefig(join('clustering', 'kmeans_%i.pdf' % n_clusters))
