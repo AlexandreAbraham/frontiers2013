@@ -316,13 +316,12 @@ estimator on a given dataset. It consists in iteratively fitting the
 estimator on a fraction of the data, called \emph{training set}, and testing it
 on the left-out unseen data, called \emph{test set}.
 Several strategies exists to partition the data.
-For example, K-Fold cross validation consists in dividing randomly the samples in $k$
+For example, K-Fold cross validation consists in dividing (randomly or not) the samples in $k$
 subsets: each subset is then used once as testing set while the others $k - 1$
 subsets are used to train the estimator. This is one of the simplest and most
 widely used cross-validation strategies. The parameter $k$ is commonly set
 to 5 or 10. Other strategies, sometimes called Monte-Carlo cross-validation,
 use many random partitions in the data.
-\michael{is K-Fold now always random?}
 
 For a given model and some fixed value of hyperparameters, the scores
 on the various test sets can be averaged to give a quantitative score
