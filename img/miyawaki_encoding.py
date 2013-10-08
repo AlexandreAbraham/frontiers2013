@@ -95,7 +95,7 @@ def plot_lines(mask, linewidth=3, color='b'):
 
 sbrain = masking.unmask(np.array(scores).mean(0), dataset.mask)
 
-bg = nibabel.load('bg.nii.gz')
+bg = nibabel.load(os.path.join('utils', 'bg.nii.gz'))
 
 pl.figure(figsize=(8, 8))
 ax1 = pl.axes([0., 0., 1., 1.])

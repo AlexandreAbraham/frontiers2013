@@ -1,10 +1,11 @@
 import nibabel
 import numpy as np
 from matplotlib import pyplot as plt
+from os.path import join
 
 
 # Load image
-bg_img = nibabel.load('bg.nii.gz')
+bg_img = nibabel.load(join('utils', 'bg.nii.gz'))
 bg = bg_img.get_data()
 # Keep values over 4000 as activation map
 act = bg.copy()
