@@ -46,7 +46,8 @@ def apply_mask(niimgs, mask_img, dtype=np.float32,
     values would spread accross the image.
     """
 
-    mask_img = nibabel.load(mask_img)
+    if isinstance(mask_img, basestring):
+        mask_img = nibabel.load(mask_img)
     mask_data = mask_img.get_data().astype(bool)
     mask_affine = mask_img.get_affine()
 
@@ -152,14 +153,18 @@ def unmask(X, mask_img, order="C"):
         3D mask array: True where a voxel should be used.
     """
 
-    mask_img = nibabel.load(mask_img)
+    if isinstance(mask_img, basestring):
+        mask_img = nibabel.load(mask_img)
     mask_data = mask_img.get_data().astype(bool)
 
-    if X.ndim != 1:
-        raise ValueError("X must be a 1-dimensional array")
-
-    data = np.zeros(
-        (mask_data.shape[0], mask_data.shape[1], mask_data.shape[2]),
-        dtype=X.dtype, order=order)
-    data[mask_data] = X
-    return data
+    if X.ndim == 1:
+        data = np.zeros(
+            (mask_data.shape[0], mask_data.shape[1], mask_data.shape[2]),
+            dtype=X.dtype, order=order)
+        data[mask_data] = X
+        return data
+    elif X.ndim == 2:
+        data = np.zeros(mask_data.shape + (X.shape[0],), dtype=X.dtype, order=order)
+        data[mask_data, :] = X.T
+        return data
+    raise ValueError("X must be 1-dimensional or 2-dimensional")
