@@ -2,7 +2,6 @@
 import numpy as np
 import sys
 import time
-from matplotlib.colors import LinearSegmentedColormap
 
 
 offset = 2
@@ -13,15 +12,6 @@ hand_made_affine = np.asarray(
          [0, 0, 3, -26],
          [0, 0, 0, 1]])
 
-cmap = LinearSegmentedColormap('bluegreen', {
-    'red': ((0., 0., 0.),
-            (1., 0., 0.)),
-    'green': ((0., 0., 0.),
-              (1., 1., 1.)),
-    'blue': ((0., 0.2, 0.2),
-             (0.5, 0.5, 0.5),
-             (1., 0., 0.))
-    })
 ### Load Kamitani dataset #####################################################
 from utils import datasets
 dataset = datasets.fetch_miyawaki2008()
@@ -32,7 +22,7 @@ y_random = dataset.label[12:]
 y_shape = (10, 10)
 
 ### Preprocess data ###########################################################
-from utils import masking, signal
+from utils import masking, signal, cm
 import nibabel
 
 sys.stderr.write("Preprocessing data...")
@@ -136,7 +126,7 @@ bg = nibabel.load('bg.nii.gz')
 pl.imshow(bg.get_data()[:, :, 10].T, interpolation="nearest", cmap='gray',
           origin='lower')
 pl.imshow(np.ma.masked_equal(sbrain[:, :, 10].T, 0.), interpolation="nearest",
-          cmap=cmap, origin='lower', vmin=0., vmax=2.6)
+          cmap=cm.bluegreen, origin='lower', vmin=0., vmax=2.6)
 plot_lines(contour[:, :, 10].T, color='r')
 pl.axis('off')
 ax2 = pl.axes([.1, .5, .05, .45])
@@ -158,7 +148,7 @@ vmax = np.max(np.abs(sbrain[:, :, 10].T))
 pl.imshow(bg.get_data()[:, :, 10].T, interpolation="nearest", cmap='gray',
           origin='lower')
 pl.imshow(np.ma.masked_equal(sbrain[:, :, 10].T, 0.), interpolation="nearest",
-          cmap=cmap, origin='lower', vmin=0., vmax=1.0)
+          cmap=cm.bluegreen, origin='lower', vmin=0., vmax=1.0)
 plot_lines(contour[:, :, 10].T, color='r')
 pl.axis('off')
 ax2 = pl.axes([.1, .5, .05, .45])

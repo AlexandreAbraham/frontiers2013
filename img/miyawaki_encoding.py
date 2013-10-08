@@ -4,7 +4,6 @@ import nibabel
 import os
 import sys
 import time
-from matplotlib.colors import LinearSegmentedColormap
 
 
 offset = 2
@@ -14,16 +13,6 @@ hand_made_affine = np.asarray(
          [0, 3, 0, -112],
          [0, 0, 3, -26],
          [0, 0, 0, 1]])
-
-cmap = LinearSegmentedColormap('bluegreen', {
-    'red': ((0., 0., 0.),
-            (1., 0., 0.)),
-    'green': ((0., 0., 0.),
-              (1., 1., 1.)),
-    'blue': ((0., 0.2, 0.2),
-             (0.5, 0.5, 0.5),
-             (1., 0., 0.))
-    })
 
 ### Load Kamitani dataset #####################################################
 from utils import datasets
@@ -35,7 +24,7 @@ y_random = dataset.label[12:]
 y_shape = (10, 10)
 
 ### Preprocess data ###########################################################
-from utils import masking, signal
+from utils import masking, signal, cm
 
 
 sys.stderr.write("Preprocessing data...")
@@ -143,7 +132,7 @@ for index in [1780, 1951, 2131, 1935]:
     # Black background
     pl.imshow(np.zeros_like(rf), vmin=0., vmax=1., cmap='gray')
     pl.imshow(np.ma.masked_equal(rf, 0.), vmin=0., vmax=0.75,
-            interpolation="nearest", cmap=cmap)
+            interpolation="nearest", cmap=cm.bluegreen)
     plot_lines(pixmask, linewidth=6, color='r')
     pl.axis('off')
     pl.subplots_adjust(left=0., right=1., bottom=0., top=1.)
@@ -158,7 +147,7 @@ import matplotlib as mpl
 
 fig = pl.figure(figsize=(2.4, .4))
 norm = mpl.colors.Normalize(vmin=0., vmax=.75)
-cb = mpl.colorbar.ColorbarBase(pl.gca(), cmap=cmap, norm=norm,
+cb = mpl.colorbar.ColorbarBase(pl.gca(), cmap=cm.bluegreen, norm=norm,
                                orientation='horizontal')
 #cb.ax.yaxis.set_ticks_position('left')
 cb.set_ticks([0., 0.38, 0.75])
