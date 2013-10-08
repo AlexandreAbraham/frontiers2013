@@ -19,14 +19,17 @@ Pattern Recognition 2011.
 from os.path import join
 import numpy as np
 import pylab as pl
-from nilearn import datasets, input_data
+from utils import datasets, masking, signal
+import nibabel
 
 
 dataset = datasets.fetch_adhd(n_subjects=1)
-nifti_masker = input_data.NiftiMasker(memory='nilearn_cache',
-                        memory_level=1, standardize=True)
-fmri_masked = nifti_masker.fit_transform(dataset.func[0])
-mask = nifti_masker.mask_img_.get_data().astype(np.bool)
+X = masking.apply_mask(dataset.func[0], 'adhd_mask.nii.gz')
+X = signal.clean(X, standardize=True, detrend=False)
+X_smoothed = masking.apply_mask(dataset.func[0], 'adhd_mask.nii.gz',
+        smoothing_fwhm=6.)
+X_smoothed = signal.clean(X_smoothed, standardize=True, detrend=False)
+mask = nibabel.load('adhd_mask.nii.gz').get_data().astype(np.bool)
 
 z = 42
 
@@ -57,10 +60,10 @@ for n_clusters in 100, 1000:
     from sklearn.cluster import WardAgglomeration
     ward = WardAgglomeration(n_clusters=n_clusters, connectivity=connectivity,
                             memory='nilearn_cache', compute_full_tree=True)
-    ward.fit(fmri_masked)
+    ward.fit(X)
 
     labels = ward.labels_ + 1
-    labels = nifti_masker.inverse_transform(labels).get_data()
+    labels = masking.unmask(labels, 'adhd_mask.nii.gz')
     # 0 is the background, putting it to -1
     labels = labels - 1
 
@@ -72,16 +75,11 @@ for n_clusters in 100, 1000:
     # Compute Kmeans clustering
     from sklearn.cluster import MiniBatchKMeans
 
-    nifti_masker = input_data.NiftiMasker(memory='nilearn_cache',
-                    memory_level=1, smoothing_fwhm=6., standardize=True)
-    fmri_masked = nifti_masker.fit_transform(dataset.func[0])
-    mask = nifti_masker.mask_img_.get_data().astype(np.bool)
-
     kmeans = MiniBatchKMeans(n_clusters=n_clusters, random_state=1)
-    kmeans.fit(fmri_masked.T)
+    kmeans.fit(X_smoothed.T)
 
     labels = kmeans.labels_ + 1
-    labels = nifti_masker.inverse_transform(labels).get_data()
+    labels = masking.unmask(labels, 'adhd_mask.nii.gz')
     # 0 is the background, putting it to -1
     labels = labels - 1
 
