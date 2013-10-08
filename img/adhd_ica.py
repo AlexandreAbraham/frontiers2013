@@ -98,7 +98,7 @@ pl.savefig(join(path, 'melodic.eps'))
 if not exists(join(path, 'ica.nii.gz')):
     from sklearn.decomposition import FastICA
     X = np.vstack(X)
-    ica = FastICA(n_components=n_components)
+    ica = FastICA(n_components=n_components, random_state=0)
     t0 = time.time()
     ica.fit(X)
     print('FastICA: %f' % (time.time() - t0))
