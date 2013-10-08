@@ -23,13 +23,14 @@ from utils import datasets, masking, signal
 import nibabel
 
 
+adhd_mask = join('utils', 'adhd_mask.nii.gz')
 dataset = datasets.fetch_adhd(n_subjects=1)
-X = masking.apply_mask(dataset.func[0], 'adhd_mask.nii.gz')
+X = masking.apply_mask(dataset.func[0], adhd_mask)
 X = signal.clean(X, standardize=True, detrend=False)
-X_smoothed = masking.apply_mask(dataset.func[0], 'adhd_mask.nii.gz',
+X_smoothed = masking.apply_mask(dataset.func[0], adhd_mask,
         smoothing_fwhm=6.)
 X_smoothed = signal.clean(X_smoothed, standardize=True, detrend=False)
-mask = nibabel.load('adhd_mask.nii.gz').get_data().astype(np.bool)
+mask = nibabel.load(adhd_mask).get_data().astype(np.bool)
 
 z = 42
 
@@ -63,7 +64,7 @@ for n_clusters in 100, 1000:
     ward.fit(X)
 
     labels = ward.labels_ + 1
-    labels = masking.unmask(labels, 'adhd_mask.nii.gz')
+    labels = masking.unmask(labels, adhd_mask)
     # 0 is the background, putting it to -1
     labels = labels - 1
 
@@ -79,7 +80,7 @@ for n_clusters in 100, 1000:
     kmeans.fit(X_smoothed.T)
 
     labels = kmeans.labels_ + 1
-    labels = masking.unmask(labels, 'adhd_mask.nii.gz')
+    labels = masking.unmask(labels, adhd_mask)
     # 0 is the background, putting it to -1
     labels = labels - 1
 

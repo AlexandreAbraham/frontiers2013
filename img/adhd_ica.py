@@ -38,7 +38,7 @@ def plot_ica_map(map_3d):
 
 
 # Resample the mask
-mask_img = resampling.resample_img('adhd_mask.nii.gz',
+mask_img = resampling.resample_img(join('utils', 'adhd_mask.nii.gz'),
                                    target_affine=np.diag((3, 3, 3.)))
 # Resample the data
 X_ = []

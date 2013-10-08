@@ -132,7 +132,7 @@ def plot_lines(mask, linewidth=3, color='b'):
 fig = pl.figure(figsize=(8, 8))
 ax1 = pl.axes([0., 0., 1., 1.])
 sbrain = masking.unmask(lr_coef[0], dataset.mask)
-bg = nibabel.load('bg.nii.gz')
+bg = nibabel.load(os.path.join('utils', 'bg.nii.gz'))
 pl.imshow(bg.get_data()[:, :, 10].T, interpolation="nearest", cmap='gray',
           origin='lower')
 pl.imshow(np.ma.masked_equal(sbrain[:, :, 10].T, 0.), interpolation="nearest",
