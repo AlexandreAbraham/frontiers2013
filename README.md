@@ -1,5 +1,5 @@
-frontiers2013
-=============
+Machine Learning for Neuroimaging with Scikit-Learning
+=======================================================
 
 Paper on using scikit-learn for NeuroImaging, for the special issue "Python in Neurosciences II" of frontiers in NeuroInformatics.
 
