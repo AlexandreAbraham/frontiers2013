@@ -303,7 +303,7 @@ convert data from one representation to another.
     can be inverted, a method called \texttt{inverse\_transform} also exists.
 
 \end{itemize}
-\michael{Do we need to add that inversion is not always exact? E.g. by saying "If the transformation can be inverted in a certain sense''}
+
 \subsection{Cross-validation and model selection}
 
 % XXX: describe cross-validation
@@ -368,20 +368,15 @@ changing the spatial resolution of the data. This is
 an interpolation and alters the data, that is why it should be used carefully.
 Downsampling is commonly used to reduce the size of data to process.
 Typical sizes are 2mm or 3mm resolution, but scan spatial resolution is
-increasing with progress in MR physics.
-Data scaling factor for each direction can be modified in the affine matrix.
-\bertrand{I dont understand the last sentence.}
-\alex{I think it means that if you have a diagonal affine with 3 3 2, you can
-    change the scaling in third direction to get something isotropic for
-example. I think we can remove this sentence.}
+increasing with progress in MR physics. The affine matrix can encode the
+scaling factors for each direction.
 
 \subsection{Signal cleaning}
 
-Due to its acquisition process and poor resolution, neuroimaging data often has a low
+Due to its complex and indirect acquisition process, neuroimaging data often has a low
 signal-to-noise ratio. It contains trends and artifacts that must be removed
 to ensure maximum machine learning algorithms efficiency. Signal cleaning
 includes:
-\michael{Poor resolution? With respect to what?}
 \begin{itemize}
     \item{\bf Detrending} removes a linear trend over the time series of each
         voxel. This is a useful step when studying fMRI data, as the voxel
@@ -567,7 +562,7 @@ is challenging, due to the so-called \emph{curse of dimensionality}.
 Several strategies exist to reduce the number of features.
 A first one is based on prior neuroscientific
 knowledge. Here one could restrict the mask to occipital areas, where the visual
-cortex is actually located.\michael{In what sense "actually"? Remove the word?} A second approach is a data-driven. Features
+cortex is located. A second approach is a data-driven. Features
 are evaluated individually with a univariate statistical test. The variables
 having the most discriminative power are kept.
 
@@ -1000,7 +995,6 @@ sklearn.feature\_extraction.image.grid\_to\_graph} function to
 construct such a graph using the neighbor structure of an image grid,
 with optionally a brain mask.
 
-\michael{K-means or K-Means? Both are used in this paragraph}
 \paragraph{K-means} is a more top-down approach, seeking cluster centers
 to evenly explain the variance of the data. Each voxels are then assigned
 to the nearest center, thus forming clusters. As imposing a spatial model
