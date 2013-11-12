@@ -14,6 +14,8 @@ n_components = 10
 z = 35
 # Path
 path = 'ica'
+min_ = None
+max_ = None
 
 ### Initialization ############################################################
 import nibabel
@@ -23,12 +25,12 @@ import numpy as np
 import time
 
 
-def plot_ica_map(map_3d):
+def plot_ica_map(map_3d, vmin, vmax):
     # Mask the background
     map_3d = np.ma.masked_array(map_3d,
             np.logical_not(mask_img.get_data().astype(bool)))
     section = map_3d[:, :, z]
-    vmax = np.max(np.abs(section))
+    vmax = np.max(np.abs(vmin), np.abs(vmax))
 
     pl.figure(figsize=(3.8, 4.5))
     pl.axes([0, 0, 1, 1])
@@ -80,17 +82,17 @@ if not exists(join(path, 'canica.nii.gz')):
         warnings.warn('nilearn must be installed to run CanICA')
 
 
-plot_ica_map(nibabel.load(join(path, 'canica.nii.gz')).get_data()[..., 4])
-pl.savefig(join(path, 'canica.pdf'))
-pl.savefig(join(path, 'canica.eps'))
+canica_dmn = nibabel.load(join(path, 'canica.nii.gz')).get_data()[..., 4]
+min_ = np.min(min_, np.min(canica_dmn))
+max_ = np.max(max_, np.max(canica_dmn))
 
 
 ### Melodic ICA ############################################################
 # To have MELODIC results, please use my melodic branch of nilearn
 
-plot_ica_map(nibabel.load(join(path, 'melodic.nii.gz')).get_data()[..., 3])
-pl.savefig(join(path, 'melodic.pdf'))
-pl.savefig(join(path, 'melodic.eps'))
+melodic_dmn = nibabel.load(join(path, 'melodic.nii.gz')).get_data()[..., 3]
+min_ = np.min(min_, np.min(melodic_dmn))
+max_ = np.max(max_, np.max(melodic_dmn))
 
 ### FastICA ##################################################################
 
@@ -106,6 +108,18 @@ if not exists(join(path, 'ica.nii.gz')):
     nibabel.save(nibabel.Nifti1Image(ica_components,
             mask_img.get_affine()), join(path, 'ica.nii.gz'))
 
-plot_ica_map(nibabel.load(join(path, 'ica.nii.gz')).get_data()[..., 2])
+ica_dmn = nibabel.load(join(path, 'ica.nii.gz')).get_data()[..., 2]
+
+### Plots ####################################################################
+
+plot_ica_map(ica_dmn, min_, max_)
 pl.savefig(join(path, 'ica.pdf'))
 pl.savefig(join(path, 'ica.eps'))
+
+plot_ica_map(canica_dmn, min_, max_)
+pl.savefig(join(path, 'canica.pdf'))
+pl.savefig(join(path, 'canica.eps'))
+
+plot_ica_map(melodic_dmn, min_, max_)
+pl.savefig(join(path, 'melodic.pdf'))
+pl.savefig(join(path, 'melodic.eps'))
