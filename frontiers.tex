@@ -268,6 +268,24 @@ languages such as Matlab or R. The main libraries in the scientific Python stack
 	We use it at the beginning of all our scripts.
 \end{itemize}
 
+\subsection{Scikit-learn and machine learning ecosystem}
+
+Scikit-learning is a general purpose machine learning library written in Python.
+Python is interactive and easy to use. It allows fast prototyping. Weka
+\citep{hall2009weka} is a machine learning framework written in Java. Although
+it provides a graphical user interface, it is more oriented toward data mining.
+Using its API for specific purpose is possible but requires knowledge of the
+Java Runtime Environment. PyBrain \citep{schaul2010pybrain} is best at neural networks
+and reinforcement learning approaches, which are black boxes, and does not match
+our will to interpret the results.
+
+Some higher level frameworks provides full pipeline to apply machine learning techniques on
+neuroimaging data. PyMVPA does data preprocessing, analysis and result
+visualization, but has dependencies on R and Shogun. PRoNTo
+\citep{schrouff2013pronto} is written in Matlab and can easily interface with
+SPM but does not propose many machine learning algorithms. This paper is about
+patterns that are lower-level.
+
 \section{Scikit-learn}
 \label{scikitlearn}
 
