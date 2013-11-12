@@ -238,13 +238,21 @@ techniques can extract useful structure from the images.
 Thanks to its scientific libraries, Python is able to compete with domain-specific
 languages such as Matlab or R. The main libraries in the scientific Python stack are:
 \begin{itemize}
-    \item{\bf Scipy and Numpy} packages are the basis of scientific computing in Python.
-        NumPy provides the \verb!ndarray! data type, an efficient $n$-dimensional data
+    \item{\bf NumPy} provides the \verb!ndarray! data type, an efficient $n$-dimensional data
         representation for array-based numerical computating, a la Matlab
-        \citep{vanderwalt2011}.
-        SciPy provides higher level mathematical functions that operate on ndarrays for
+        \citep{vanderwalt2011}. It handles efficient NumPy array persistance
+        (input and output) and provides basic operations. A
+        growing number of scientific libraries, including scikit-learn, uses NumPy arrays
+        as input and output data type. Section~\ref{data_preparation} explains
+        how to load neuroimaging data and convert it to NumPy arrays compatible
+        with scikit-learn.
+
+    \item{\bf SciPy} provides higher level mathematical functions that operate on ndarrays for
         a variety of domains including linear algebra, optimization and signal
-        processing. Together, NumPy and SciPy provide a robust scientific environment
+        processing. SciPy is typically used to do signal processing during data
+        preparation.
+        % Detail ?
+        Together, NumPy and SciPy provide a robust scientific environment
         for numerical computing and they are the elementary bricks we use in all our
         algorithms.
         % XXX : elementary bricks -> foundations ? building blocks?
@@ -338,7 +346,7 @@ computed for all hyperparameters combinations, possibly in parallel,
 in order to find the best one.
 
 \section{Data preparation: from MR volumes to a data matrix}
-
+\label{data_preparation}
 Before applying statistical learning to neuroimaging data, standard
 preprocessing must be applied. For fMRI, this includes motion
 correction, slice timing correction, coregistration with an anatomical image and normalization to a common
@@ -613,9 +621,9 @@ and the target behavioral variable. In practice, it entails performing
 cross-validation of the model, most often an SVM, on voxels contained in
 balls centered on each voxel of interest. The procedure amounts to
 solving a large number of SVMs and can be computationally expensive.
-Detailing an efficient implementation of this algorithm is beyond the scope of this
-paper. However, the code, along with this example,
-are available in nilearn.
+Detailing an efficient implementation of this algorithm is beyond the
+scope of this paper. However, the code, along with this example,
+are available in the github repository.
 
 \subsection{Results}
 
