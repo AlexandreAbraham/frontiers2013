@@ -238,13 +238,21 @@ techniques can extract useful structure from the images.
 Thanks to its scientific libraries, Python is able to compete with domain-specific
 languages such as Matlab or R. The main libraries in the scientific Python stack are:
 \begin{itemize}
-    \item{\bf Scipy and Numpy} packages are the basis of scientific computing in Python.
-        NumPy provides the \verb!ndarray! data type, an efficient $n$-dimensional data
+    \item{\bf NumPy} provides the \verb!ndarray! data type, an efficient $n$-dimensional data
         representation for array-based numerical computating, a la Matlab
-        \citep{vanderwalt2011}.
-        SciPy provides higher level mathematical functions that operate on ndarrays for
+        \citep{vanderwalt2011}. It handles efficient NumPy array persistance
+        (input and output) and provides basic operations. A
+        growing number of scientific libraries, including scikit-learn, uses NumPy arrays
+        as input and output data type. Section~\ref{data_preparation} explains
+        how to load neuroimaging data and convert it to NumPy arrays compatible
+        with scikit-learn.
+
+    \item{\bf SciPy} provides higher level mathematical functions that operate on ndarrays for
         a variety of domains including linear algebra, optimization and signal
-        processing. Together, NumPy and SciPy provide a robust scientific environment
+        processing. SciPy is typically used to do signal processing during data
+        preparation.
+        % Detail ?
+        Together, NumPy and SciPy provide a robust scientific environment
         for numerical computing and they are the elementary bricks we use in all our
         algorithms.
         % XXX : elementary bricks -> foundations ? building blocks?
@@ -259,6 +267,24 @@ languages such as Matlab or R. The main libraries in the scientific Python stack
     \item{\bf Nibabel} loads or saves data in neuroimaging file formats.
 	We use it at the beginning of all our scripts.
 \end{itemize}
+
+\subsection{Scikit-learn and machine learning ecosystem}
+
+Scikit-learning is a general purpose machine learning library written in Python.
+Python is interactive and easy to use. It allows fast prototyping. Weka
+\citep{hall2009weka} is a machine learning framework written in Java. Although
+it provides a graphical user interface, it is more oriented toward data mining.
+Using its API for specific purpose is possible but requires knowledge of the
+Java Runtime Environment. PyBrain \citep{schaul2010pybrain} is best at neural networks
+and reinforcement learning approaches, which are black boxes, and does not match
+our will to interpret the results.
+
+Some higher level frameworks provides full pipeline to apply machine learning techniques on
+neuroimaging data. PyMVPA does data preprocessing, analysis and result
+visualization, but has dependencies on R and Shogun. PRoNTo
+\citep{schrouff2013pronto} is written in Matlab and can easily interface with
+SPM but does not propose many machine learning algorithms. This paper is about
+patterns that are lower-level.
 
 \section{Scikit-learn}
 \label{scikitlearn}
@@ -338,7 +364,7 @@ computed for all hyperparameters combinations, possibly in parallel,
 in order to find the best one.
 
 \section{Data preparation: from MR volumes to a data matrix}
-
+\label{data_preparation}
 Before applying statistical learning to neuroimaging data, standard
 preprocessing must be applied. For fMRI, this includes motion
 correction, slice timing correction, coregistration with an anatomical image and normalization to a common
@@ -613,9 +639,9 @@ and the target behavioral variable. In practice, it entails performing
 cross-validation of the model, most often an SVM, on voxels contained in
 balls centered on each voxel of interest. The procedure amounts to
 solving a large number of SVMs and can be computationally expensive.
-Detailing an efficient implementation of this algorithm is beyond the scope of this
-paper. However, the code, along with this example,
-are available in nilearn.
+Detailing an efficient implementation of this algorithm is beyond the
+scope of this paper. However, the code, along with this example,
+are available in the github repository.
 
 \subsection{Results}
 
