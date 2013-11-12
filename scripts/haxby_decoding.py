@@ -163,21 +163,20 @@ n_jobs = 1
 # Here we use precision which measures proportion of true positives among
 # all positives results for one class.
 from sklearn.metrics import precision_score
-score_func = precision_score
+scoring = precision_score
 
 ### Define the cross-validation scheme used for validation.
 # Here we use a KFold cross-validation on the session, which corresponds to
 # splitting the samples in 4 folds and make 4 runs using each fold as a test
 # set once and the others as learning sets
 from sklearn.cross_validation import KFold
-cv = KFold(y.size, k=4)
+cv = KFold(y.size, n_folds=4)
 
-import nilearn.decoding
+from utils.searchlight import SearchLight
 # The radius is the one of the Searchlight sphere that will scan the volume
-searchlight = nilearn.decoding.SearchLight(mask_img,
-                                      process_mask_img=process_mask_img,
-                                      radius=5.6, n_jobs=n_jobs,
-                                      score_func=score_func, verbose=1, cv=cv)
+searchlight = SearchLight(mask_img, process_mask_img=process_mask_img,
+                          radius=5.6, n_jobs=n_jobs,
+                          scoring='precision', verbose=1, cv=cv)
 searchlight.fit(X_img, y)
 s_scores = np.ma.array(searchlight.scores_, mask=np.logical_not(process_mask))
 plot_haxby(s_scores, 'Searchlight')
