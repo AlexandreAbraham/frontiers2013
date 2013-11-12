@@ -112,6 +112,7 @@ cb.ax.yaxis.set_tick_params(labelcolor='white')
 cb.ax.yaxis.set_tick_params(labelsize=20)
 cb.set_ticks(np.arange(0., .8, .2))
 pl.savefig(os.path.join('miyawaki', 'encoding_scores.pdf'))
+pl.savefig(os.path.join('miyawaki', 'encoding_scores.png'))
 pl.savefig(os.path.join('miyawaki', 'encoding_scores.eps'))
 pl.clf()
 
@@ -153,4 +154,5 @@ cb = mpl.colorbar.ColorbarBase(pl.gca(), cmap=cm.bluegreen, norm=norm,
 cb.set_ticks([0., 0.38, 0.75])
 fig.subplots_adjust(bottom=0.5, top=1., left=0.08, right=.92)
 pl.savefig(os.path.join('miyawaki', 'rf_colorbar.pdf'))
+pl.savefig(os.path.join('miyawaki', 'rf_colorbar.png'))
 pl.savefig(os.path.join('miyawaki', 'rf_colorbar.eps'))
