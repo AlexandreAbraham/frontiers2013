@@ -241,7 +241,7 @@ languages such as Matlab or R. The main libraries in the scientific Python stack
     \item{\bf NumPy} provides the \verb!ndarray! data type, an efficient $n$-dimensional data
         representation for array-based numerical computating, a la Matlab
         \citep{vanderwalt2011}. It handles efficient NumPy array persistance
-        (input and output) and provides basic operations. A
+        (input and output) and provides basic operations such as dot product. A
         growing number of scientific libraries, including scikit-learn, uses NumPy arrays
         as input and output data type. Section~\ref{data_preparation} explains
         how to load neuroimaging data and convert it to NumPy arrays compatible
@@ -249,9 +249,9 @@ languages such as Matlab or R. The main libraries in the scientific Python stack
 
     \item{\bf SciPy} provides higher level mathematical functions that operate on ndarrays for
         a variety of domains including linear algebra, optimization and signal
-        processing. SciPy is typically used to do signal processing during data
-        preparation.
-        % Detail ?
+        processing. SciPy is linked to compiled libraries to ensure high
+        performances (BLAS, Arpack and MKL for linear algebra and mathematical
+        operations and libSVM and libLinear for SVM).
         Together, NumPy and SciPy provide a robust scientific environment
         for numerical computing and they are the elementary bricks we use in all our
         algorithms.
@@ -384,15 +384,20 @@ target variable to predict, $y$.
 Neuroimaging data often come as Nifti files, 4-dimensional data (3D scans
 with time series at each location or voxel) along with a
 transformation matrix (called affine) used to compute voxel locations
-from array indices to world coordinates. Such matrix can express data
+from array indices to world coordinates. When working with several subjects,
+each individual data is registered on a common template (MNI, Talairach...),
+hence on a common affine, during preprocessing.
+
+Affine matrix can express data
 anisotropy, when the distance between two voxels is not the same
 depending on the direction. This information is used by algorithms
 relying on the spatial structure of the data, for instance the
-Searchlight. SciPy provides routines taking affine into account in its
-\texttt{ndimage} module, for instance \texttt{scipy.ndimage.affine\_transform}.
+Searchlight.
 
-Nilearn uses Scipy to implement easy-to-use image resampling: 
-changing the spatial resolution of the data. This is
+SciPy routine \texttt{scipy.ndimage.affine\_transform}
+can be used to perform image resampling: 
+changing the spatial resolution of the data\footnote{An easy-to-use
+implementation is proposed in nilearn}. This is
 an interpolation and alters the data, that is why it should be used carefully.
 Downsampling is commonly used to reduce the size of data to process.
 Typical sizes are 2mm or 3mm resolution, but scan spatial resolution is
@@ -416,11 +421,6 @@ includes:
     \item{\bf Normalization} consists in setting the timeseries variance to 1.
         This harmonization is necessary as some machine learning algorithms are
         sensible to different value ranges.
-    \item{\bf Confounds removal} consists in regressing out confounding factors.
-        Typical neuroimaging confounds are head movements. These spurious
-        variables induce spurious correlation between all brain voxels.
-        Some datasets provide estimated confounds (usually in csv files) but
-        they can also be estimated from the data \citep{behzadi2007}.
     \item{\bf Frequency filtering} consists in removing high or low
         frequency signals. Low-frequency signals in fMRI data are caused by
         physiological mechanisms or scanner drifts.
