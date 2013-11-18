@@ -423,7 +423,9 @@ includes:
         sensible to different value ranges.
     \item{\bf Frequency filtering} consists in removing high or low
         frequency signals. Low-frequency signals in fMRI data are caused by
-        physiological mechanisms or scanner drifts.
+        physiological mechanisms or scanner drifts. Filtering can be done thanks
+        to a Fourier transform (\texttt{scipy.fftpack.fft}) or a Butterworth
+        filter (\texttt{scipy.signal.butter}).
 \end{itemize}
 
 \subsection{From 4-dimensional images to 2-dimensional array: masking}
@@ -564,7 +566,10 @@ First, we illustrate decoding with a simplified version of the experiment presen
 \cite{haxby2001}. In the original work, visual stimuli from 8 different categories
 are presented to 6 subjects during 12 sessions. The goal is to 
 predict the category of the stimulus presented to the subject given the
-recorded fMRI volumes. For the sake of simplicity, we restrict the example
+recorded fMRI volumes. This example has already been widely analyzed
+(\cite{hanson2004combinatorial}; \cite{detre2006multi}; \cite{otoole2007};
+\cite{hanson2008brain}; \cite{hanke2009pymvpa}) and has become a reference
+example in matter of decoding. For the sake of simplicity, we restrict the example
 to one subject and to two categories, faces and houses.
 
 As there is a \emph{target} variable $y$ to predict, this is a supervised
@@ -617,7 +622,8 @@ It is said to maximize the \emph{margin}. Classifying a new sample boils
 down to determining on which side of the hyperplane it lies. When employing a
 linear kernel, the separating hyperplane is defined in the input
 data space and its coefficients can be related to the voxels.
-Such coefficients can therefore be visualized as an image
+Such coefficients can therefore be visualized as an image (after
+unmasking step described in~\ref{sec:unmasking})
 where voxels with high values have more influence on the prediction
 than the others (see figure~\ref{fig:haxby}).
 
@@ -626,6 +632,10 @@ feature_selection = SelectKBest(f_classif, k=500)
 clf = SVC(kernel='linear')
 X_reduced = feature_selection.fit_transform(X)
 clf.fit(X_reduced, y)
+### Look at the discriminating weights
+coef = clf.coef_
+### Reverse feature selection
+coef = feature_selection.inverse_transform(coef)
 \end{lstlisting}
 
 \subsection{Searchlight}
@@ -659,16 +669,6 @@ paper \citep{haxby2001} are displayed in blue and green.}
 \label{fig:haxby}
 \end{figure}
 
-To create full-brain maps from SVC weights, we must apply the
-unmasking step described in \ref{sec:unmasking}, but also invert the
-feature selection:
-\begin{lstlisting}
-### Look at the discriminating weights
-coef = clf.coef_
-# reverse feature selection
-coef = feature_selection.inverse_transform(coef)
-\end{lstlisting}
-
 Results are shown in figure~\ref{fig:haxby}: first
 F-score, that is standard analysis in brain mapping but also the
 statistic used to select features; second the SVC weights after feature
@@ -685,6 +685,14 @@ high level regions of the ventral visual cortex which is known to
 contain category-specific visual areas. While Searchlight only gives a
 score to each voxel, the SVC can be used afterward to classify unseen
 brain scans.
+
+Note that most of the example script \texttt{haxby\_decoding.py} is for data
+loading and result visualization. Only 5 lines are needed to run a scikit-learn
+classifier. Plus, thanks to the scikit-learn modularity, the SVC can be easily
+replaced by any other classifier. The SearchLight estimator has been designed to
+make use of any classifier and restrain the computation to an area of interest
+for fast computation.
+
 
 \section{Encoding brain activity and decoding images}
 \label{kamitani}

@@ -121,5 +121,6 @@ pl.savefig(join(path, 'canica.pdf'))
 pl.savefig(join(path, 'canica.eps'))
 
 plot_ica_map(melodic_dmn, min_, max_)
+pl.colorbar()
 pl.savefig(join(path, 'melodic.pdf'))
 pl.savefig(join(path, 'melodic.eps'))
