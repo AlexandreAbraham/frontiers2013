@@ -191,13 +191,16 @@ scikit-learn, Python
 \section{Introduction}
 
 Statistical machine learning is gaining interest in
-neuroimaging data analysis. It is used by neuroscientists as a complicated yet powerful tool for statistical inference,
+neuroimaging data analysis. It is used by neuroscientists as a complicated
+yet powerful tool for statistical inference,
 and by computer scientists working in neuroscience,
-who often lack a deep understanding of the neuroscience questions. This paper aims to fill 
-the gap between machine learning and neuroimaging by demonstrating how a 
-general-purpose machine-learning toolbox can be used to produce scripts 
+who often lack a deep understanding of the neuroscience questions. This paper
+aims to fill the gap between machine learning and neuroimaging by demonstrating
+how a general-purpose machine-learning toolbox can be used to produce scripts 
 for neuroimaging analysis with state-of-the-art methods
-that are fully understood by both worlds.
+that are fully understood by both worlds. For a more theoretical introduction to
+the use of machine learning methods for functional MRI analysis, see
+\cite{pereira2009} or \cite{mur2009}.
 
 With its mature scientific stack, Python is a growing contender in the
 landscape of neuroimaging data analysis with tools such as Nipy
@@ -212,9 +215,9 @@ We discuss a few applications of statistical learning to
 resolve common neuroimaging needs, which methods can be used, what the underlying
 assumptions are, and how to achieve the desired results. We discuss not only
 prediction scores, but also the interpretability of the results, which
-leads us to explore the internal model of various methods. The scope of this paper is not
-to discuss a library, but rather code patterns, and the github repository
-of the
+leads us to explore the internal model of various methods. 
+The scope of this paper is not to discuss a library, but rather
+code patterns, and the github repository of the
 paper\footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}}
 provides complete scripts to generate figures. Naturally, there would be
 value in a software package building upon these patterns. Such a package
@@ -275,9 +278,9 @@ It proposes efficient implementations of state-of-the-art algorithms. It also
 takes advantage of Python interactivity and modularity to propose fast and easy
 prototyping.
 
-Weka \citep{hall2009weka} is a machine learning framework written in Java. Although
-it provides a graphical user interface, it is more oriented toward data mining.
-Using its API for specific purpose is possible but requires knowledge of the
+Weka \citep{hall2009weka}, a machine learning framework written in Java,
+provides a simple user interface, however it is more oriented toward data mining
+and it using its API for specific purpose requires knowledge of the
 Java Runtime Environment. PyBrain \citep{schaul2010pybrain} is best at neural networks
 and reinforcement learning approaches, which are black boxes, and does not match
 our will to interpret the results.
@@ -364,7 +367,8 @@ In {\em scikit-learn}, hyperparameters tuning can be conviently done with the
 \texttt{GridSearchCV} estimator. It takes as input an estimator and
 a set of candidate hyperparameters. Cross-validation scores are then
 computed for all hyperparameters combinations, possibly in parallel,
-in order to find the best one.
+in order to find the best one. Grid search has been used to explore several
+values for regularization coefficient in section~\ref{kamitani}.
 
 \section{Data preparation: from MR volumes to a data matrix}
 \label{data_preparation}
@@ -431,6 +435,8 @@ includes:
         filter (\texttt{scipy.signal.butter}).
 \end{itemize}
 
+More about
+
 \subsection{From 4-dimensional images to 2-dimensional array: masking}
 
 \label{sec:unmasking}
@@ -465,7 +471,6 @@ Applying the mask is made easy by NumPy fancy indexing using boolean arrays.
 Two-dimensional masked data will be referred to as \texttt{X} to follow
 scikit-learn conventions:
 \begin{lstlisting}
-import nibabel
 mask = nibabel.load('mask.nii').get_data()
 func_data = nibabel.load('epi.nii').get_data()
 # Ensure that the mask is boolean
@@ -484,13 +489,14 @@ Across all our examples, voxels of interest are represented on an axial slice of
 the brain. Some transformations of the original matrix data are required to match
 matplotlib data format. The following snippet of code shows how to load and
 display an axial slice overlaid with an activation map. The background is an
-anatomical scan and highest voxels are taken as phony activation map.
+anatomical scan and highest voxels of the background are taken as artificial
+activation map.
 
 \begin{lstlisting}
 # Load image
 bg_img = nibabel.load('bg.nii.gz')
 bg = bg_img.get_data()
-# Keep values over 4000 as phony activation map
+# Keep values over 6000 as artificial activation map
 act = bg.copy()
 act[act < 6000] = 0.
 
@@ -502,8 +508,6 @@ plt.imshow(masked_act[..., 10].T, origin='lower', interpolation='nearest', cmap=
 # Cosmetics: disable axis
 plt.axis('off')
 plt.show()
-# Save the activation map
-nibabel.save(nibabel.Nifti1Image(act, bg_img.get_affine()), 'activation.nii.gz')
 \end{lstlisting}
 
 Note that a background is needed to display partial maps. Overlaying two images
@@ -868,7 +872,8 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 \subsection{Results}
 
 \label{sec:miyawaki_results}
-Results are presented in figure~\ref{fig:miyawaki}.
+Results are presented in figure~\ref{fig:miyawaki}. They show the relation
+between a specific image pixel and four voxels of interest in the brain.
 In decoding settings, Figures \textit{a} and \textit{c} show the classifier's weights as brain
 maps for both methods. They both give roughly the same results and we can
 see that the weights are centered in the V1 and nearby retinotopic areas.
@@ -901,7 +906,8 @@ different methods come to the same conclusion comes as face validity.
     \includegraphics[width=\linewidth]{scripts/miyawaki/figure}
   \end{center}
   \caption{
-      Miyawaki results in both decoding and encoding.
+      Miyawaki results in both decoding and encoding. Relations between one
+      pixel and four brain voxels is highlighted for both methods.
       \textbf{Top: Decoding.} Classifier weights for the pixel
       highlighted (\textit{a.} Logistic regression, \textit{c.} SVM).
       Reconstruction accuracy per pixel
@@ -947,12 +953,13 @@ clustering methods.
 
 \subsection{Independent Component Analysis (ICA) to extract networks}
 
-\subsubsection{Principle}
 
 ICA is a blind source separation method. Its principle is to separate a
 multivariate signal into several components by maximizing their non-Gaussianity.
 A typical example is the \emph{cocktail party problem} where ICA is able to separate
 voices from several people using signal from microphones located across the room.
+
+\subsubsection{ICA in neuroimaging}
 
 ICA is the reference method to extract networks from resting state
 fMRI \citep{kiviniemi2003}. Several strategies have been used to syndicate ICA
@@ -961,8 +968,6 @@ reduction (using PCA) followed by a concatenation of timeseries (used in this
 example). \cite{varoquaux2010} use dimension reduction and canonical correlation analysis
 to aggregate subject data. Melodic \citep{beckmann2004}, the ICA tool in
 the FSL suite, uses a concatenation approach not detailed here.
-% XXX: we are not using Melodic in TensorICA mode, I hope: the 'concat'
-% mode turns off TensorICA, which is not suitable for rest
 
 \subsubsection{Application}
 
@@ -991,8 +996,10 @@ components_masked = ica.fit_transform(data_masked.T).T
 
 On fig. \ref{fig:ica} we compare a simple concat ICA as implemented by
 the code above to more sophisticated multi-subject methods, namely CanICA
-and MELODIC's concat ICA. We display here only the default mode network
-as it is a well-known resting-state network.
+and Melodic's concat ICA. We display here only the default mode network
+as it is a well-known resting-state network. It is hard to draw conclusions from
+a single map but, at first sight, it seems that both CanICA and Melodic
+approaches are less subject to noise and give similar results.
 
 \begin{figure}[hbtp]
   \centerline{\includegraphics[width=.9\linewidth]{scripts/ica/figure}}
