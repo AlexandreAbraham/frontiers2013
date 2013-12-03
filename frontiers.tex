@@ -360,15 +360,15 @@ use many random partitions in the data.
 For a given model and some fixed value of hyperparameters, the scores
 on the various test sets can be averaged to give a quantitative score
 to assess how good the model is. Maximizing this cross-validation score offers
-a principled way to set hyperparameters, but also allows to choose between
+a principled way to set hyperparameters and allows to choose between
 different models. This procedure is known as \emph{model selection}.
 %
 In {\em scikit-learn}, hyperparameters tuning can be conviently done with the
 \texttt{GridSearchCV} estimator. It takes as input an estimator and
 a set of candidate hyperparameters. Cross-validation scores are then
 computed for all hyperparameters combinations, possibly in parallel,
-in order to find the best one. Grid search has been used to explore several
-values for regularization coefficient in section~\ref{kamitani}.
+in order to find the best one. In this paper, we set the regularization
+coefficient with grid search in section~\ref{kamitani}.
 
 \section{Data preparation: from MR volumes to a data matrix}
 \label{data_preparation}
@@ -434,8 +434,6 @@ includes:
         to a Fourier transform (\texttt{scipy.fftpack.fft}) or a Butterworth
         filter (\texttt{scipy.signal.butter}).
 \end{itemize}
-
-More about
 
 \subsection{From 4-dimensional images to 2-dimensional array: masking}
 
@@ -817,7 +815,7 @@ and spurious noise.
 On the Miyawaki dataset, we can observe that mere black and white pixel values
 can explain a large part of the BOLD variance in many visual voxels. Sticking
 to the notation that \(X\) represesents BOLD signal and \(y\) the stimulus, we
-can write an encoding model using the ridge regression estimator of the scikit-learn:
+can write an encoding model using the ridge regression estimator:
 
 \begin{lstlisting}
 from sklearn.linear_model import Ridge
