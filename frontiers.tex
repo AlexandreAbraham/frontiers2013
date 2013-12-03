@@ -262,10 +262,8 @@ languages such as Matlab or R. The main libraries in the scientific Python stack
 
     \item{\bf Matplotlib} is a plotting library tightly integrated into the
         scientific Python stack \citep{hunter2007}. It offers publication-quality figures in
-        a variety of formats.
-        %  and can display plots or images in a
-        % graphical user interface.
-        All figures in this paper have been generated with it.
+        different formats and is used to generate the figures in
+	this paper.
 
     \item{\bf Nibabel} loads or saves data in neuroimaging file formats.
 	We use it at the beginning of all our scripts.
@@ -285,14 +283,14 @@ and reinforcement learning approaches, which are black boxes, and does not match
 our will to interpret the results.
 
 Some higher level frameworks provides full pipeline to apply machine
-learning techniques on neuroimaging data. PyMVPA does data preprocessing,
+learning techniques to neuroimaging. PyMVPA does data preprocessing,
 analysis and result visualization, but has dependencies on R and Shogun.
 PRoNTo \citep{schrouff2013pronto} is written in Matlab and can easily
 interface with SPM but does not propose many machine learning algorithms.
-Here we discuss lower-level patterns that break down how neuroimaging
+Here, rather than full-blown neuroimaging analysis pipelines, we discuss lower-level patterns that break down how neuroimaging
 data is input to scikit-learn and processed with it. Indeed, the breadth
 of machine learning techniques in scikit-learn and the variety of
-possible application are too wide to be fully exposed in a high-level
+possible applications are too wide to be fully exposed in a high-level
 interface.
 
 
