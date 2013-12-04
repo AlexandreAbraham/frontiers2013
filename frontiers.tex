@@ -317,14 +317,14 @@ convert data from one representation to another.
     All supervised
     and unsupervised learning algorithms (e.g., for classification, regression or
     clustering) are available as objects implementing this interface. Machine
-    learning tasks such as feature extraction, feature selection or dimensionality
+    learning tasks such as feature selection or dimensionality
     reduction are also provided as estimators.
 
-\item {\bf Predictor}. The \textit{predictor} interface extends the notion of an estimator
-    by adding a \texttt{predict}
+\item {\bf Predictor}. A \textit{predictor} is an estimator with
+    a \texttt{predict}
     method that takes an input array \texttt{X\_test} and makes
     predictions for each sample in it.
-    We call the input parameter ``\texttt{X\_test}'' in order
+    We denote this input parameter ``\texttt{X\_test}'' in order
     to emphasize that \texttt{predict} generalizes to new data. In the case of
     supervised learning estimators, this method typically returns the predicted
     labels or values computed from the estimated model.
