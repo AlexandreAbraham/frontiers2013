@@ -584,13 +584,15 @@ problem is known as \emph{classification}, as opposed to
 \emph{regression} when the variable $y$ can take continuous values,
 such as age.
 
+\subsection{Classification with feature selection and linear SVM}
+
 Many classification methods are available in scikit-learn. In this
 example we chose to
 combine the use of univariate feature selection and Support Vector
-Machines (SVM). Such a classification strategy is simple,
-yet quite efficient when used on neuroimaging data.
+Machines (SVM). Such a classification strategy is simple
+yet efficient when used on neuroimaging data.
 
-\subsection{Feature selection: ANOVA F-Test}
+\smallskip
 
 After applying a brain mask, the data consist of 40\,000 voxels, here
 the features, for only 1\,400 volumes, here the samples.
@@ -606,24 +608,23 @@ with high individual discriminative power are kept.
 
 Scikit-learn offers a panel of strategies to select features. In supervised
 learning, the most popular feature selection method is the
-ANalysis Of VAriance (ANOVA) F-Test. 
+F-test. 
 The null hypothesis of this test is that the feature takes the same value
 independently of the value of $y$ to predict.
-
-After ranking the features, \verb!sklearn.feature_selection! proposes a panel
+In scikit-learn, \verb!sklearn.feature_selection! proposes a panel
 of feature selection strategies. One can choose to take a percentile of the features
 (\verb!SelectPercentile!), or a fixed number of features (\verb!SelectKBest!).
 All these objects are implemented as transformers (see
  section~\ref{scikitlearn}).
-In the code below, the \verb!f_classif! function (ANOVA F-Test) along with
-the selection of a fixed number of features is used.
+The code below uses the \verb!f_classif! function (ANOVA F-Test) along with
+the selection of a fixed number of features.
 
-\subsection{Classification: SVM}
+\smallskip
 
-A linear SVM for classification, \verb!sklearn.svm.SVC!,
-finds the hyperplane that maximally
+On the reduced feature set, we use a linear SVM classifier, 
+\verb!sklearn.svm.SVC!, to find the hyperplane that maximally
 separates the samples belonging to the different classes.
-It is said to maximize the \emph{margin}. Classifying a new sample boils
+Classifying a new sample boils
 down to determining on which side of the hyperplane it lies. With a
 linear kernel, the separating hyperplane is defined in the input
 data space and its coefficients can be related to the voxels.
@@ -652,11 +653,12 @@ neighborhood of each voxel and tests the out-of-sample prediction
 performance as proxy measure of the link between the local brain activity
 and the target behavioral variable. In practice, it entails performing
 cross-validation of the model, most often an SVM, on voxels contained in
-balls centered on each voxel of interest. The procedure amounts to
+balls centered on each voxel of interest. The procedure calls for 
 solving a large number of SVMs and can be computationally expensive.
 Detailing an efficient implementation of this algorithm is beyond the
-scope of this paper. However, the code, along with this example,
-are available in the github repository.
+scope of this paper. However, code for searchlight and to generate
+figure~\ref{fig:haxby}
+is available in the github repository accompanying the paper.
 
 \subsection{Results}
 
@@ -691,12 +693,12 @@ contain category-specific visual areas. While Searchlight only gives a
 score to each voxel, the SVC can be used afterward to classify unseen
 brain scans.
 
-Note that most of the example script \texttt{haxby\_decoding.py} is for data
+Most of the final example script (\texttt{haxby\_decoding.py} on github) is
+for data
 loading and result visualization. Only 5 lines are needed to run a scikit-learn
-classifier. Plus, thanks to the scikit-learn modularity, the SVC can be easily
-replaced by any other classifier. The SearchLight estimator has been designed to
-make use of any classifier and restrain the computation to an area of interest
-for fast computation.
+classifier. In addition, thanks to the scikit-learn modularity, the SVC can be easily
+replaced by any other classifier in this example by changing only a
+couple of lines of code.
 
 
 \section{Encoding brain activity and decoding images}
