@@ -599,9 +599,10 @@ is challenging, due to the so-called \emph{curse of dimensionality}.
 Several strategies exist to reduce the number of features.
 A first one is based on prior neuroscientific
 knowledge. Here one could restrict the mask to occipital areas, where the visual
-cortex is located. A second approach is a data-driven. Features
-are evaluated individually with a univariate statistical test. The variables
-having the most discriminative power are kept.
+cortex is located. Feature selection is a second, data-driven, approach
+that relies on a univariate
+statistical test for each individual feature. Variables
+with high individual discriminative power are kept.
 
 Scikit-learn offers a panel of strategies to select features. In supervised
 learning, the most popular feature selection method is the
@@ -623,7 +624,7 @@ A linear SVM for classification, \verb!sklearn.svm.SVC!,
 finds the hyperplane that maximally
 separates the samples belonging to the different classes.
 It is said to maximize the \emph{margin}. Classifying a new sample boils
-down to determining on which side of the hyperplane it lies. When employing a
+down to determining on which side of the hyperplane it lies. With a
 linear kernel, the separating hyperplane is defined in the input
 data space and its coefficients can be related to the voxels.
 Such coefficients can therefore be visualized as an image (after
