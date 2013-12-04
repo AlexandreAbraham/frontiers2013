@@ -727,17 +727,17 @@ from descriptors of the visual stimuli, which is an encoding task.
 In this setting, we want to infer the binary visual stimulus presented to
 the subject from the recorded fMRI data.
 As the stimuli are binary, we will treat this problem as a classification
-problem. Note that the method presented here cannot be extended as-is to
-natural stimuli. 
+problem. This implies that the method presented here cannot be extended as-is to
+natural stimuli described with gray values. 
 
 In the original work, \cite{miyawaki2008} uses a Bayesian logistic regression
 promoting sparsity along with a sophisticated multi-scale strategy.
 As one can indeed expect the number of predictive voxels to be limited, we 
 compare the $\ell_2$ SVM used above with
-a Logistic Regression (LR) and a SVM
+a logistic regression and a SVM
 penalized with the $\ell_1$ norm
 known to promote sparsity. The $\ell_1$ penalized SVM classifier compared here
-uses a square-hinge loss while the LR uses a logit function.
+uses a square-hinge loss while the logistic regression uses a logit function.
 
 % We ran a 5-fold cross validation to estimate the penalization parameter $C$
 % (inverse of the amount of regularization); this yields the scores presented in
@@ -782,7 +782,7 @@ true for $\ell_1$ regularized models. However,
 in accordance with our prior knowledge, $\ell_1$
 regularized models, when properly
 parametrized, outperform an $\ell_2$ regularized estimator.
-Both $\ell_1$ LR and SVM yield similar performances,
+Both $\ell_1$ logistic regression and SVM yield similar performances,
 which is not surprising as they implement similar models.
 
 \begin{lstlisting}
@@ -1101,25 +1101,28 @@ neuroscientific problems. Encoding and decoding can rely on supervised
 learning to link brain images with stimuli. Unsupervised learning
 can extract structure from resting-state data, functional networks or
 brain regions. The accompanying Python code for the machine learning
-tasks is very straightforward. Difficulties lie in applying proper 
-preprocessing of the data, choosing the right model for the problem at
-hand and interpreting these results. Tackling these difficulties while
+tasks is straightforward. Difficulties lie in applying proper 
+preprocessing of the data, choosing the right model for the problem
+and interpreting the results. Tackling these difficulties while
 providing the scientists with simple and readable code requires building
 a domain-specific library, dedicated to applying scikit-learn to
 neuroimaging data. This effort is underway in a nascent project, nilearn,
 that aims to facilitate the use of scikit-learn on neuroimaging data.
 
-Note that the examples described in this paper only scratch the
-surface of the applications of statistical learning in neuroimaging. For
+The examples covered in this paper only scratch the
+surface of applications of statistical learning to neuroimaging, and
+the tool stack presented here shines in this regard as it opens the
+door to any combination of the wide range of machine learning methods
+present in scikit-learn with neuroimaging-related code. For
 instance, sparse inverse covariance can extract the functional 
-interaction structure from fMRI time-series \citep{varoquaux2013}, using
-the graph-lasso estimator also available in scikit-learn.
-Modern neuroimaging data processing entails fitting rich models on
+interaction structure from fMRI time-series \citep{varoquaux2013} using
+the graph-lasso estimator.
+Modern neuroimaging data analysis entails fitting rich models on
 limited data quantities. These are high-dimensional statistics problems
 which call
 for statistical-learning techniques. We hope that bridging a
 general-purpose machine learning tool, scikit-learn, to domain-specific
-data preparation code will open the door to new scientific advances.
+data preparation code will foster new scientific advances.
 
 
 \section*{Disclosure/Conflict-of-Interest Statement}
