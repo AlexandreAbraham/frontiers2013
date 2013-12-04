@@ -847,7 +847,7 @@ stimulus pixels should suffice to explain the activity in each brain
 voxel of the posterior visual cortex.
 %
 This information can be exploited by using a sparse linear
-regression --the Lasso-- to find the receptive fields~\citep{tibshirani:96}.
+regression --the Lasso~\citep{tibshirani:96}-- to find the receptive fields.
 Here we use the \emph{LassoLarsCV} estimator that relies on the LARS
 algorithm~\citep{Efron04leastangle} and
 cross-validation to set the Lasso parameter.
@@ -872,12 +872,12 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 \subsection{Results}
 
 \label{sec:miyawaki_results}
-Results are presented in figure~\ref{fig:miyawaki}. They show the relation
-between a specific image pixel and four voxels of interest in the brain.
-In decoding settings, Figures \textit{a} and \textit{c} show the classifier's weights as brain
+Figure~\ref{fig:miyawaki} gives encoding and decoding results: the relationship
+between a given image pixel and four voxels of interest in the brain.
+In decoding settings, Figures \ref{fig:miyawaki}\textit{a} and \ref{fig:miyawaki}\textit{c} show the classifier's weights as brain
 maps for both methods. They both give roughly the same results and we can
 see that the weights are centered in the V1 and nearby retinotopic areas.
-Figures \textit{b} and \textit{d} show reconstruction
+Figures \ref{fig:miyawaki}\textit{b} and \ref{fig:miyawaki}\textit{d} show reconstruction
 accuracy score using LR and SVM
 (variable \texttt{mean\_scores} in the code above).
 Both methods give almost identical results. 
@@ -886,12 +886,11 @@ accurate in the fovea.
 This is explained by the higher density of neurons dedicated to
 foveal representation in the primary visual area.
 
-In encoding settings, figure~\ref{fig:miyawaki}.e shows classifiers
+In encoding settings, figure~\ref{fig:miyawaki}\textit{e} shows classifiers
 weights for encoding, that we interpret as receptive fields. We can
 see that receptive fields of neighboring voxels are neighboring
-pixels, which is an expected result as we know that primary visual
-cortex directly encodes the geometric structure and contrast of visual
-stimuli.
+pixels, which is expected from retinotopy: primary visual
+cortex directly has a topological mapping of the stimuli.
 
 Both encoding and decoding analysis show a link between the selected
 pixel and brain voxels. In the absence of ground truth, seeing that
@@ -946,8 +945,8 @@ In machine learning, this class of problems is known as unsupervised
 learning. 
 To extract functional networks or regions, we use methods that group together 
 similar voxels by comparing their time
-series. In neuroimaging, the most popular method is ICA and
-is the subject of our first example. We will then show how to obtained 
+series. In neuroimaging, the most popular method is ICA that
+is the subject of our first example. We then show how to obtained 
 functionally-homogeneous regions with
 clustering methods.
 
