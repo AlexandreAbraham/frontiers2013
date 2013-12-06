@@ -191,43 +191,40 @@ scikit-learn, Python
 \section{Introduction}
 
 Statistical machine learning is gaining interest in
-neuroimaging data analysis. It is used by neuroscientists as a complicated
-yet powerful tool for statistical inference,
-and by computer scientists working in neuroscience,
-who often lack a deep understanding of the neuroscience questions. This paper
+neuroimaging data analysis. Neuroscientists use it as a complicated
+yet powerful tool for statistical inference. Computer scientists
+develop the tools used, although they 
+often lack a deep understanding of the neuroscience questions. This paper
 aims to fill the gap between machine learning and neuroimaging by demonstrating
-how a general-purpose machine-learning toolbox can be used to produce scripts 
-for neuroimaging analysis with state-of-the-art methods
-that are fully understood by both worlds. For a more theoretical introduction to
-the use of machine learning methods for functional MRI analysis, see
-\cite{pereira2009} or \cite{mur2009}.
+how a general-purpose machine-learning toolbox, scikit-learn, can be used 
+for neuroimaging analysis with state-of-the-art methods with code
+understandable by both worlds. This paper focuses on code; for a 
+more conceptual introduction to machine learning methods in fMRI analysis,
+see \cite{pereira2009} or \cite{mur2009}.
+We focus on the scikit-learn toolkit as it is a reference
+machine learning tool with a very wide variety of algorithms,
+but also because it is implemented in Python,
+and thus dovetails nicely in the rich neuroimaging Python ecosystem.
 
-With its mature scientific stack, Python is a growing contender in the
-landscape of neuroimaging data analysis with tools such as Nipy
-\citep{millman2007analysis} or Nipype \citep{gorgolewski2011}.
-For multi-variate pattern analysis, PyMVPA \citep{hanke2009pymvpa}
-combines Python and external tools such as R or Shogun
-\citep{sonnenburg2010}. 
-
-In this paper, we show how scikit-learn, a Python machine learning
-library \citep{pedregosa2011}, can be used on neuroimaging data.
-We discuss a few applications of statistical learning to
-resolve common neuroimaging needs, which methods can be used, what the underlying
-assumptions are, and how to achieve the desired results. We discuss not only
+This paper explores a few applications of statistical learning to
+resolve common neuroimaging needs, detailing the corresponding code,
+the choice of the methods, and the underlying assumptions. We discuss not only
 prediction scores, but also the interpretability of the results, which
 leads us to explore the internal model of various methods. 
-The scope of this paper is not to discuss a library, but rather
-code patterns, and the github repository of the
+The github repository of the
 paper\footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}}
-provides complete scripts to generate figures. Naturally, there would be
-value in a software package building upon these patterns. Such a package
-is under development, in the form of nilearn
---\url{http://nilearn.github.io}-- but is, to date, not ready
-for public consumption.
+provides complete scripts to generate figures. 
+The scope of this paper is not a neuroimaging-specific library, but rather
+code patterns related to scikit-learn. The nilearn library --\url{http://nilearn.github.io}-- is a software
+package under development
+that seeks to simplify the use of scikit-learn for neuroimaging. Rather
+than relying on an immature and black-box library, we prefer here to
+unravel simple and didactic examples of code that enables readers to
+build there own analysis strategies.
 
 The paper is organized as
 follows. After introducing the \emph{scikit-learn} toolbox, we show 
-how the data must be prepared to apply
+how to prepare the data to apply
 \emph{scikit-learn}. Then we describe the application of \emph{supervised
 learning} techniques, to learn the links between brain images and
 stimuli. Finally we demonstrate how \emph{unsupervised learning}
@@ -236,72 +233,77 @@ techniques can extract useful structure from the images.
 % Maybe we should stress that this paper is meant to be didactic, and
 % thus only presents simple examples
 
-\subsection{Scientific Python and neuroimaging ecosystem}
+\section{Our tools: scikit-learn and the Python ecosystem}
 
-Thanks to its scientific libraries, Python is able to compete with domain-specific
-languages such as Matlab or R. The main libraries in the scientific Python stack are:
+\subsection{Basic scientific Python tools for the neuroimager}
+
+With its mature scientific stack, Python is a growing contender in the
+landscape of neuroimaging data analysis with tools such as Nipy
+\citep{millman2007analysis} or Nipype \citep{gorgolewski2011}.
+For multi-variate pattern analysis, PyMVPA \citep{hanke2009pymvpa}
+combines Python and external tools such as R or Shogun
+\citep{sonnenburg2010}. 
+The scientific Python libraries used in this paper are:
 \begin{itemize}
-    \item{\bf NumPy} provides the \verb!ndarray! data type, an efficient $n$-dimensional data
+    \item{\bf NumPy}, that provides the \verb!ndarray! data type, an efficient $n$-dimensional data
         representation for array-based numerical computating, a la Matlab
-        \citep{vanderwalt2011}. It handles efficient NumPy array persistance
-        (input and output) and provides basic operations such as dot product. A
-        growing number of scientific libraries, including scikit-learn, uses NumPy arrays
+        \citep{vanderwalt2011}. It handles efficient array persistance
+        (input and output) and provides basic operations such as dot
+        product. Most scientific Python libraries, including scikit-learn, 
+	use NumPy arrays
         as input and output data type. Section~\ref{data_preparation} explains
         how to load neuroimaging data and convert it to NumPy arrays compatible
         with scikit-learn.
 
-    \item{\bf SciPy} provides higher level mathematical functions that operate on ndarrays for
+    \item{\bf SciPy}: higher level mathematical functions that operate on ndarrays for
         a variety of domains including linear algebra, optimization and signal
         processing. SciPy is linked to compiled libraries to ensure high
         performances (BLAS, Arpack and MKL for linear algebra and mathematical
-        operations and libSVM and libLinear for SVM).
+        operations).
         Together, NumPy and SciPy provide a robust scientific environment
         for numerical computing and they are the elementary bricks we use in all our
         algorithms.
         % XXX : elementary bricks -> foundations ? building blocks?
 
-    \item{\bf Matplotlib} is a plotting library tightly integrated into the
+    \item{\bf Matplotlib}, a plotting library tightly integrated into the
         scientific Python stack \citep{hunter2007}. It offers publication-quality figures in
-        a variety of formats.
-        %  and can display plots or images in a
-        % graphical user interface.
-        All figures in this paper have been generated with it.
+        different formats and is used to generate the figures in
+	this paper.
 
-    \item{\bf Nibabel} loads or saves data in neuroimaging file formats.
+    \item{\bf Nibabel}, to access data in neuroimaging file formats.
 	We use it at the beginning of all our scripts.
 \end{itemize}
 
-\subsection{Scikit-learn and machine learning ecosystem}
+\subsection{Scikit-learn and the machine learning ecosystem}
 
-Scikit-learning is a general purpose machine learning library written in Python.
-It proposes efficient implementations of state-of-the-art algorithms. It also
+Scikit-learn \citep{pedregosa2011} is a general purpose machine learning
+library written in Python.
+It proposes efficient implementations of state-of-the-art algorithms,
+accessible to non-machine learning experts,
+and reusable across scientific disciplines and applicative fields. It also
 takes advantage of Python interactivity and modularity to propose fast and easy
-prototyping.
-
-Weka \citep{hall2009weka}, a machine learning framework written in Java,
-provides a simple user interface, however it is more oriented toward data mining
-and it using its API for specific purpose requires knowledge of the
-Java Runtime Environment. PyBrain \citep{schaul2010pybrain} is best at neural networks
+prototyping. There is a variety of other learning packages. For instance,
+in Python, PyBrain \citep{schaul2010pybrain} is best at neural networks
 and reinforcement learning approaches, which are black boxes, and does not match
-our will to interpret the results.
+our need to interpret the results.
+Beyond Python, Weka \citep{hall2009weka} is a rich machine learning framework
+written in Java,
+however it is more oriented toward data mining. 
 
-Some higher level frameworks provides full pipeline to apply machine learning techniques on
-neuroimaging data. PyMVPA does data preprocessing, analysis and result
-visualization, but has dependencies on R and Shogun. PRoNTo
-\citep{schrouff2013pronto} is written in Matlab and can easily interface with
-SPM but does not propose many machine learning algorithms. This paper is about
-patterns that are lower-level.
+Some higher level frameworks provides full pipeline to apply machine
+learning techniques to neuroimaging. PyMVPA is a Python packaging that 
+does data preprocessing,
+analysis and result visualization, but has dependencies on R and Shogun.
+PRoNTo \citep{schrouff2013pronto} is written in Matlab and can easily
+interface with SPM but does not propose many machine learning algorithms.
+Here, rather than full-blown neuroimaging analysis pipelines, we discuss lower-level patterns that break down how neuroimaging
+data is input to scikit-learn and processed with it. Indeed, the breadth
+of machine learning techniques in scikit-learn and the variety of
+possible applications are too wide to be fully exposed in a high-level
+interface.
 
-\section{Scikit-learn}
+\subsection{Scikit-learn concepts}
 \label{scikitlearn}
-
-{\em Scikit-learn} \citep{pedregosa2011} is an open source machine
-learning library for the Python programming language. The ambition of the
-project is to provide efficient and well-established machine learning tools within
-a programming environment accessible to non-machine learning experts
-and reusable across scientific disciplines and applicative fields.
-
-\subsection{Concepts}
 
 In {\em scikit-learn}, all objects and algorithms accept input data in the form of
 2-dimensional arrays of size samples $\times$ features.
@@ -317,14 +319,14 @@ convert data from one representation to another.
     All supervised
     and unsupervised learning algorithms (e.g., for classification, regression or
     clustering) are available as objects implementing this interface. Machine
-    learning tasks such as feature extraction, feature selection or dimensionality
+    learning tasks such as feature selection or dimensionality
     reduction are also provided as estimators.
 
-\item {\bf Predictor}. The \textit{predictor} interface extends the notion of an estimator
-    by adding a \texttt{predict}
+\item {\bf Predictor}. A \textit{predictor} is an estimator with
+    a \texttt{predict}
     method that takes an input array \texttt{X\_test} and makes
     predictions for each sample in it.
-    We call the input parameter ``\texttt{X\_test}'' in order
+    We denote this input parameter ``\texttt{X\_test}'' in order
     to emphasize that \texttt{predict} generalizes to new data. In the case of
     supervised learning estimators, this method typically returns the predicted
     labels or values computed from the estimated model.
@@ -338,9 +340,8 @@ convert data from one representation to another.
 
 \end{itemize}
 
-\subsection{Cross-validation and model selection}
+\smallskip
 
-% XXX: describe cross-validation
 When testing an estimator or setting hyperparameters, one needs a reliable
 metric to evaluate its performance. Using the same
 data for training and testing is not acceptable because it leads to
@@ -354,21 +355,21 @@ For example, K-Fold cross validation consists in dividing (randomly or not) the 
 subsets: each subset is then used once as testing set while the others $k - 1$
 subsets are used to train the estimator. This is one of the simplest and most
 widely used cross-validation strategies. The parameter $k$ is commonly set
-to 5 or 10. Other strategies, sometimes called Monte-Carlo cross-validation,
-use many random partitions in the data.
+to 5 or 10. Another strategy, sometimes called Monte-Carlo cross-validation,
+uses many random partitions in the data.
 
 For a given model and some fixed value of hyperparameters, the scores
 on the various test sets can be averaged to give a quantitative score
 to assess how good the model is. Maximizing this cross-validation score offers
-a principled way to set hyperparameters, but also allows to choose between
+a principled way to set hyperparameters and allows to choose between
 different models. This procedure is known as \emph{model selection}.
 %
 In {\em scikit-learn}, hyperparameters tuning can be conviently done with the
 \texttt{GridSearchCV} estimator. It takes as input an estimator and
 a set of candidate hyperparameters. Cross-validation scores are then
 computed for all hyperparameters combinations, possibly in parallel,
-in order to find the best one. Grid search has been used to explore several
-values for regularization coefficient in section~\ref{kamitani}.
+in order to find the best one. In this paper, we set the regularization
+coefficient with grid search in section~\ref{kamitani}.
 
 \section{Data preparation: from MR volumes to a data matrix}
 \label{data_preparation}
@@ -377,8 +378,8 @@ preprocessing must be applied. For fMRI, this includes motion
 correction, slice timing correction, coregistration with an anatomical image and normalization to a common
 template like the MNI (Montreal Neurologic Institute) one if necessary.
 Reference softwares for these tasks are
-SPM\footnote{http://www.fil.ion.ucl.ac.uk/spm}~\citep{friston2007} and
-FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\citep{smith2004}. A Python
+SPM~\citep{friston2007} and
+FSL~\citep{smith2004}. A Python
 interface to these tools is available in nipype Python library
 \citep{gorgolewski2011}. Below we discuss shaping preprocessed data into
 a format that can be fed to scikit-learn. For the machine learning
@@ -435,8 +436,6 @@ includes:
         filter (\texttt{scipy.signal.butter}).
 \end{itemize}
 
-More about
-
 \subsection{From 4-dimensional images to 2-dimensional array: masking}
 
 \label{sec:unmasking}
@@ -489,8 +488,8 @@ Across all our examples, voxels of interest are represented on an axial slice of
 the brain. Some transformations of the original matrix data are required to match
 matplotlib data format. The following snippet of code shows how to load and
 display an axial slice overlaid with an activation map. The background is an
-anatomical scan and highest voxels of the background are taken as artificial
-activation map.
+anatomical scan and its highest voxels are used as synthetic
+activations.
 
 \begin{lstlisting}
 # Load image
@@ -513,8 +512,8 @@ plt.show()
 Note that a background is needed to display partial maps. Overlaying two images
 can be done thanks to the \texttt{numpy.ma.masked\_array} data structure.
 Several options exist to enhance the overall aspect of the plot.
-Some of them can be found in the full scripts provided with this paper
-\footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}}. It generally
+Some of them can be found in the full scripts provided with this paper.
+It generally
 boils down to a good knowledge of Matplotlib. Note that the Nipy package provides a
 \texttt{plot\_map} function that is tuned to display activation maps (a
 background is even provided if needed).
@@ -574,8 +573,7 @@ First, we illustrate decoding with a simplified version of the experiment presen
 are presented to 6 subjects during 12 sessions. The goal is to 
 predict the category of the stimulus presented to the subject given the
 recorded fMRI volumes. This example has already been widely analyzed
-(\cite{hanson2004combinatorial}; \cite{detre2006multi}; \cite{otoole2007};
-\cite{hanson2008brain}; \cite{hanke2009pymvpa}) and has become a reference
+\citep{hanson2004combinatorial,detre2006multi,otoole2007,hanson2008brain,hanke2009pymvpa} and has become a reference
 example in matter of decoding. For the sake of simplicity, we restrict the example
 to one subject and to two categories, faces and houses.
 
@@ -587,13 +585,15 @@ problem is known as \emph{classification}, as opposed to
 \emph{regression} when the variable $y$ can take continuous values,
 such as age.
 
+\subsection{Classification with feature selection and linear SVM}
+
 Many classification methods are available in scikit-learn. In this
 example we chose to
 combine the use of univariate feature selection and Support Vector
-Machines (SVM). Such a classification strategy is simple,
-yet quite efficient when used on neuroimaging data.
+Machines (SVM). Such a classification strategy is simple
+yet efficient when used on neuroimaging data.
 
-\subsection{Feature selection: ANOVA F-Test}
+\smallskip
 
 After applying a brain mask, the data consist of 40\,000 voxels, here
 the features, for only 1\,400 volumes, here the samples.
@@ -602,31 +602,31 @@ is challenging, due to the so-called \emph{curse of dimensionality}.
 Several strategies exist to reduce the number of features.
 A first one is based on prior neuroscientific
 knowledge. Here one could restrict the mask to occipital areas, where the visual
-cortex is located. A second approach is a data-driven. Features
-are evaluated individually with a univariate statistical test. The variables
-having the most discriminative power are kept.
+cortex is located. Feature selection is a second, data-driven, approach
+that relies on a univariate
+statistical test for each individual feature. Variables
+with high individual discriminative power are kept.
 
 Scikit-learn offers a panel of strategies to select features. In supervised
 learning, the most popular feature selection method is the
-ANalysis Of VAriance (ANOVA) F-Test. 
+F-test. 
 The null hypothesis of this test is that the feature takes the same value
 independently of the value of $y$ to predict.
-
-After ranking the features, \verb!sklearn.feature_selection! proposes a panel
+In scikit-learn, \verb!sklearn.feature_selection! proposes a panel
 of feature selection strategies. One can choose to take a percentile of the features
 (\verb!SelectPercentile!), or a fixed number of features (\verb!SelectKBest!).
 All these objects are implemented as transformers (see
  section~\ref{scikitlearn}).
-In the code below, the \verb!f_classif! function (ANOVA F-Test) along with
-the selection of a fixed number of features is used.
+The code below uses the \verb!f_classif! function (ANOVA F-Test) along with
+the selection of a fixed number of features.
 
-\subsection{Classification: SVM}
+\smallskip
 
-A linear SVM for classification, \verb!sklearn.svm.SVC!,
-finds the hyperplane that maximally
+On the reduced feature set, we use a linear SVM classifier, 
+\verb!sklearn.svm.SVC!, to find the hyperplane that maximally
 separates the samples belonging to the different classes.
-It is said to maximize the \emph{margin}. Classifying a new sample boils
-down to determining on which side of the hyperplane it lies. When employing a
+Classifying a new sample boils
+down to determining on which side of the hyperplane it lies. With a
 linear kernel, the separating hyperplane is defined in the input
 data space and its coefficients can be related to the voxels.
 Such coefficients can therefore be visualized as an image (after
@@ -654,11 +654,12 @@ neighborhood of each voxel and tests the out-of-sample prediction
 performance as proxy measure of the link between the local brain activity
 and the target behavioral variable. In practice, it entails performing
 cross-validation of the model, most often an SVM, on voxels contained in
-balls centered on each voxel of interest. The procedure amounts to
+balls centered on each voxel of interest. The procedure calls for 
 solving a large number of SVMs and can be computationally expensive.
 Detailing an efficient implementation of this algorithm is beyond the
-scope of this paper. However, the code, along with this example,
-are available in the github repository.
+scope of this paper. However, code for searchlight and to generate
+figure~\ref{fig:haxby}
+is available in the github repository accompanying the paper.
 
 \subsection{Results}
 
@@ -693,12 +694,12 @@ contain category-specific visual areas. While Searchlight only gives a
 score to each voxel, the SVC can be used afterward to classify unseen
 brain scans.
 
-Note that most of the example script \texttt{haxby\_decoding.py} is for data
+Most of the final example script (\texttt{haxby\_decoding.py} on github) is
+for data
 loading and result visualization. Only 5 lines are needed to run a scikit-learn
-classifier. Plus, thanks to the scikit-learn modularity, the SVC can be easily
-replaced by any other classifier. The SearchLight estimator has been designed to
-make use of any classifier and restrain the computation to an area of interest
-for fast computation.
+classifier. In addition, thanks to the scikit-learn modularity, the SVC can be easily
+replaced by any other classifier in this example by changing only a
+couple of lines of code.
 
 
 \section{Encoding brain activity and decoding images}
@@ -727,17 +728,17 @@ from descriptors of the visual stimuli, which is an encoding task.
 In this setting, we want to infer the binary visual stimulus presented to
 the subject from the recorded fMRI data.
 As the stimuli are binary, we will treat this problem as a classification
-problem. Note that the method presented here cannot be extended as-is to
-natural stimuli. 
+problem. This implies that the method presented here cannot be extended as-is to
+natural stimuli described with gray values. 
 
 In the original work, \cite{miyawaki2008} uses a Bayesian logistic regression
 promoting sparsity along with a sophisticated multi-scale strategy.
 As one can indeed expect the number of predictive voxels to be limited, we 
 compare the $\ell_2$ SVM used above with
-a Logistic Regression (LR) and a SVM
+a logistic regression and a SVM
 penalized with the $\ell_1$ norm
 known to promote sparsity. The $\ell_1$ penalized SVM classifier compared here
-uses a square-hinge loss while the LR uses a logit function.
+uses a square-hinge loss while the logistic regression uses a logit function.
 
 % We ran a 5-fold cross validation to estimate the penalization parameter $C$
 % (inverse of the amount of regularization); this yields the scores presented in
@@ -782,7 +783,7 @@ true for $\ell_1$ regularized models. However,
 in accordance with our prior knowledge, $\ell_1$
 regularized models, when properly
 parametrized, outperform an $\ell_2$ regularized estimator.
-Both $\ell_1$ LR and SVM yield similar performances,
+Both $\ell_1$ logistic regression and SVM yield similar performances,
 which is not surprising as they implement similar models.
 
 \begin{lstlisting}
@@ -817,7 +818,7 @@ and spurious noise.
 On the Miyawaki dataset, we can observe that mere black and white pixel values
 can explain a large part of the BOLD variance in many visual voxels. Sticking
 to the notation that \(X\) represesents BOLD signal and \(y\) the stimulus, we
-can write an encoding model using the ridge regression estimator of the scikit-learn:
+can write an encoding model using the ridge regression estimator:
 
 \begin{lstlisting}
 from sklearn.linear_model import Ridge
@@ -847,7 +848,7 @@ stimulus pixels should suffice to explain the activity in each brain
 voxel of the posterior visual cortex.
 %
 This information can be exploited by using a sparse linear
-regression --the Lasso-- to find the receptive fields~\citep{tibshirani:96}.
+regression --the Lasso~\citep{tibshirani:96}-- to find the receptive fields.
 Here we use the \emph{LassoLarsCV} estimator that relies on the LARS
 algorithm~\citep{Efron04leastangle} and
 cross-validation to set the Lasso parameter.
@@ -872,12 +873,12 @@ receptive_fields = [lasso.fit(y_train, X_train[:, index]
 \subsection{Results}
 
 \label{sec:miyawaki_results}
-Results are presented in figure~\ref{fig:miyawaki}. They show the relation
-between a specific image pixel and four voxels of interest in the brain.
-In decoding settings, Figures \textit{a} and \textit{c} show the classifier's weights as brain
+Figure~\ref{fig:miyawaki} gives encoding and decoding results: the relationship
+between a given image pixel and four voxels of interest in the brain.
+In decoding settings, Figures \ref{fig:miyawaki}\textit{a} and \ref{fig:miyawaki}\textit{c} show the classifier's weights as brain
 maps for both methods. They both give roughly the same results and we can
 see that the weights are centered in the V1 and nearby retinotopic areas.
-Figures \textit{b} and \textit{d} show reconstruction
+Figures \ref{fig:miyawaki}\textit{b} and \ref{fig:miyawaki}\textit{d} show reconstruction
 accuracy score using LR and SVM
 (variable \texttt{mean\_scores} in the code above).
 Both methods give almost identical results. 
@@ -886,12 +887,11 @@ accurate in the fovea.
 This is explained by the higher density of neurons dedicated to
 foveal representation in the primary visual area.
 
-In encoding settings, figure~\ref{fig:miyawaki}.e shows classifiers
+In encoding settings, figure~\ref{fig:miyawaki}\textit{e} shows classifiers
 weights for encoding, that we interpret as receptive fields. We can
 see that receptive fields of neighboring voxels are neighboring
-pixels, which is an expected result as we know that primary visual
-cortex directly encodes the geometric structure and contrast of visual
-stimuli.
+pixels, which is expected from retinotopy: primary visual
+cortex directly has a topological mapping of the stimuli.
 
 Both encoding and decoding analysis show a link between the selected
 pixel and brain voxels. In the absence of ground truth, seeing that
@@ -946,8 +946,8 @@ In machine learning, this class of problems is known as unsupervised
 learning. 
 To extract functional networks or regions, we use methods that group together 
 similar voxels by comparing their time
-series. In neuroimaging, the most popular method is ICA and
-is the subject of our first example. We will then show how to obtained 
+series. In neuroimaging, the most popular method is ICA that
+is the subject of our first example. We then show how to obtained 
 functionally-homogeneous regions with
 clustering methods.
 
@@ -1100,27 +1100,30 @@ learning techniques using the scikit-learn Python toolkit can be applied
 to fMRI data in order to tackle
 neuroscientific problems. Encoding and decoding can rely on supervised
 learning to link brain images with stimuli. Unsupervised learning
-can extract structure from resting-state data, functional networks or
+can extract from resting-state data structure such as functional networks or
 brain regions. The accompanying Python code for the machine learning
-tasks is very straightforward. Difficulties lie in applying proper 
-preprocessing of the data, choosing the right model for the problem at
-hand and interpreting these results. Tackling these difficulties while
+tasks is straightforward. Difficulties lie in applying proper 
+preprocessing to the data, choosing the right model for the problem,
+and interpreting the results. Tackling these difficulties while
 providing the scientists with simple and readable code requires building
 a domain-specific library, dedicated to applying scikit-learn to
 neuroimaging data. This effort is underway in a nascent project, nilearn,
 that aims to facilitate the use of scikit-learn on neuroimaging data.
 
-Note that the examples described in this paper only scratch the
-surface of the applications of statistical learning in neuroimaging. For
+The examples covered in this paper only scratch the
+surface of applications of statistical learning to neuroimaging.
+The tool stack presented here shines uniquely in this regard as it opens the
+door to any combination of the wide range of machine learning methods
+present in scikit-learn with neuroimaging-related code. For
 instance, sparse inverse covariance can extract the functional 
-interaction structure from fMRI time-series \citep{varoquaux2013}, using
-the graph-lasso estimator also available in scikit-learn.
-Modern neuroimaging data processing entails fitting rich models on
+interaction structure from fMRI time-series \citep{varoquaux2013} using
+the graph-lasso estimator.
+Modern neuroimaging data analysis entails fitting rich models on
 limited data quantities. These are high-dimensional statistics problems
 which call
 for statistical-learning techniques. We hope that bridging a
 general-purpose machine learning tool, scikit-learn, to domain-specific
-data preparation code will open the door to new scientific advances.
+data preparation code will foster new scientific advances.
 
 
 \section*{Disclosure/Conflict-of-Interest Statement}
