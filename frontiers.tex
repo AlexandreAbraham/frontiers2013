@@ -191,46 +191,40 @@ scikit-learn, Python
 \section{Introduction}
 
 Statistical machine learning is gaining interest in
-neuroimaging data analysis. It is used by neuroscientists as a complicated
-yet powerful tool for statistical inference,
-and by computer scientists working in neuroscience,
-who often lack a deep understanding of the neuroscience questions. This paper
+neuroimaging data analysis. Neuroscientists use it as a complicated
+yet powerful tool for statistical inference. Computer scientists
+develop the tools used, although they 
+often lack a deep understanding of the neuroscience questions. This paper
 aims to fill the gap between machine learning and neuroimaging by demonstrating
-how a general-purpose machine-learning toolbox can be used to produce scripts 
-for neuroimaging analysis with state-of-the-art methods
-that are fully understood by both worlds. For a more theoretical introduction to
-the use of machine learning methods for functional MRI analysis, see
-\cite{pereira2009} or \cite{mur2009}.
+how a general-purpose machine-learning toolbox, scikit-learn, can be used 
+for neuroimaging analysis with state-of-the-art methods with code
+understandable by both worlds. This paper focuses on code; for a 
+more conceptual introduction to machine learning methods in fMRI analysis,
+see \cite{pereira2009} or \cite{mur2009}.
+We focus on the scikit-learn toolkit as it is a reference
+machine learning tool with a very wide variety of algorithms,
+but also because it is implemented in Python,
+and thus dovetails nicely in the rich neuroimaging Python ecosystem.
 
-% TODO: merge this with the paragraph above
-With its mature scientific stack, Python is a growing contender in the
-landscape of neuroimaging data analysis with tools such as Nipy
-\citep{millman2007analysis} or Nipype \citep{gorgolewski2011}.
-
-% XXX: This should probably go in the section below
-For multi-variate pattern analysis, PyMVPA \citep{hanke2009pymvpa}
-combines Python and external tools such as R or Shogun
-\citep{sonnenburg2010}. 
-
-In this paper, we show how scikit-learn, a Python machine learning
-library \citep{pedregosa2011}, can be used on neuroimaging data.
-We discuss a few applications of statistical learning to
-resolve common neuroimaging needs, which methods can be used, what the underlying
-assumptions are, and how to achieve the desired results. We discuss not only
+This paper explores a few applications of statistical learning to
+resolve common neuroimaging needs, detailing the corresponding code,
+the choice of the methods, and the underlying assumptions. We discuss not only
 prediction scores, but also the interpretability of the results, which
 leads us to explore the internal model of various methods. 
-The scope of this paper is not to discuss a library, but rather
-code patterns, and the github repository of the
+The github repository of the
 paper\footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}}
-provides complete scripts to generate figures. Naturally, there would be
-value in a software package building upon these patterns. Such a package
-is under development, in the form of nilearn
---\url{http://nilearn.github.io}-- but is, to date, not ready
-for public consumption.
+provides complete scripts to generate figures. 
+The scope of this paper is not a neuroimaging-specific library, but rather
+code patterns related to scikit-learn. The nilearn library is a software
+package under development --\url{http://nilearn.github.io}--
+that seeks to simplify the use of scikit-learn for neuroimaging. Rather
+than relying on an immature and black-box library, we prefer here to
+unravel simple and didactic examples of code that enables readers to
+build there own analysis strategies.
 
 The paper is organized as
 follows. After introducing the \emph{scikit-learn} toolbox, we show 
-how the data must be prepared to apply
+how to prepare the data to apply
 \emph{scikit-learn}. Then we describe the application of \emph{supervised
 learning} techniques, to learn the links between brain images and
 stimuli. Finally we demonstrate how \emph{unsupervised learning}
@@ -241,10 +235,15 @@ techniques can extract useful structure from the images.
 
 \subsection{Scientific Python and neuroimaging ecosystem}
 
-Thanks to its scientific libraries, Python is able to compete with domain-specific
-languages such as Matlab or R. The main libraries in the scientific Python stack are:
+With its mature scientific stack, Python is a growing contender in the
+landscape of neuroimaging data analysis with tools such as Nipy
+\citep{millman2007analysis} or Nipype \citep{gorgolewski2011}.
+For multi-variate pattern analysis, PyMVPA \citep{hanke2009pymvpa}
+combines Python and external tools such as R or Shogun
+\citep{sonnenburg2010}. 
+The scientific Python libraries used in this paper are:
 \begin{itemize}
-    \item{\bf NumPy} provides the \verb!ndarray! data type, an efficient $n$-dimensional data
+    \item{\bf NumPy}, that provides the \verb!ndarray! data type, an efficient $n$-dimensional data
         representation for array-based numerical computating, a la Matlab
         \citep{vanderwalt2011}. It handles efficient array persistance
         (input and output) and provides basic operations such as dot
@@ -254,7 +253,7 @@ languages such as Matlab or R. The main libraries in the scientific Python stack
         how to load neuroimaging data and convert it to NumPy arrays compatible
         with scikit-learn.
 
-    \item{\bf SciPy} provides higher level mathematical functions that operate on ndarrays for
+    \item{\bf SciPy}: higher level mathematical functions that operate on ndarrays for
         a variety of domains including linear algebra, optimization and signal
         processing. SciPy is linked to compiled libraries to ensure high
         performances (BLAS, Arpack and MKL for linear algebra and mathematical
@@ -264,12 +263,12 @@ languages such as Matlab or R. The main libraries in the scientific Python stack
         algorithms.
         % XXX : elementary bricks -> foundations ? building blocks?
 
-    \item{\bf Matplotlib} is a plotting library tightly integrated into the
+    \item{\bf Matplotlib}, a plotting library tightly integrated into the
         scientific Python stack \citep{hunter2007}. It offers publication-quality figures in
         different formats and is used to generate the figures in
 	this paper.
 
-    \item{\bf Nibabel} loads or saves data in neuroimaging file formats.
+    \item{\bf Nibabel}, to access data in neuroimaging file formats.
 	We use it at the beginning of all our scripts.
 \end{itemize}
 
@@ -279,7 +278,7 @@ Scikit-learn \citep{pedregosa2011} is a general purpose machine learning
 library written in Python.
 It proposes efficient implementations of state-of-the-art algorithms,
 accessible to non-machine learning experts,
-and reusable across scientific disciplines and applicative fields.. It also
+and reusable across scientific disciplines and applicative fields. It also
 takes advantage of Python interactivity and modularity to propose fast and easy
 prototyping. There is a variety of other learning packages. For instance,
 Weka \citep{hall2009weka} is a machine learning framework written in Java,
