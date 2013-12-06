@@ -286,10 +286,9 @@ prototyping. There is a variety of other learning packages. For instance,
 in Python, PyBrain \citep{schaul2010pybrain} is best at neural networks
 and reinforcement learning approaches, which are black boxes, and does not match
 our need to interpret the results.
-Weka \citep{hall2009weka} is a machine learning framework written in Java,
-however it is more oriented toward data mining
-and it using its API for specific purpose requires knowledge of the
-Java Runtime Environment. 
+Beyond Python, Weka \citep{hall2009weka} is a rich machine learning framework
+written in Java,
+however it is more oriented toward data mining. 
 
 Some higher level frameworks provides full pipeline to apply machine
 learning techniques to neuroimaging. PyMVPA is a Python packaging that 
@@ -379,8 +378,8 @@ preprocessing must be applied. For fMRI, this includes motion
 correction, slice timing correction, coregistration with an anatomical image and normalization to a common
 template like the MNI (Montreal Neurologic Institute) one if necessary.
 Reference softwares for these tasks are
-SPM\footnote{http://www.fil.ion.ucl.ac.uk/spm}~\citep{friston2007} and
-FSL\footnote{http://fsl.fmrib.ox.ac.uk}~\citep{smith2004}. A Python
+SPM~\citep{friston2007} and
+FSL~\citep{smith2004}. A Python
 interface to these tools is available in nipype Python library
 \citep{gorgolewski2011}. Below we discuss shaping preprocessed data into
 a format that can be fed to scikit-learn. For the machine learning
