@@ -6,7 +6,8 @@ An example applying ICA to resting-state data.
 """
 
 ### Load nyu_rest dataset #####################################################
-from utils import datasets, masking, signal, resampling
+from utils import datasets, masking, signal
+import numpy as np
 dataset = datasets.fetch_adhd(n_subjects=10)
 n_components = 10
 
@@ -14,43 +15,31 @@ n_components = 10
 z = 35
 # Path
 path = 'ica'
-min_ = None
-max_ = None
 
 ### Initialization ############################################################
 import nibabel
 from os.path import exists, join
 import pylab as pl
-import numpy as np
 import time
 
 
-def plot_ica_map(map_3d, vmin, vmax):
+mask_img = nibabel.load(join('utils', 'adhd_mask.nii.gz'))
+
+def plot_ica_map(map_3d):
     # Mask the background
     map_3d = np.ma.masked_array(map_3d,
             np.logical_not(mask_img.get_data().astype(bool)))
     section = map_3d[:, :, z]
-    vmax = np.max(np.abs(vmin), np.abs(vmax))
-
+    vmax = np.max(np.abs(map_3d))
     pl.figure(figsize=(3.8, 4.5))
     pl.axes([0, 0, 1, 1])
     pl.imshow(np.rot90(section), interpolation='nearest',
               vmax=vmax, vmin=-vmax, cmap='jet')
     pl.axis('off')
 
-
-# Resample the mask
-mask_img = resampling.resample_img(join('utils', 'adhd_mask.nii.gz'),
-                                   target_affine=np.diag((3, 3, 3.)))
-# Resample the data
-X_ = []
-for func in dataset.func:
-    X_.append(resampling.resample_img(func, target_affine=np.diag((3, 3, 3.))))
-X = X_
-
 # Mask data
 X_ = []
-for x in X:
+for x in dataset.func:
     X_.append(masking.apply_mask(x, mask_img, smoothing_fwhm=6.))
 X = X_
 
@@ -67,7 +56,6 @@ if not exists(join(path, 'canica.nii.gz')):
         from nilearn.decomposition.canica import CanICA
         t0 = time.time()
         canica = CanICA(n_components=n_components, mask=mask_img,
-                        target_affine=np.diag((3, 3, 3.)),
                         smoothing_fwhm=6.,
                         memory="nilearn_cache", memory_level=1,
                         threshold=None,
@@ -83,16 +71,12 @@ if not exists(join(path, 'canica.nii.gz')):
 
 
 canica_dmn = nibabel.load(join(path, 'canica.nii.gz')).get_data()[..., 4]
-min_ = np.min(min_, np.min(canica_dmn))
-max_ = np.max(max_, np.max(canica_dmn))
 
 
 ### Melodic ICA ############################################################
 # To have MELODIC results, please use my melodic branch of nilearn
 
 melodic_dmn = nibabel.load(join(path, 'melodic.nii.gz')).get_data()[..., 3]
-min_ = np.min(min_, np.min(melodic_dmn))
-max_ = np.max(max_, np.max(melodic_dmn))
 
 ### FastICA ##################################################################
 
@@ -112,15 +96,20 @@ ica_dmn = nibabel.load(join(path, 'ica.nii.gz')).get_data()[..., 2]
 
 ### Plots ####################################################################
 
-plot_ica_map(ica_dmn, min_, max_)
+# Split the sign to harmonize maps
+ica_dmn = -ica_dmn
+canica_dmn = -canica_dmn
+
+plot_ica_map(ica_dmn)
 pl.savefig(join(path, 'ica.pdf'))
 pl.savefig(join(path, 'ica.eps'))
 
-plot_ica_map(canica_dmn, min_, max_)
+plot_ica_map(canica_dmn)
 pl.savefig(join(path, 'canica.pdf'))
 pl.savefig(join(path, 'canica.eps'))
 
-plot_ica_map(melodic_dmn, min_, max_)
-pl.colorbar()
+plot_ica_map(melodic_dmn)
+cbar = pl.colorbar()
+cbar.ax.set_yticklabels([])
 pl.savefig(join(path, 'melodic.pdf'))
 pl.savefig(join(path, 'melodic.eps'))
