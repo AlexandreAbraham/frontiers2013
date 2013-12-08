@@ -15,6 +15,7 @@ n_components = 10
 z = 35
 # Path
 path = 'ica'
+cmap = 'jet'
 
 ### Initialization ############################################################
 import nibabel
@@ -25,6 +26,7 @@ import time
 
 mask_img = nibabel.load(join('utils', 'adhd_mask.nii.gz'))
 
+
 def plot_ica_map(map_3d):
     # Mask the background
     map_3d = np.ma.masked_array(map_3d,
@@ -34,7 +36,7 @@ def plot_ica_map(map_3d):
     pl.figure(figsize=(3.8, 4.5))
     pl.axes([0, 0, 1, 1])
     pl.imshow(np.rot90(section), interpolation='nearest',
-              vmax=vmax, vmin=-vmax, cmap='jet')
+              vmax=vmax, vmin=-vmax, cmap=cmap)
     pl.axis('off')
 
 # Mask data
@@ -109,7 +111,17 @@ pl.savefig(join(path, 'canica.pdf'))
 pl.savefig(join(path, 'canica.eps'))
 
 plot_ica_map(melodic_dmn)
-cbar = pl.colorbar()
-cbar.ax.set_yticklabels([])
 pl.savefig(join(path, 'melodic.pdf'))
 pl.savefig(join(path, 'melodic.eps'))
+
+### Plot the colorbar #########################################################
+import matplotlib as mpl
+
+
+fig = pl.figure(figsize=(.4, 2.4))
+norm = mpl.colors.Normalize(vmin=0., vmax=1.)
+cb = mpl.colorbar.ColorbarBase(pl.gca(), cmap=cmap, norm=norm)
+cb.set_ticks([])
+#fig.subplots_adjust(bottom=0.05, top=1., left=0.08, right=.92)
+pl.savefig(join(path, 'colorbar.pdf'))
+pl.savefig(join(path, 'colorbar.eps'))
