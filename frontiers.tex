@@ -284,8 +284,8 @@ and reusable across scientific disciplines and applicative fields. It also
 takes advantage of Python interactivity and modularity to propose fast and easy
 prototyping. There is a variety of other learning packages. For instance,
 in Python, PyBrain \citep{schaul2010pybrain} is best at neural networks
-and reinforcement learning approaches, which are black boxes, and does not match
-our need to interpret the results.
+and reinforcement learning approaches, but its models are fairly black box,
+and do not match our need to interpret the results.
 Beyond Python, Weka \citep{hall2009weka} is a rich machine learning framework
 written in Java,
 however it is more oriented toward data mining. 
@@ -995,8 +995,9 @@ components_masked = ica.fit_transform(data_masked.T).T
 \subsubsection{Results}
 
 On fig. \ref{fig:ica} we compare a simple concat ICA as implemented by
-the code above to more sophisticated multi-subject methods, namely CanICA
-and Melodic's concat ICA. We display here only the default mode network
+the code above to more sophisticated multi-subject methods, namely Melodic's
+concat ICA and CanICA--also implemented using scikit-learn although we do
+not discuss the code here. We display here only the default mode network
 as it is a well-known resting-state network. It is hard to draw conclusions from
 a single map but, at first sight, it seems that both CanICA and Melodic
 approaches are less subject to noise and give similar results.
@@ -1083,7 +1084,7 @@ small. On the opposite, Ward operates directly at the level of regions.
 As it is a bottom-up process, it is often to be preferred when working
 with a large number of clusters. There exist many more clustering
 techniques expose in scikit-learn. Determining which is the best one to
-process fMRI time-series requires defining more precisely the targeted
+process fMRI time-series requires a more precise definition of the target
 application.
 
 \begin{figure}[hbtp]
