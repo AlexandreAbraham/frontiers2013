@@ -1080,8 +1080,8 @@ is a useful method of summarizing information, as it groups together
 similar voxels. Note that, as K-means does not extract spatially-contiguous
 clusters, it gives a number of regions that can be much larger than the
 number of clusters specified, although some of these regions can be very
-small. On the opposite, Ward operates directly at the level of regions.
-As it is a bottom-up process, it is often to be preferred when working
+small. On the opposite, spatially-constrained Ward directly creates regions.
+As it is a bottom-up process, it tends to perform best
 with a large number of clusters. There exist many more clustering
 techniques expose in scikit-learn. Determining which is the best one to
 process fMRI time-series requires a more precise definition of the target
@@ -1097,8 +1097,8 @@ random.}
 \section{Conclusion}
 
 In this paper we have illustrated with simple examples how machine
-learning techniques using the scikit-learn Python toolkit can be applied
-to fMRI data in order to tackle
+learning techniques can be applied
+to fMRI data using the scikit-learn Python toolkit in order to tackle
 neuroscientific problems. Encoding and decoding can rely on supervised
 learning to link brain images with stimuli. Unsupervised learning
 can extract from resting-state data structure such as functional networks or
