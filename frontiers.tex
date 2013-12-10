@@ -159,22 +159,21 @@
 
 \section{}
 Statistical machine learning methods are increasingly used for
-neuroimaging data analysis. Their main virtue for this type of application
+neuroimaging data analysis. Their main virtue 
 is their ability to model high-dimensional datasets, e.g.\ multivariate
-analysis of activation images, or capturing inter-subject variability.
+analysis of activation images or resting-state time series.
 Supervised learning is typically used in \emph{decoding} or
 \emph{encoding} settings to relate
 brain images to behavioral or clinical observations, while
-unsupervised learning is typically used to uncover hidden structure in
-sets of images (e.g.\ resting state functional MRI) or to find
-sub-populations in large cohorts of subjects. By considering
+unsupervised learning can uncover hidden structure in
+sets of images (e.g.\ resting state functional MRI) or find
+sub-populations in large cohorts. By considering
 different functional neuroimaging applications, we illustrate how scikit-learn,
 a Python machine learning library, can be used to perform some key
-analysis steps. Scikit-learn contains a large set of statistical
-learning algorithms, both supervised and unsupervised, that can be applied
-to neuroimaging data. Other Python libraries provide the tools for
-loading and preparing neuroimaging data for scikit-learn, and visualizing
-the results.
+analysis steps. Scikit-learn contains a very large set of statistical
+learning algorithms, both supervised and unsupervised, and its
+application to neuroimaging data provides a versatile tool to study the
+brain.
 
 % XXX: here the tone of the article should be: scikit-learn for methods
 % development, ie we target the methods researchers for Neuroimaging. We
@@ -196,13 +195,15 @@ yet powerful tool for statistical inference. Computer scientists
 develop the tools used, although they 
 often lack a deep understanding of the neuroscience questions. This paper
 aims to fill the gap between machine learning and neuroimaging by demonstrating
-how a general-purpose machine-learning toolbox, scikit-learn, can be used 
-for neuroimaging analysis with state-of-the-art methods with code
-understandable by both worlds. This paper focuses on code; for a 
+how a general-purpose machine-learning toolbox, scikit-learn, can
+provide state-of-the-art methods for neuroimaging analysis while keeping
+the code simple and
+understandable by both worlds. Here, we focus on software; for a 
 more conceptual introduction to machine learning methods in fMRI analysis,
 see \cite{pereira2009} or \cite{mur2009}.
-We focus on the scikit-learn toolkit as it is a reference
-machine learning tool with a very wide variety of algorithms,
+We discuss the use of the scikit-learn toolkit as it is a reference
+machine learning tool and has and a variety of algorithms that is matched by few
+packages,
 but also because it is implemented in Python,
 and thus dovetails nicely in the rich neuroimaging Python ecosystem.
 
