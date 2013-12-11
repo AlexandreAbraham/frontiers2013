@@ -111,7 +111,7 @@ Answer
 We precised the position of scikit-learn regarding other machine learning and
 neuroimaging frameworks. We also add references to papers that we found useful
 for the targeted public (we referenced the book "The Elements of Statistical
-Learning" by Hastie et al. instead of Vapnik for exemple because it has a more
+Learning" by Hastie et al. instead of Vapnik for example because it has a more
 general and didactic approach regarding machine learning).
 
 Other comments: nilearn positioning
@@ -224,7 +224,7 @@ concepts.
 Answer
 ......
 
-Hyperparameter tuning is now explained deeper in the concepts and an exemple is
+Hyperparameter tuning is now explained deeper in the concepts and an example is
 provided in the Miyawaki example.
 
 Other comments: temporal compression
@@ -276,7 +276,7 @@ Answer
 Some people in neuroimaging want to run algorithms and get compact regions in
 the brain. We just give them the corresponding regularization.
 
-However, we developped this part and used the hyperparamter exploration to show
+However, we developed this part and used the hyperparameter exploration to show
 that, properly parametrized, some methods are better than the others.
 
 Other comments: Figure 3 unclear
@@ -290,7 +290,7 @@ Answer
 ......
 
 There is a difference here between image pixels and brain voxels. One pixel is
-higlighted and, in fact, four voxels are highlighted in the brain
+highlighted and, in fact, four voxels are highlighted in the brain
 representations. This has been detailed in the corresponding caption and the
 related text.
 
@@ -309,7 +309,7 @@ Answer
 ......
 
 We did not insist on ICA because it is not possible to make statements from a
-particular map. Plus, we tried to get the best out of each method butthey are
+particular map. Plus, we tried to get the best out of each method but they are
 subject to high variability.
 
 We added a colorbar, flipped the sign of some maps so that they look alike and
@@ -332,7 +332,7 @@ Answer
 
 This is exactly the take-home message of this paper: thanks to scikit-learn, 
 it is possible to run an analysis on neuroimaging data with a simple script.
-Following your recommandation, we insisted on scikit-learn versatility all along
+Following your recommendation, we insisted on scikit-learn versatility all along
 the paper. But what we really want is to give people the will to take our
 example scripts and run them on their data. We want them to found by themselves
 that it is very easy to change the regularization of a model or simply change
