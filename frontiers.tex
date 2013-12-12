@@ -165,7 +165,7 @@ analysis of activation images or resting-state time series.
 Supervised learning is typically used in \emph{decoding} or
 \emph{encoding} settings to relate
 brain images to behavioral or clinical observations, while
-unsupervised learning can uncover hidden structure in
+unsupervised learning can uncover hidden structures in
 sets of images (e.g.\ resting state functional MRI) or find
 sub-populations in large cohorts. By considering
 different functional neuroimaging applications, we illustrate how scikit-learn,
@@ -191,9 +191,9 @@ scikit-learn, Python
 
 Statistical machine learning is gaining interest in
 neuroimaging data analysis. Neuroscientists use it as a complicated
-yet powerful tool for statistical inference. Computer scientists
-develop the tools used, although they 
-often lack a deep understanding of the neuroscience questions. This paper
+yet powerful tool for statistical inference. The tools are developped by
+computer scientists who often lack a deep understanding of the
+neuroscience questions. This paper
 aims to fill the gap between machine learning and neuroimaging by demonstrating
 how a general-purpose machine-learning toolbox, scikit-learn, can
 provide state-of-the-art methods for neuroimaging analysis while keeping
@@ -227,7 +227,7 @@ build their own analysis strategies.
 The paper is organized as
 follows. After introducing the \emph{scikit-learn} toolbox, we show 
 how to prepare the data to apply
-\emph{scikit-learn}. Then we describe the application of \emph{supervised
+\emph{scikit-learn} routines. Then we describe the application of \emph{supervised
 learning} techniques, to learn the links between brain images and
 stimuli. Finally we demonstrate how \emph{unsupervised learning}
 techniques can extract useful structure from the images.
@@ -261,7 +261,7 @@ The scientific Python libraries used in this paper are:
         performances (BLAS, Arpack and MKL for linear algebra and mathematical
         operations).
         Together, NumPy and SciPy provide a robust scientific environment
-        for numerical computing and they are the elementary bricks we use in all our
+        for numerical computing and they are the elementary bricks that we use in all our
         algorithms.
         % XXX : elementary bricks -> foundations ? building blocks?
 
@@ -351,7 +351,7 @@ estimator on a given dataset. It consists in iteratively fitting the
 estimator on a fraction of the data, called \emph{training set}, and testing it
 on the left-out unseen data, called \emph{test set}.
 Several strategies exists to partition the data.
-For example, K-Fold cross validation consists in dividing (randomly or not) the samples in $k$
+For example, k-fold cross-validation consists in dividing (randomly or not) the samples in $k$
 subsets: each subset is then used once as testing set while the others $k - 1$
 subsets are used to train the estimator. This is one of the simplest and most
 widely used cross-validation strategies. The parameter $k$ is commonly set
@@ -986,7 +986,7 @@ direction considered as random is that of the voxels and not the time
 points. The maps obtained capture different components of the signal,
 including noise components as well as resting-state functional networks.
 To produce the figures, we extract only 10 components, as we are
-interested here in exploring only the very large structures.
+interested here in exploring only the main signal structures.
 
 \begin{lstlisting}
 # Here we start with Xs: a list of subject-level data matrices
@@ -1031,7 +1031,7 @@ that form functionally homogeneous regions \citep{thirion2006}.
 
 Several clustering approaches exists, each one having its own pros and
 cons. Most require setting the number of clusters extracted. This choice
-depends on the application: a large number of cluster will give a more
+depends on the application: a large number of clusters will give a more
 fine-grained description of the data, with a higher fidelity to the
 original signal, but also a higher model complexity. Some clustering
 approaches can make use of spatial information and yield
@@ -1089,7 +1089,7 @@ number of clusters specified, although some of these regions can be very
 small. On the opposite, spatially-constrained Ward directly creates regions.
 As it is a bottom-up process, it tends to perform best
 with a large number of clusters. There exist many more clustering
-techniques expose in scikit-learn. Determining which is the best one to
+techniques exposed in scikit-learn. Determining which is the best one to
 process fMRI time-series requires a more precise definition of the target
 application.
 
