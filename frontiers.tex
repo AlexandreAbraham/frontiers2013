@@ -212,7 +212,7 @@ resolve common neuroimaging needs, detailing the corresponding code,
 the choice of the methods, and the underlying assumptions. We discuss not only
 prediction scores, but also the interpretability of the results, which
 leads us to explore the internal model of various methods. 
-Importantly, the github repository of the
+Importantly, the GitHub repository of the
 paper\footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}}
 provides complete scripts to generate figures. 
 The scope of this paper is not to present a neuroimaging-specific library,
@@ -228,7 +228,7 @@ The paper is organized as
 follows. After introducing the \emph{scikit-learn} toolbox, we show 
 how to prepare the data to apply
 \emph{scikit-learn} routines. Then we describe the application of \emph{supervised
-learning} techniques, to learn the links between brain images and
+learning} techniques to learn the links between brain images and
 stimuli. Finally we demonstrate how \emph{unsupervised learning}
 techniques can extract useful structure from the images.
 
@@ -414,8 +414,9 @@ scaling factors for each direction.
 
 \subsection{Signal cleaning}
 
-Due to its complex and indirect acquisition process, neuroimaging data often has a low
-signal-to-noise ratio. It contains trends and artifacts that must be removed
+Due to its complex and indirect acquisition process, neuroimaging data often
+have a low
+signal-to-noise ratio. They contain trends and artifacts that must be removed
 to ensure maximum machine learning algorithms efficiency. Signal cleaning
 includes:
 \begin{itemize}
@@ -441,10 +442,10 @@ includes:
 \label{sec:unmasking}
 
 Neuroimaging data are represented in 4 dimensions: 3 spatial dimensions, and 
-one dimension for the time.
+one dimension to index time or trials.
 Scikit-learn algorithms, on the other hand, only accept 2-dimensional
 samples $\times$ features matrices (see Section~\ref{scikitlearn}).
-Depending on the settings, voxels and time series can be
+Depending on the setting, voxels and time series can be
 considered as features
 or samples. For example, in spatial independent component analysis (ICA),
 voxels are samples.
@@ -654,12 +655,12 @@ neighborhood of each voxel and tests the out-of-sample prediction
 performance as proxy measure of the link between the local brain activity
 and the target behavioral variable. In practice, it entails performing
 cross-validation of the model, most often an SVM, on voxels contained in
-balls centered on each voxel of interest. The procedure calls for 
-solving a large number of SVMs and can be computationally expensive.
+balls centered on each voxel of interest. The procedure entails 
+solving a large number of SVMs and is computationally expensive.
 Detailing an efficient implementation of this algorithm is beyond the
 scope of this paper. However, code for searchlight and to generate
 figure~\ref{fig:haxby}
-is available in the github repository accompanying the paper.
+is available in the GitHub repository accompanying the paper.
 
 \subsection{Results}
 
@@ -694,7 +695,7 @@ contain category-specific visual areas. While Searchlight only gives a
 score to each voxel, the SVC can be used afterward to classify unseen
 brain scans.
 
-Most of the final example script (\texttt{haxby\_decoding.py} on github) is
+Most of the final example script (\texttt{haxby\_decoding.py} on GitHub) is
 for data
 loading and result visualization. Only 5 lines are needed to run a scikit-learn
 classifier. In addition, thanks to the scikit-learn modularity, the SVC can be easily
@@ -869,9 +870,10 @@ indices = mean_scores.argsort()[::-1][:n_voxels]
 
 lasso = LassoLarsCV(max_iter=10)
 
-receptive_fields = [lasso.fit(y_train, X_train[:, index]
-        ).coef_.reshape(10, 10)
-        for index in indices]
+receptive_fields = []
+for index in indices:
+    lasso.fit(y_train, X_train[:, index])
+    receptive_fields.append(lasso.coef_.reshape(10, 10))
 
 \end{lstlisting}
 %y_train_centered = (y_train - y_train.mean(axis=0)) / y_train.std(axis=0)
@@ -885,7 +887,7 @@ In decoding settings, Figures \ref{fig:miyawaki}\textit{a} and \ref{fig:miyawaki
 maps for both methods. They both give roughly the same results and we can
 see that the weights are centered in the V1 and nearby retinotopic areas.
 Figures \ref{fig:miyawaki}\textit{b} and \ref{fig:miyawaki}\textit{d} show reconstruction
-accuracy score using LR and SVM
+accuracy score using Logistic Regression (LR) and SVM
 (variable \texttt{mean\_scores} in the code above).
 Both methods give almost identical results. 
 As in the original work \citep{miyawaki2008}, reconstruction is more
@@ -897,7 +899,7 @@ In encoding settings, figure~\ref{fig:miyawaki}\textit{e} shows classifiers
 weights for encoding, that we interpret as receptive fields. We can
 see that receptive fields of neighboring voxels are neighboring
 pixels, which is expected from retinotopy: primary visual
-cortex directly has a topological mapping of the stimuli.
+cortex maps the visual field in a topologically organized manner.
 
 Both encoding and decoding analysis show a link between the selected
 pixel and brain voxels. In the absence of ground truth, seeing that
@@ -937,7 +939,8 @@ Even in the absence of external behavioral or clinical variable, studying
 the structure of brain signals can reveal interesting information.
 Indeed, \cite{biswal1995} have shown that brain activation exhibits
 coherent spatial patterns during rest. These correlated voxel activations
-form functional networks that are consistent with known task-related networks.
+form functional networks that are consistent with known task-related networks
+\citep{smith2009}.
 
 Biomarkers found via predictive modeling on resting-state fMRI would be
 particularly useful, as they could be applied to diminished subjects that
@@ -1107,8 +1110,8 @@ learning techniques can be applied
 to fMRI data using the scikit-learn Python toolkit in order to tackle
 neuroscientific problems. Encoding and decoding can rely on supervised
 learning to link brain images with stimuli. Unsupervised learning
-can extract from resting-state data structure such as functional networks or
-brain regions. The accompanying Python code for the machine learning
+can extract structure such as functional networks or
+brain regions from resting-state data. The accompanying Python code for the machine learning
 tasks is straightforward. Difficulties lie in applying proper 
 preprocessing to the data, choosing the right model for the problem,
 and interpreting the results. Tackling these difficulties while
@@ -1144,7 +1147,9 @@ The authors declare that the research was conducted in the absence of any
 commercial or financial relationships that could be construed as a potential
 conflict of interest.
 
-\paragraph{Funding\textcolon} We acknowledge funding from the NiConnect project.
+\paragraph{Funding\textcolon} We acknowledge funding from the NiConnect
+project and NIDA R21 DA034954, SUBSample project from the DIGITEO
+Institute, France.
 
 \bibliographystyle{frontiersinSCNS} % for Science articles
 \bibliography{biblio}
