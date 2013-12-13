@@ -29,17 +29,18 @@ Although a more general introduction of the scikit-learn would have been
 interesting, the focus of this manuscript is on neuroimaging specific cases.
 Scikit-learn is deeply presented in the reference paper Pedregosa et al. 2012.
 
-Our goal with this manuscript is to provide enough material to the
-non-experienced user so that he can run a basis estimator on his data. Provided
-scripts are simple enough for non-experienced users. We believe that they will
-be able to run them on their data and copy/paste the code they need in a new
-script. Unfortunately, there is no way to simplify the structure of scipy and
-numpy. We presented the methods that we found useful.
+Our goal with this manuscript is to provide enough material so that the
+non-experienced can run an estimator on his data. Provided scripts are
+short, documented, and simple enough to be understood by non-technical people.
+We believe that these scripts can be used as a basis for their own study.
+Unfortunately, numpy and scipy are huge modules that proposes a lot of features
+we do not need. The features we highlighted from these packages are the ones
+that we found useful in our field.
 
 The code snippets in the code are laconic but they focus on the interesting
-lines: they focus on a particular task. Technical details like module
+lines, to perform a particular task. Technical details like module
 importation are treated directly into the provided scripts, that are fully
-documented and readable by a non experienced user.
+documented and readable by a non-experienced user.
 
 We reworded our position regarding nilearn: it is clearly under development and
 only advanced users should start using it. All references to nilearn have also
@@ -69,7 +70,7 @@ mature, we do not want to do that for the moment.
 Please add any further comments you have regarding this manuscript.
 -------------------------------------------------------------------
 
-Note: I didn't report here typos or formulation remarks.
+Note: I didn't report here typos or formulation remarks from the reviewer.
 
 Intro: This should be made more clear - it has a number of vague and unclear
 statements, and fails to clearly position SkiKits-Learn with the python scientific
@@ -174,7 +175,10 @@ abstractions).
 We believe that the only way to make people realize that no framework is needed
 is to try that themselves. For this purpose, we propose complete documented
 scripts and, following your remark, we added some suggestions of other possible
-models at the end of each example.
+models at the end of each example. Taking the original script and changing the
+model is very simple, thanks to scikit-learn, and we hope that users will
+realize that.
+Provided scripts can also be used as basis for reader's own analysis.
 
 Other comments: advantages of the scikit-learn
 ----------------------------------------------
@@ -193,7 +197,8 @@ Answer
 Once data is in matrix form, and with proper pre-treatments applied, it is in
 fact possible to send it to any machine learning framework. Scikit-learn
 benefits of the interactivity of Python and provides a lot of efficient
-estimators. We highlighted this point in the manuscript.
+estimators, as you already suggested above. We highlighted this point in the
+manuscript.
 
 Other comments: cite previous Haxby studies
 -------------------------------------------
