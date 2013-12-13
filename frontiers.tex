@@ -700,10 +700,10 @@ for data
 loading and result visualization. Only 5 lines are needed to run a scikit-learn
 classifier. In addition, thanks to the scikit-learn modularity, the SVC can be easily
 replaced by any other classifier in this example. As all linear models share the
-same interface, replacing the SVC by another linear model, such as ElasticNet,
-LogisticRegression or Perceptron, is a one liner. You can also chose another
-approachs, like k-nearest neighbors, but then a couple of lines are needed to
-visualize the results properly.
+same interface, replacing the SVC by another linear model, such as ElasticNet
+or LogisticRegression, is a one liner. Gaussian Naive Bayes is a non-linear
+classifier that should perform well in this case, and modifiying display can be
+done by replacing \texttt{coef_} by \texttt{theta_}.
 
 
 \section{Encoding brain activity and decoding images}
