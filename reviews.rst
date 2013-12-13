@@ -27,18 +27,27 @@ Answer
 
 Although a more general introduction of the scikit-learn would have been
 interesting, the focus of this manuscript is on neuroimaging specific cases.
-For a complete scikit-learn presentation, the reader can read Pedregosa et al.
-2012. We believe that the function we point to should be enough for most usages
-and, in case it is not, we believe that the high quality documentation provided
-with all scientific packages we cite should be enough.
+Scikit-learn is deeply presented in the reference paper Pedregosa et al. 2012.
 
-Although the code snippets may be laconic, they focus on the interesting lines.
-We documented and made the provided scripts as readable as possible for the user
-to read them.
+Our goal with this manuscript is to provide enough material to the
+non-experienced user so that he can run a basis estimator on his data. Provided
+scripts are simple enough for non-experienced users. We believe that they will
+be able to run them on their data and copy/paste the code they need in a new
+script. Unfortunately, there is no way to simplify the structure of scipy and
+numpy. We presented the methods that we found useful.
+
+The code snippets in the code are laconic but they focus on the interesting
+lines: they focus on a particular task. Technical details like module
+importation are treated directly into the provided scripts, that are fully
+documented and readable by a non experienced user.
 
 We reworded our position regarding nilearn: it is clearly under development and
 only advanced users should start using it. All references to nilearn have also
-been removed from the scripts.
+been removed from the scripts. Important nilearn primitives have been copied
+into the code repository.
+
+We also added more openings regarding scikit-learn in the result sections of
+each example.
 
 
 Are methods of other authors accurately presented and interpreted?
@@ -60,7 +69,7 @@ mature, we do not want to do that for the moment.
 Please add any further comments you have regarding this manuscript.
 -------------------------------------------------------------------
 
-Note: I don't report here typos or formulation remarks.
+Note: I didn't report here typos or formulation remarks.
 
 Intro: This should be made more clear - it has a number of vague and unclear
 statements, and fails to clearly position SkiKits-Learn with the python scientific
@@ -158,9 +167,14 @@ than Matlab and R.
 Answer
 ......
 
-We developped this point in the introduction.
+We developped the potential alternatives in the introduction. However, most of
+them operate on a higher level than our code snippets (they propose
+abstractions).
 
-TODO.
+We believe that the only way to make people realize that no framework is needed
+is to try that themselves. For this purpose, we propose complete documented
+scripts and, following your remark, we added some suggestions of other possible
+models at the end of each example.
 
 Other comments: advantages of the scikit-learn
 ----------------------------------------------
@@ -179,8 +193,7 @@ Answer
 Once data is in matrix form, and with proper pre-treatments applied, it is in
 fact possible to send it to any machine learning framework. Scikit-learn
 benefits of the interactivity of Python and provides a lot of efficient
-estimators. Thanks to its versatility, it is even possible to replace an
-estimator by another very easily.
+estimators. We highlighted this point in the manuscript.
 
 Other comments: cite previous Haxby studies
 -------------------------------------------
@@ -195,7 +208,7 @@ mentioned in this context.
 Answer
 ......
 
-Indeed, we have cited these previous studies.
+Indeed, we have added references to these previous studies.
 
 Other comments: cite model-validation references
 ------------------------------------------------
@@ -242,11 +255,9 @@ doing neuroimaging. Plus, one of our datasets (ADHD) needed this resampling for
 the script to run in decent time. Resampling being a non-trivial operation, we
 believed that providing the code could really help.
 
-As we resampled ADHD by our side, it is less necessary to get into details so
-now spatial resampling is only mentioned in the introduction. Temporal
-resampling is not mentioned because it should be used carefully: the method used
-to compress time series depends on the model used afterward to analyze data.
-This is beyond the scope of this manuscript.
+Temporal resampling is not mentioned because it should be used carefully: the
+method used to compress time series can have an impact on the model used afterward to
+analyze data. This is beyond the scope of this manuscript.
 
 Other comments: Searchlight balls
 ---------------------------------

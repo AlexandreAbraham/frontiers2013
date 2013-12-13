@@ -699,8 +699,11 @@ Most of the final example script (\texttt{haxby\_decoding.py} on GitHub) is
 for data
 loading and result visualization. Only 5 lines are needed to run a scikit-learn
 classifier. In addition, thanks to the scikit-learn modularity, the SVC can be easily
-replaced by any other classifier in this example by changing only a
-couple of lines of code.
+replaced by any other classifier in this example. As all linear models share the
+same interface, replacing the SVC by another linear model, such as ElasticNet,
+LogisticRegression or Perceptron, is a one liner. You can also chose another
+approachs, like k-nearest neighbors, but then a couple of lines are needed to
+visualize the results properly.
 
 
 \section{Encoding brain activity and decoding images}
@@ -1017,6 +1020,14 @@ concat-ICA. Data have been normalized (set to unit variance) for display
 purposes.}
   \label{fig:ica}
 \end{figure}
+
+Scikit-learn proposes several other matrix decomposition strategies listed in
+the module `sklearn.decomposition`. A good alternative to ICA is the dictionary
+learning that applies a $\ell_1$ regularization on the extracted components
+\citep{varoquaux2011}.
+This leads to more sparse and compact components than ICA ones, that are
+full-brain and require thresholding. 
+
 
 \subsection{Learning functionally homogeneous regions with clustering}
 \label{clustering}
