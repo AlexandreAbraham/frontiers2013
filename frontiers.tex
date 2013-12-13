@@ -1013,7 +1013,8 @@ approaches are less subject to noise and give similar results.
   \caption{Default mode network extracted using different approaches:
 \emph{left}: the simple Concat-ICA approach detailed in this article;
 \emph{middle}: CanICA, as implemented in nilearn; \emph{right}: Melodic's
-concat-ICA.}
+concat-ICA. Data have been normalized (set to unit variance) for display
+purposes.}
   \label{fig:ica}
 \end{figure}
 
@@ -1048,7 +1049,7 @@ sklearn.feature\_extraction.image.grid\_to\_graph} function to
 construct such a graph using the neighbor structure of an image grid,
 with optionally a brain mask.
 
-\paragraph{K-means} is a more top-down approach, seeking cluster centers
+\paragraph{K-Means} is a more top-down approach, seeking cluster centers
 to evenly explain the variance of the data. Each voxels are then assigned
 to the nearest center, thus forming clusters. As imposing a spatial model
 in K-means is not easy, it is often advisable to spatially smooth the
@@ -1092,6 +1093,10 @@ with a large number of clusters. There exist many more clustering
 techniques expose in scikit-learn. Determining which is the best one to
 process fMRI time-series requires a more precise definition of the target
 application.
+
+Ward's clustering and K-Means are among the simplest approaches proposed in the
+scikit-learn. \cite{craddock2011} applied spectral clustering on neuroimaging
+data, a similar application is available in nilearn as an example.
 
 \begin{figure}[hbtp]
   \includegraphics[width=\linewidth]{scripts/clustering/figure}
