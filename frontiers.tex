@@ -200,7 +200,8 @@ provide state-of-the-art methods for neuroimaging analysis while keeping
 the code simple and
 understandable by both worlds. Here, we focus on software; for a 
 more conceptual introduction to machine learning methods in fMRI analysis,
-see \cite{pereira2009} or \cite{mur2009}.
+see \cite{pereira2009} or \cite{mur2009}, while \cite{hastie2001}
+provides a good reference on machine learning.
 We discuss the use of the scikit-learn toolkit as it is a reference
 machine learning tool and has and a variety of algorithms that is matched by few
 packages,
@@ -701,9 +702,9 @@ loading and result visualization. Only 5 lines are needed to run a scikit-learn
 classifier. In addition, thanks to the scikit-learn modularity, the SVC can be easily
 replaced by any other classifier in this example. As all linear models share the
 same interface, replacing the SVC by another linear model, such as ElasticNet
-or LogisticRegression, is a one liner. Gaussian Naive Bayes is a non-linear
+or LogisticRegression, requires changing only one line. Gaussian Naive Bayes is a non-linear
 classifier that should perform well in this case, and modifiying display can be
-done by replacing \texttt{coef_} by \texttt{theta_}.
+done by replacing \texttt{coef\_} by \texttt{theta\_}.
 
 
 \section{Encoding brain activity and decoding images}
@@ -846,8 +847,8 @@ for train, test in cv:
 mean_scores = np.mean(scores, axis=0)
 \end{lstlisting}
 
-Note here that the Ridge can be replaced by a Lasso estimator. Results would be
-better at the cost of computation time.
+Note here that the Ridge can be replaced by a Lasso estimator, which can
+give better prediction performance at the cost of computation time.
 
 \subsubsection{Receptive fields}
 Given the retinotopic structure of early visual areas, it is expected

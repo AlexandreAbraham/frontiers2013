@@ -25,31 +25,29 @@ to provide more insight into the tool.
 Answer
 ......
 
-Although a more general introduction of the scikit-learn would have been
-interesting, the focus of this manuscript is on neuroimaging specific cases.
-Scikit-learn is deeply presented in the reference paper Pedregosa et al. 2012.
+We agree that a more general introduction of the scikit-learn is
+interesting and important. However, the focus of this manuscript is on
+neuroimaging specific cases. Indeed, scikit-learn is presented in the
+reference paper Pedregosa et al. 2012, and has a very complete online
+documentation.
 
 Our goal with this manuscript is to provide enough material so that the
-non-experienced can run an estimator on his data. Provided scripts are
-short, documented, and simple enough to be understood by non-technical people.
-We believe that these scripts can be used as a basis for their own study.
-Unfortunately, numpy and scipy are huge modules that proposes a lot of features
-we do not need. The features we highlighted from these packages are the ones
-that we found useful in our field.
+non-experienced can run an estimator on his data. The accompagning
+scripts are short, documented, and simple enough to be understood by
+non-technical people. We believe that these scripts can be used as a
+basis for the reader's own study. Numpy and scipy are huge modules that
+proposes a lot of features we do not need. We only highlighted from these
+packages the features that we found useful in our field.
 
-The code snippets in the code are laconic but they focus on the interesting
-lines, to perform a particular task. Technical details like module
-importation are treated directly into the provided scripts, that are fully
-documented and readable by a non-experienced user.
+The code snippets in the code are short to focus on the interesting lines
+of each script, performing the task discussed in the text. Technical
+details like module importation are treated directly into the
+accompagning scripts, that are fully documented and readable by a
+non-experienced user.
 
-We reworded our position regarding nilearn: it is clearly under development and
-only advanced users should start using it. All references to nilearn have also
-been removed from the scripts. Important nilearn primitives have been copied
-into the code repository.
-
-We also added more openings regarding scikit-learn in the result sections of
-each example.
-
+We reworded the mentions to nilearn: it is under development and is not
+suitable for end users. We have removed all references to nilearn
+from the scripts.
 
 Are methods of other authors accurately presented and interpreted?
 ------------------------------------------------------------------
@@ -60,11 +58,11 @@ PyMVPA is highly relevant and could be described and compared in more detail.
 Answer
 ......
 
-There are indeed existing solutions to process neuroimaging data with Python.
-However, PyMVPA is clearly at a higher level: it provides abstractions to
-process neuroimaging data while we only describe code patterns and usages.
-It would make sense to compare nilearn to PyMVPA but, as nilearn is still not
-mature, we do not want to do that for the moment.
+There are indeed existing solutions to process neuroimaging data with
+Python. However, PyMVPA is clearly at a higher level: it provides
+abstractions to process neuroimaging data while we only describe
+low-level code patterns and usages. We explicitely point to PyMVPA for
+these usecases and give a reference to the corresponding paper.
 
 
 Please add any further comments you have regarding this manuscript.
@@ -86,11 +84,11 @@ Answer
 Intro: we detailed the position of scikit-learn in the Python scientific stack
 and why we think it has its place into the neuroimaging landscape.
 
-4.4 Results:
-We focused on the outcome of the simple methods for neuroimaging people that are
-not into machine learning. We want to show them what they can get out of the
-scikit-learn. We took your remark into account by adding that our simple
-models can be replaced by any more sophisticated model embedded in scikit-learn.
+4.4 Results: We focused on the outcome of the simple methods for
+neuroimaging people that are not into machine learning. We want to show
+the possibilities opened by scikit-learn. We outlined the fact that our
+simple models can be replaced by any more sophisticated model embedded in
+scikit-learn.
 
 
 
@@ -118,11 +116,14 @@ additional comments.
 Answer
 ......
 
-We detailed the position of scikit-learn regarding other machine learning and
-neuroimaging frameworks. We also add references to papers that we found useful
-for the targeted public (we referenced the book "The Elements of Statistical
-Learning" by Hastie et al. instead of Vapnik for example because it has a more
-general and didactic approach regarding machine learning).
+We add details to the positionning of scikit-learn with regards to
+machine learning and neuroimaging frameworks. However, this manuscript is
+not a review article, and we cannot compare in detail with every package.
+We also added references to
+papers that we found useful for the targeted public (we referenced the
+book "The Elements of Statistical Learning" by Hastie et al. instead of
+Vapnik for example because it has a more general and didactic approach
+regarding machine learning).
 
 Other comments: nilearn positioning
 -----------------------------------
@@ -142,10 +143,10 @@ scikit-learn vs nilearn.
 Answer
 ......
 
-We reworded our position regarding nilearn. We want the advanced users to take a
-look at it but, as it is still in early development, we cannot ensure the
-required quality for a Python package (no backward compatibility, documentation
-still in progress...).
+This manuscript is not meant to be an introduction to nilearn, and we
+reworded its positionning. Nilearn is not needed at all to apply
+scikit-learn to neuroimaging data, and this usage is specifically what we
+whish to discuss.
 
 We also removed all references to nilearn from our scripts. All scripts can now
 run without any dependencies outside of Python scientific and, for methods that
@@ -168,17 +169,16 @@ than Matlab and R.
 Answer
 ......
 
-We developed the potential alternatives in the introduction. However, most of
-them operate on a higher level than our code snippets (they propose
-abstractions).
+We expanded on the potential alternatives in the introduction. However,
+most of them operate on a higher level than our code snippets (they
+propose abstractions). In the conclusion and in the results paragraph of
+the different sections we added a discussion on why the broad variety of
+methods in scikit-learn is interesting.
 
-We believe that the only way to make people realize that no framework is needed
-is to try that themselves. For this purpose, we propose complete documented
-scripts and, following your remark, we added some suggestions of other possible
-models at the end of each example. Taking the original script and changing the
-model is very simple, thanks to scikit-learn, and we hope that users will
-realize that.
-Provided scripts can also be used as basis for reader's own analysis.
+The scripts that we provide enable the use of scikit-learn without a
+neuroimaging-specific framework. Taking the original script and changing
+the model is very simple, and thus opens the door to analysis approaches
+that are not present in neuroimaging-specific libraries.
 
 Other comments: advantages of the scikit-learn
 ----------------------------------------------
@@ -255,14 +255,12 @@ being mentioned in the section on 'signal cleaning'.
 Answer
 ......
 
-We mention spatial resampling because it is sometimes a showstopper for people
-doing neuroimaging. Plus, one of our datasets (ADHD) needed this resampling for
-the script to run in decent time. Resampling being a non-trivial operation, we
-believed that providing the code could really help.
-
-Temporal resampling is not mentioned because it should be used carefully: the
-method used to compress time series can have an impact on the model used afterward to
-analyze data. This is beyond the scope of this manuscript.
+We briefly mention spatial resampling because it is sometimes a
+showstopper for people doing neuroimaging, however we have made this
+reference very light. Temporal resampling is not mentioned because it
+should be used carefully: the method used to compress time series can
+have an impact on the model used afterward to analyze data. This is
+beyond the scope of this manuscript.
 
 Other comments: Searchlight balls
 ---------------------------------
@@ -324,9 +322,8 @@ methods, ...". But the actual comparison is left to the reader.
 Answer
 ......
 
-We did not insist on ICA because it is not possible to make statements from a
-particular map. Plus, we tried to get the best out of each method but they are
-subject to high variability.
+We did not insist on the significance of the comparison, because there is
+no accepted criterion or figure of merit to compare ICA approaches.
 
 We added a colorbar, flipped the sign of some maps so that they look alike and
 made the only statement we could do out of this analysis: sophisticated methods
@@ -346,10 +343,9 @@ appreciated.
 Answer
 ......
 
-This is exactly the take-home message of this paper: thanks to scikit-learn, 
-it is possible to run an analysis on neuroimaging data with a simple script.
-Following your recommendation, we insisted on scikit-learn versatility all along
-the paper. But what we really want is to give people the will to take our
-example scripts and run them on their data. We want them to found by themselves
-that it is very easy to change the regularization of a model or simply change
-the whole model. I hope that this message is now clearer in the paper.
+We thank the reviewer for stressing this point, which we feel is
+important to the paper. Following this recommendation, we highlighted the
+scikit-learn versatility all along the paper, gave pointers to other
+methods in scikit-learn, and reworked the conclusion to make this point
+more central.
+
