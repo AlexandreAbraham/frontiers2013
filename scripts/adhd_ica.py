@@ -15,7 +15,7 @@ n_components = 10
 z = 35
 # Path
 path = 'ica'
-cmap = 'jet'
+cmap = 'gist_rainbow_r'
 
 ### Initialization ############################################################
 import nibabel
@@ -27,12 +27,12 @@ import time
 mask_img = nibabel.load(join('utils', 'adhd_mask.nii.gz'))
 
 
-def plot_ica_map(map_3d):
+def plot_ica_map(map_3d, vmax):
     # Mask the background
     map_3d = np.ma.masked_array(map_3d,
             np.logical_not(mask_img.get_data().astype(bool)))
+    # Normalize the map
     section = map_3d[:, :, z]
-    vmax = np.max(np.abs(map_3d))
     pl.figure(figsize=(3.8, 4.5))
     pl.axes([0, 0, 1, 1])
     pl.imshow(np.rot90(section), interpolation='nearest',
@@ -102,15 +102,22 @@ ica_dmn = nibabel.load(join(path, 'ica.nii.gz')).get_data()[..., 2]
 ica_dmn = -ica_dmn
 canica_dmn = -canica_dmn
 
-plot_ica_map(ica_dmn)
+# normalize maps
+ica_dmn = (ica_dmn - np.mean(ica_dmn)) / np.std(ica_dmn)
+canica_dmn = (canica_dmn - np.mean(canica_dmn)) / np.std(canica_dmn)
+melodic_dmn = (melodic_dmn - np.mean(melodic_dmn)) / np.std(melodic_dmn)
+
+vmax = 9 # Maximum value on the chosen section
+
+plot_ica_map(ica_dmn, vmax)
 pl.savefig(join(path, 'ica.pdf'))
 pl.savefig(join(path, 'ica.eps'))
 
-plot_ica_map(canica_dmn)
+plot_ica_map(canica_dmn, vmax)
 pl.savefig(join(path, 'canica.pdf'))
 pl.savefig(join(path, 'canica.eps'))
 
-plot_ica_map(melodic_dmn)
+plot_ica_map(melodic_dmn, vmax)
 pl.savefig(join(path, 'melodic.pdf'))
 pl.savefig(join(path, 'melodic.eps'))
 
@@ -118,10 +125,12 @@ pl.savefig(join(path, 'melodic.eps'))
 import matplotlib as mpl
 
 
-fig = pl.figure(figsize=(.4, 2.4))
-norm = mpl.colors.Normalize(vmin=0., vmax=1.)
+fig = pl.figure(figsize=(.6, 3.6))
+
+# Max value of the selected slices
+norm = mpl.colors.Normalize(vmin=-vmax, vmax=vmax)
 cb = mpl.colorbar.ColorbarBase(pl.gca(), cmap=cmap, norm=norm)
-cb.set_ticks([])
-#fig.subplots_adjust(bottom=0.05, top=1., left=0.08, right=.92)
+cb.set_ticks([-vmax, 0, vmax])
+fig.subplots_adjust(bottom=0.03, top=.97, left=0., right=.45)
 pl.savefig(join(path, 'colorbar.pdf'))
 pl.savefig(join(path, 'colorbar.eps'))

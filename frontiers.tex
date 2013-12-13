@@ -165,7 +165,7 @@ analysis of activation images or resting-state time series.
 Supervised learning is typically used in \emph{decoding} or
 \emph{encoding} settings to relate
 brain images to behavioral or clinical observations, while
-unsupervised learning can uncover hidden structure in
+unsupervised learning can uncover hidden structures in
 sets of images (e.g.\ resting state functional MRI) or find
 sub-populations in large cohorts. By considering
 different functional neuroimaging applications, we illustrate how scikit-learn,
@@ -191,9 +191,9 @@ scikit-learn, Python
 
 Statistical machine learning is gaining interest in
 neuroimaging data analysis. Neuroscientists use it as a complicated
-yet powerful tool for statistical inference. Computer scientists
-develop the tools used, although they 
-often lack a deep understanding of the neuroscience questions. This paper
+yet powerful tool for statistical inference. The tools are developped by
+computer scientists who often lack a deep understanding of the
+neuroscience questions. This paper
 aims to fill the gap between machine learning and neuroimaging by demonstrating
 how a general-purpose machine-learning toolbox, scikit-learn, can
 provide state-of-the-art methods for neuroimaging analysis while keeping
@@ -212,7 +212,7 @@ resolve common neuroimaging needs, detailing the corresponding code,
 the choice of the methods, and the underlying assumptions. We discuss not only
 prediction scores, but also the interpretability of the results, which
 leads us to explore the internal model of various methods. 
-Importantly, the github repository of the
+Importantly, the GitHub repository of the
 paper\footnote{\url{http://www.github.com/AlexandreAbraham/frontiers2013}}
 provides complete scripts to generate figures. 
 The scope of this paper is not to present a neuroimaging-specific library,
@@ -227,8 +227,8 @@ build their own analysis strategies.
 The paper is organized as
 follows. After introducing the \emph{scikit-learn} toolbox, we show 
 how to prepare the data to apply
-\emph{scikit-learn}. Then we describe the application of \emph{supervised
-learning} techniques, to learn the links between brain images and
+\emph{scikit-learn} routines. Then we describe the application of \emph{supervised
+learning} techniques to learn the links between brain images and
 stimuli. Finally we demonstrate how \emph{unsupervised learning}
 techniques can extract useful structure from the images.
 
@@ -261,7 +261,7 @@ The scientific Python libraries used in this paper are:
         performances (BLAS, Arpack and MKL for linear algebra and mathematical
         operations).
         Together, NumPy and SciPy provide a robust scientific environment
-        for numerical computing and they are the elementary bricks we use in all our
+        for numerical computing and they are the elementary bricks that we use in all our
         algorithms.
         % XXX : elementary bricks -> foundations ? building blocks?
 
@@ -351,7 +351,7 @@ estimator on a given dataset. It consists in iteratively fitting the
 estimator on a fraction of the data, called \emph{training set}, and testing it
 on the left-out unseen data, called \emph{test set}.
 Several strategies exists to partition the data.
-For example, K-Fold cross validation consists in dividing (randomly or not) the samples in $k$
+For example, k-fold cross-validation consists in dividing (randomly or not) the samples in $k$
 subsets: each subset is then used once as testing set while the others $k - 1$
 subsets are used to train the estimator. This is one of the simplest and most
 widely used cross-validation strategies. The parameter $k$ is commonly set
@@ -414,8 +414,9 @@ scaling factors for each direction.
 
 \subsection{Signal cleaning}
 
-Due to its complex and indirect acquisition process, neuroimaging data often has a low
-signal-to-noise ratio. It contains trends and artifacts that must be removed
+Due to its complex and indirect acquisition process, neuroimaging data often
+have a low
+signal-to-noise ratio. They contain trends and artifacts that must be removed
 to ensure maximum machine learning algorithms efficiency. Signal cleaning
 includes:
 \begin{itemize}
@@ -441,10 +442,10 @@ includes:
 \label{sec:unmasking}
 
 Neuroimaging data are represented in 4 dimensions: 3 spatial dimensions, and 
-one dimension for the time.
+one dimension to index time or trials.
 Scikit-learn algorithms, on the other hand, only accept 2-dimensional
 samples $\times$ features matrices (see Section~\ref{scikitlearn}).
-Depending on the settings, voxels and time series can be
+Depending on the setting, voxels and time series can be
 considered as features
 or samples. For example, in spatial independent component analysis (ICA),
 voxels are samples.
@@ -654,12 +655,12 @@ neighborhood of each voxel and tests the out-of-sample prediction
 performance as proxy measure of the link between the local brain activity
 and the target behavioral variable. In practice, it entails performing
 cross-validation of the model, most often an SVM, on voxels contained in
-balls centered on each voxel of interest. The procedure calls for 
-solving a large number of SVMs and can be computationally expensive.
+balls centered on each voxel of interest. The procedure entails 
+solving a large number of SVMs and is computationally expensive.
 Detailing an efficient implementation of this algorithm is beyond the
 scope of this paper. However, code for searchlight and to generate
 figure~\ref{fig:haxby}
-is available in the github repository accompanying the paper.
+is available in the GitHub repository accompanying the paper.
 
 \subsection{Results}
 
@@ -694,7 +695,7 @@ contain category-specific visual areas. While Searchlight only gives a
 score to each voxel, the SVC can be used afterward to classify unseen
 brain scans.
 
-Most of the final example script (\texttt{haxby\_decoding.py} on github) is
+Most of the final example script (\texttt{haxby\_decoding.py} on GitHub) is
 for data
 loading and result visualization. Only 5 lines are needed to run a scikit-learn
 classifier. In addition, thanks to the scikit-learn modularity, the SVC can be easily
@@ -762,18 +763,18 @@ uses a square-hinge loss while the logistic regression uses a logit function.
                                      & 0.63 $\pm$ .13
                                      & \textbf{0.64} $\pm$ .13
                                      & 0.64 $\pm$ .13 \\[.1em]
-        $\ell_1$ SVC        & 0.50 $\pm$ .06
-                            & 0.55 $\pm$ .12
-                            & 0.69 $\pm$ .11
-                            & \textbf{0.71} $\pm$ .12
-                            & 0.69 $\pm$ .12
-                            & 0.68 $\pm$ .12 \\[.1em]
-        $\ell_2$ SVC        & 0.67 $\pm$ .12
-                            & \textbf{0.67} $\pm$ .12
-                            & 0.67 $\pm$ .12
-                            & 0.66 $\pm$ .12
-                            & 0.65 $\pm$ .12
-                            & 0.65 $\pm$ .12
+        $\ell_1$ SVM classifier (SVC)& 0.50 $\pm$ .06
+                                     & 0.55 $\pm$ .12
+                                     & 0.69 $\pm$ .11
+                                     & \textbf{0.71} $\pm$ .12
+                                     & 0.69 $\pm$ .12
+                                     & 0.68 $\pm$ .12 \\[.1em]
+        $\ell_2$ SVM classifier (SVC)& 0.67 $\pm$ .12
+                                     & \textbf{0.67} $\pm$ .12
+                                     & 0.67 $\pm$ .12
+                                     & 0.66 $\pm$ .12
+                                     & 0.65 $\pm$ .12
+                                     & 0.65 $\pm$ .12
     \end{tabular}
     \end{center}
     \caption{5-fold cross validation accuracy scores obtained for different
@@ -785,10 +786,7 @@ Table~\ref{fig:miyawaki_cv} reports the performance of the different classifiers
 for various values of C using a 5-fold cross-validation.
 We first observe that setting the parameter $C$ is
 crucial as performance drops for inappropriate values of C. It is particularly
-true for $\ell_1$ regularized models. However,
-in accordance with our prior knowledge, $\ell_1$
-regularized models, when properly
-parametrized, outperform an $\ell_2$ regularized estimator.
+true for $\ell_1$ regularized models.
 Both $\ell_1$ logistic regression and SVM yield similar performances,
 which is not surprising as they implement similar models.
 
@@ -869,9 +867,10 @@ indices = mean_scores.argsort()[::-1][:n_voxels]
 
 lasso = LassoLarsCV(max_iter=10)
 
-receptive_fields = [lasso.fit(y_train, X_train[:, index]
-        ).coef_.reshape(10, 10)
-        for index in indices]
+receptive_fields = []
+for index in indices:
+    lasso.fit(y_train, X_train[:, index])
+    receptive_fields.append(lasso.coef_.reshape(10, 10))
 
 \end{lstlisting}
 %y_train_centered = (y_train - y_train.mean(axis=0)) / y_train.std(axis=0)
@@ -885,7 +884,7 @@ In decoding settings, Figures \ref{fig:miyawaki}\textit{a} and \ref{fig:miyawaki
 maps for both methods. They both give roughly the same results and we can
 see that the weights are centered in the V1 and nearby retinotopic areas.
 Figures \ref{fig:miyawaki}\textit{b} and \ref{fig:miyawaki}\textit{d} show reconstruction
-accuracy score using LR and SVM
+accuracy score using Logistic Regression (LR) and SVM
 (variable \texttt{mean\_scores} in the code above).
 Both methods give almost identical results. 
 As in the original work \citep{miyawaki2008}, reconstruction is more
@@ -897,7 +896,7 @@ In encoding settings, figure~\ref{fig:miyawaki}\textit{e} shows classifiers
 weights for encoding, that we interpret as receptive fields. We can
 see that receptive fields of neighboring voxels are neighboring
 pixels, which is expected from retinotopy: primary visual
-cortex directly has a topological mapping of the stimuli.
+cortex maps the visual field in a topologically organized manner.
 
 Both encoding and decoding analysis show a link between the selected
 pixel and brain voxels. In the absence of ground truth, seeing that
@@ -937,7 +936,8 @@ Even in the absence of external behavioral or clinical variable, studying
 the structure of brain signals can reveal interesting information.
 Indeed, \cite{biswal1995} have shown that brain activation exhibits
 coherent spatial patterns during rest. These correlated voxel activations
-form functional networks that are consistent with known task-related networks.
+form functional networks that are consistent with known task-related networks
+\citep{smith2009}.
 
 Biomarkers found via predictive modeling on resting-state fMRI would be
 particularly useful, as they could be applied to diminished subjects that
@@ -986,7 +986,7 @@ direction considered as random is that of the voxels and not the time
 points. The maps obtained capture different components of the signal,
 including noise components as well as resting-state functional networks.
 To produce the figures, we extract only 10 components, as we are
-interested here in exploring only the very large structures.
+interested here in exploring only the main signal structures.
 
 \begin{lstlisting}
 # Here we start with Xs: a list of subject-level data matrices
@@ -1032,7 +1032,7 @@ that form functionally homogeneous regions \citep{thirion2006}.
 
 Several clustering approaches exists, each one having its own pros and
 cons. Most require setting the number of clusters extracted. This choice
-depends on the application: a large number of cluster will give a more
+depends on the application: a large number of clusters will give a more
 fine-grained description of the data, with a higher fidelity to the
 original signal, but also a higher model complexity. Some clustering
 approaches can make use of spatial information and yield
@@ -1090,7 +1090,7 @@ number of clusters specified, although some of these regions can be very
 small. On the opposite, spatially-constrained Ward directly creates regions.
 As it is a bottom-up process, it tends to perform best
 with a large number of clusters. There exist many more clustering
-techniques expose in scikit-learn. Determining which is the best one to
+techniques exposed in scikit-learn. Determining which is the best one to
 process fMRI time-series requires a more precise definition of the target
 application.
 
@@ -1112,8 +1112,8 @@ learning techniques can be applied
 to fMRI data using the scikit-learn Python toolkit in order to tackle
 neuroscientific problems. Encoding and decoding can rely on supervised
 learning to link brain images with stimuli. Unsupervised learning
-can extract from resting-state data structure such as functional networks or
-brain regions. The accompanying Python code for the machine learning
+can extract structure such as functional networks or
+brain regions from resting-state data. The accompanying Python code for the machine learning
 tasks is straightforward. Difficulties lie in applying proper 
 preprocessing to the data, choosing the right model for the problem,
 and interpreting the results. Tackling these difficulties while
@@ -1149,7 +1149,9 @@ The authors declare that the research was conducted in the absence of any
 commercial or financial relationships that could be construed as a potential
 conflict of interest.
 
-\paragraph{Funding\textcolon} We acknowledge funding from the NiConnect project.
+\paragraph{Funding\textcolon} We acknowledge funding from the NiConnect
+project and NIDA R21 DA034954, SUBSample project from the DIGITEO
+Institute, France.
 
 \bibliographystyle{frontiersinSCNS} % for Science articles
 \bibliography{biblio}
