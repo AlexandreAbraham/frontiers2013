@@ -846,6 +846,9 @@ for train, test in cv:
 mean_scores = np.mean(scores, axis=0)
 \end{lstlisting}
 
+Note here that the Ridge can be replaced by a Lasso estimator. Results would be
+better at the cost of computation time.
+
 \subsubsection{Receptive fields}
 Given the retinotopic structure of early visual areas, it is expected
 that the voxels well predicted by the presence of a black or white pixel
