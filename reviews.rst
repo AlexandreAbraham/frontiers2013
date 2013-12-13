@@ -289,11 +289,11 @@ estimator." This requires a reference.
 Answer
 ......
 
-Some people in neuroimaging want to run algorithms and get compact regions in
-the brain. We just give them the corresponding regularization.
-
-However, we developed this part and used the hyperparameter exploration to show
-that, properly parametrized, some methods are better than the others.
+In the case of the Miyawaki experiment, the hypothesis is that one pixel will be
+correlated will only few voxels in the brain. This is why l1 regularization,
+that promotes sparsity, is expected to work better.
+We removed the statement you quoted given that standard
+deviation on scores is too high to state a statistically significant conclusion.
 
 Other comments: Figure 3 unclear
 --------------------------------
