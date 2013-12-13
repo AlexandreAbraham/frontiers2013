@@ -88,7 +88,7 @@ and why we think it has its place into the neuroimaging landscape.
 4.4 Results:
 We focused on the outcome of the simple methods for neuroimaging people that are
 not into machine learning. We want to show them what they can get out of the
-scikit-learn. We took your remark into account by precising that our simple
+scikit-learn. We took your remark into account by adding that our simple
 models can be replaced by any more sophisticated model embedded in scikit-learn.
 
 
@@ -117,7 +117,7 @@ additional comments.
 Answer
 ......
 
-We precised the position of scikit-learn regarding other machine learning and
+We detailed the position of scikit-learn regarding other machine learning and
 neuroimaging frameworks. We also add references to papers that we found useful
 for the targeted public (we referenced the book "The Elements of Statistical
 Learning" by Hastie et al. instead of Vapnik for example because it has a more
@@ -167,7 +167,7 @@ than Matlab and R.
 Answer
 ......
 
-We developped the potential alternatives in the introduction. However, most of
+We developed the potential alternatives in the introduction. However, most of
 them operate on a higher level than our code snippets (they propose
 abstractions).
 
