@@ -279,7 +279,7 @@ library written in Python.
 It provides efficient implementations of state-of-the-art algorithms,
 accessible to non-machine learning experts,
 and reusable across scientific disciplines and application fields. It also
-takes advantage of Python interactivity and modularity to propose fast and easy
+takes advantage of Python interactivity and modularity to supply fast and easy
 prototyping. There is a variety of other learning packages. For instance,
 in Python, PyBrain \citep{schaul2010pybrain} is best at neural networks
 and reinforcement learning approaches, but its models are fairly black box,
@@ -352,7 +352,7 @@ estimator on a given dataset. It consists in iteratively fitting the
 estimator on a fraction of the data, called \emph{training set}, and testing it
 on the left-out unseen data, called \emph{test set}.
 Several strategies exists to partition the data.
-For example, k-fold cross-validation consists in dividing (randomly or not) the samples in $k$
+For example, $k$-fold cross-validation consists in dividing (randomly or not) the samples in $k$
 subsets: each subset is then used once as testing set while the others $k - 1$
 subsets are used to train the estimator. This is one of the simplest and most
 widely used cross-validation strategies. The parameter $k$ is commonly set
@@ -468,7 +468,7 @@ with software tools such as FSL or SPM.
     \label{fig:niimg}
 \end{figure}
 
-Applying the mask is made easy by NumPy fancy indexing using boolean arrays.
+Applying the mask is made easy by NumPy advanced indexing using boolean arrays.
 Two-dimensional masked data will be referred to as \texttt{X} to follow
 scikit-learn conventions:
 \begin{lstlisting}
@@ -656,7 +656,7 @@ neighborhood of each voxel and tests the out-of-sample prediction
 performance as proxy measure of the link between the local brain activity
 and the target behavioral variable. In practice, it entails performing
 cross-validation of the model, most often an SVM, on voxels contained in
-balls centered on each voxel of interest. The procedure entails 
+balls centered on each voxel of interest. The procedure implies 
 solving a large number of SVMs and is computationally expensive.
 Detailing an efficient implementation of this algorithm is beyond the
 scope of this paper. However, code for searchlight and to generate
