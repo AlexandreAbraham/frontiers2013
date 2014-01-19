@@ -86,7 +86,7 @@ melodic_dmn = nibabel.load(join(path, 'melodic.nii.gz')).get_data()[..., 3]
 if not exists(join(path, 'ica.nii.gz')):
     from sklearn.decomposition import FastICA
     X = np.vstack(X)
-    ica = FastICA(n_components=n_components, random_state=0)
+    ica = FastICA(n_components=n_components, random_state=2)
     t0 = time.time()
     ica.fit(X)
     print('FastICA: %f' % (time.time() - t0))
@@ -94,7 +94,7 @@ if not exists(join(path, 'ica.nii.gz')):
     nibabel.save(nibabel.Nifti1Image(ica_components,
             mask_img.get_affine()), join(path, 'ica.nii.gz'))
 
-ica_dmn = nibabel.load(join(path, 'ica.nii.gz')).get_data()[..., 2]
+ica_dmn = -nibabel.load(join(path, 'ica.nii.gz')).get_data()[..., 1]
 
 ### Plots ####################################################################
 
