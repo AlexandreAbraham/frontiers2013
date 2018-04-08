@@ -4,12 +4,14 @@ Preprocessing functions for time series.
 All functions in this module should take X matrices with samples x
 features
 """
+# Authors: Alexandre Abraham, Gael Varoquaux, Philippe Gervais
+# License: simplified BSD
 
 import distutils.version
 
 import numpy as np
 from scipy import signal, stats, linalg
-import sklearn.utils.fixes
+from sklearn.utils.fixes import qr_economic
 from sklearn.utils import gen_even_slices
 
 np_version = distutils.version.LooseVersion(np.version.short_version).version
@@ -354,7 +356,7 @@ def clean(signals, detrend=True, standardize=True, confounds=None,
     """
 
     if not isinstance(confounds,
-                      (list, tuple, str, np.ndarray, type(None))):
+                      (list, tuple, basestring, np.ndarray, type(None))):
         raise TypeError("confounds keyword has an unhandled type: %s"
                         % confounds.__class__)
 
@@ -374,7 +376,7 @@ def clean(signals, detrend=True, standardize=True, confounds=None,
         # Read confounds
         all_confounds = []
         for confound in confounds:
-            if isinstance(confound, str):
+            if isinstance(confound, basestring):
                 filename = confound
                 confound = np.genfromtxt(filename)
                 if np.isnan(confound.flat[0]):
