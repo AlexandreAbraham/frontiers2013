@@ -1,18 +1,10 @@
-### Init ######################################################################
+from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
 import sys
 import time
 
 
-offset = 2
-
-hand_made_affine = np.asarray(
-        [[3, 0, 0, 98],
-         [0, 3, 0, -112],
-         [0, 0, 3, -26],
-         [0, 0, 0, 1]])
-
-### Load Kamitani dataset #####################################################
+### Load the dataset from Miyawaki #####################################################
 from utils import datasets
 dataset = datasets.fetch_miyawaki2008()
 
@@ -22,11 +14,22 @@ y_random = dataset.label[12:]
 y_shape = (10, 10)
 
 ### Preprocess data ###########################################################
-from utils import masking, signal, cm
+from utils import masking, signal
 import nibabel
 
 sys.stderr.write("Preprocessing data...")
 t0 = time.time()
+
+bluegreen = LinearSegmentedColormap('bluegreen', {
+    'red': ((0., 0., 0.),
+            (1., 0., 0.)),
+    'green': ((0., 0., 0.),
+              (1., 1., 1.)),
+    'blue': ((0., 0.2, 0.2),
+             (0.5, 0.5, 0.5),
+             (1., 0., 0.))
+    })
+
 
 # Load and mask fMRI data
 
@@ -44,8 +47,8 @@ for y in y_random:
     y_train.append(np.reshape(np.loadtxt(y, dtype=np.int, delimiter=','),
                               (-1,) + y_shape, order='F'))
 
-X_train = [x[offset:] for x in X_train]
-y_train = [y[:-offset] for y in y_train]
+X_train = [x[2:] for x in X_train]
+y_train = [y[:-2] for y in y_train]
 
 X_train = np.vstack(X_train)
 y_train = np.vstack(y_train).astype(np.float)
@@ -126,7 +129,7 @@ bg = nibabel.load(os.path.join('utils', 'bg.nii.gz'))
 pl.imshow(bg.get_data()[:, :, 10].T, interpolation="nearest", cmap='gray',
           origin='lower')
 pl.imshow(np.ma.masked_equal(sbrain[:, :, 10].T, 0.), interpolation="nearest",
-          cmap=cm.bluegreen, origin='lower', vmin=0., vmax=2.6)
+          cmap=bluegreen, origin='lower', vmin=0., vmax=2.6)
 plot_lines(contour[:, :, 10].T, color='r')
 pl.axis('off')
 ax2 = pl.axes([.1, .5, .05, .45])
@@ -149,7 +152,7 @@ vmax = np.max(np.abs(sbrain[:, :, 10].T))
 pl.imshow(bg.get_data()[:, :, 10].T, interpolation="nearest", cmap='gray',
           origin='lower')
 pl.imshow(np.ma.masked_equal(sbrain[:, :, 10].T, 0.), interpolation="nearest",
-          cmap=cm.bluegreen, origin='lower', vmin=0., vmax=1.0)
+          cmap=bluegreen, origin='lower', vmin=0., vmax=1.0)
 plot_lines(contour[:, :, 10].T, color='r')
 pl.axis('off')
 ax2 = pl.axes([.1, .5, .05, .45])
@@ -165,7 +168,7 @@ sys.stderr.write("SVC: %d nonzero voxels\n" % np.sum(lr_coef != 0.))
 pl.close()
 
 
-### Cross Validation Scores ###################################################
+### Calcualte the Cross Validation Scores ###################################################
 from sklearn.cross_validation import cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.externals.joblib import Parallel, delayed
@@ -220,7 +223,7 @@ pl.hot()
 fig.subplots_adjust(bottom=0., top=1., left=0., right=1.)
 pl.savefig(os.path.join('miyawaki', 'scores_log.pdf'))
 pl.savefig(os.path.join('miyawaki', 'scores_log.eps'))
-print 'Logistic Regression mean accuracy: %f' % lr_scores.mean()
+print('Logistic Regression mean accuracy: %f' % lr_scores.mean())
 pl.close()
 
 
@@ -233,7 +236,7 @@ pl.hot()
 fig.subplots_adjust(bottom=0., top=1., left=0., right=1.)
 pl.savefig(os.path.join('miyawaki', 'scores_svc.pdf'))
 pl.savefig(os.path.join('miyawaki', 'scores_svc.eps'))
-print 'SVC L1 mean accuracy: %f' % svc_scores.mean()
+print('SVC L1 mean accuracy: %f' % svc_scores.mean())
 pl.close()
 
 
@@ -246,7 +249,7 @@ pl.hot()
 fig.subplots_adjust(bottom=0., top=1., left=0., right=1.)
 pl.savefig(os.path.join('miyawaki', 'scores_svcl2.pdf'))
 pl.savefig(os.path.join('miyawaki', 'scores_svcl2.eps'))
-print 'SVC L2 mean accuracy: %f' % svcl2_scores.mean()
+print('SVC L2 mean accuracy: %f' % svcl2_scores.mean())
 pl.close()
 
 ### Plot the colorbar #########################################################

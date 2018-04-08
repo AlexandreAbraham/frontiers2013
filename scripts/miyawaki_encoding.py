@@ -8,11 +8,6 @@ import time
 
 offset = 2
 
-hand_made_affine = np.asarray(
-        [[3, 0, 0, 98],
-         [0, 3, 0, -112],
-         [0, 0, 3, -26],
-         [0, 0, 0, 1]])
 
 ### Load Kamitani dataset #####################################################
 from utils import datasets
@@ -60,14 +55,14 @@ n_features = X_train.shape[1]
 from sklearn.linear_model import Ridge
 from sklearn.cross_validation import KFold
 
-print "Do ridge regression"
+print("Do ridge regression")
 estimator = Ridge(alpha=100.)
 cv = KFold(len(y_train), 10)
 predictions = [
         Ridge(alpha=100.).fit(y_train.reshape(-1, 100)[train], X_train[train]
             ).predict(y_train.reshape(-1, 100)[test]) for train, test in cv]
 
-print "Scoring"
+print("Scoring")
 scores = [1. - (((X_train[test] - pred) ** 2).sum(axis=0) /
            ((X_train[test] - X_train[test].mean(axis=0)) ** 2).sum(axis=0))
 for pred, (train, test) in zip(predictions, cv)]

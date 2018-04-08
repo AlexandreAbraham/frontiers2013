@@ -2,12 +2,10 @@
 """
 Utilities to download NeuroImaging datasets
 """
-# Author: Alexandre Abraham, Philippe Gervais
-# License: simplified BSD
 
 import os
 import urllib
-import urllib2
+import urllib.request as urllib2
 import tarfile
 import zipfile
 import sys
@@ -58,7 +56,7 @@ def _read_md5_sum_file(path):
     return hashes
 
 
-class ResumeURLOpener(urllib.FancyURLopener):
+class ResumeURLOpener(urllib2.FancyURLopener):
     """Create sub-class in order to overide error 206.  This error means a
        partial file is being sent, which is fine in this case.
        Do nothing with this error.
@@ -131,14 +129,14 @@ def _chunk_read_(response, local_file, chunk_size=8192, report_hook=None,
 
     """
     if total_size is None:
-        total_size = response.info().getheader('Content-Length').strip()
+        total_size = response.info().get_all('Content-Length')
     try:
         total_size = int(total_size) + initial_size
-    except Exception, e:
+    except Exception as e:
         if verbose > 0:
-            print "Warning: total size could not be determined."
+            print("Warning: total size could not be determined.")
             if verbose > 1:
-                print "Full stack trace: %s" % e
+                print("Full stack trace: %s" % e)
         total_size = None
     bytes_so_far = initial_size
 
@@ -218,7 +216,7 @@ def _uncompress_file(file_, delete_archive=True):
     -----
     This handles zip, tar, gzip and bzip files only.
     """
-    print 'extracting data from %s...' % file_
+    print('extracting data from %s...' % file_)
     data_dir = os.path.dirname(file_)
     # We first try to see if it is a zip file
     try:
@@ -251,9 +249,9 @@ def _uncompress_file(file_, delete_archive=True):
             raise IOError("Uncompress: unknown file extension: %s" % ext)
         if delete_archive:
             os.remove(file_)
-        print '   ...done.'
+        print('   ...done.')
     except Exception as e:
-        print 'Error uncompressing file: %s' % e
+        print('Error uncompressing file: %s' % e)
         raise
 
 
@@ -315,7 +313,7 @@ def _fetch_file(url, data_dir, resume=True, overwrite=False,
     initial_size = 0
     try:
         # Download data
-        print 'Downloading data from %s ...' % url
+        print('Downloading data from %s ...' % url)
         if resume and os.path.exists(temp_full_name):
             url_opener = ResumeURLOpener()
             # Download has been interrupted, we try to resume it.
@@ -341,18 +339,18 @@ def _fetch_file(url, data_dir, resume=True, overwrite=False,
             local_file.close()
         shutil.move(temp_full_name, full_name)
         dt = time.time() - t0
-        print '...done. (%i seconds, %i min)' % (dt, dt / 60)
-    except urllib2.HTTPError, e:
-        print 'Error while fetching file %s.' \
-            ' Dataset fetching aborted.' % file_name
+        print('...done. (%i seconds, %i min)' % (dt, dt / 60))
+    except urllib2.HTTPError as e:
+        print('Error while fetching file %s.' \
+            ' Dataset fetching aborted.' % file_name)
         if verbose > 0:
-            print "HTTP Error:", e, url
+            print("HTTP Error:", e, url)
         raise
-    except urllib2.URLError, e:
-        print 'Error while fetching file %s.' \
-            ' Dataset fetching aborted.' % file_name
+    except urllib2.URLError as e:
+        print('Error while fetching file %s.' \
+            ' Dataset fetching aborted.' % file_name)
         if verbose > 0:
-            print "URL Error:", e, url
+            print("URL Error:", e, url)
         raise
     finally:
         if local_file is not None:
