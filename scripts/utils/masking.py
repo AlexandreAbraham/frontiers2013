@@ -3,6 +3,7 @@ Utilities to compute a brain mask from EPI images
 """
 # Author: Gael Varoquaux, Alexandre Abraham, Philippe Gervais
 # License: simplified BSD
+
 import numpy as np
 from scipy import ndimage
 import nibabel
@@ -46,7 +47,7 @@ def apply_mask(niimgs, mask_img, dtype=np.float32,
     values would spread accross the image.
     """
 
-    if isinstance(mask_img, basestring):
+    if isinstance(mask_img, str):
         mask_img = nibabel.load(mask_img)
     mask_data = mask_img.get_data().astype(bool)
     mask_affine = mask_img.get_affine()
@@ -54,7 +55,7 @@ def apply_mask(niimgs, mask_img, dtype=np.float32,
     if smoothing_fwhm is not None:
         ensure_finite = True
 
-    if isinstance(niimgs, basestring):
+    if isinstance(niimgs, str):
         niimgs = nibabel.load(niimgs)
     affine = niimgs.get_affine()[:3, :3]
 
@@ -153,7 +154,7 @@ def unmask(X, mask_img, order="C"):
         3D mask array: True where a voxel should be used.
     """
 
-    if isinstance(mask_img, basestring):
+    if isinstance(mask_img, str):
         mask_img = nibabel.load(mask_img)
     mask_data = mask_img.get_data().astype(bool)
 
